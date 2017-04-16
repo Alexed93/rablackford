@@ -8,10 +8,10 @@ require './config/slack'
 # Setup WordPress
 ############################################
 
-set :wp_user, "yourname" # The admin username
-set :wp_email, "yourname@example.com" # The admin email address
-set :wp_sitename, "WP Deploy" # The site title
-set :wp_localurl, "http://wpdeploy" # Your local environment URL
+set :wp_user, "alexeddesign@gmail.com" # The admin username
+set :wp_email, "alexeddesign@gmail.com" # The admin email address
+set :wp_sitename, "RA Blackford" # The site title
+set :wp_localurl, "http://rablackford.dev" # Your local environment URL
 
 ############################################
 # Setup project
