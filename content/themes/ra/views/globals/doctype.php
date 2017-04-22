@@ -26,22 +26,26 @@
 
     <!-- Titles/Descriptions -->
     <title><?php wp_title( '', true, 'right' ); ?><?php echo ! is_front_page() ? '| ' . bloginfo( 'name' ) : ''; ?></title>
+
     <link rel="canonical" href="<?php echo get_bloginfo('url'); ?>" />
 
     <!-- Favicons -->
-    <?php get_template_part( 'parts/favicons' ); ?>
+    <?php get_template_part( 'views/globals/favicons' ); ?>
 
     <!-- Styles -->
     <!--[if IE 9]><!-->
-    <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/css/styles.css">
+    <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/css/styles.css">
     <!--<![endif]-->
 
     <!--[if lte IE 8]>
-        <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/css/ie.css" media="screen">
+        <link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/css/ie.css" media="screen">
     <![endif]-->
 
     <!-- @font-face declarations -->
     <link href='http://fonts.googleapis.com/css?family=Open+Sans:400,400italic,700' rel='stylesheet' type='text/css'>
+
+    <!-- Scripts -->
+    <noscript><link href="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/grunticon/icons.fallback.css" rel="stylesheet"></noscript>
 
     <!-- wp_head -->
     <?php wp_head(); ?>

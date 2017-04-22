@@ -161,8 +161,8 @@ module.exports = function( grunt ) {
         browserSync: {
             bsFiles: {
                 src : [
-                    '<%= dirs.assets_input %>/css/*.css',
-                    '<%= dirs.assets_input %>/js/*.js',
+                    '<%= dirs.assets_output %>/css/*.css',
+                    '<%= dirs.assets_output %>/js/*.js',
                     '**/*.php',
                     '**/*.html',
                     '**/*.htm'
