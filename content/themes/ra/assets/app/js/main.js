@@ -18,9 +18,35 @@
 (function($) {
 
     /**
+     * Set variable to pool DOM only once.
+     */
+    var html = $('html');
+    var body = $('body');
+    var toggleNav = $('.toggle__icon--nav');
+
+    /**
      * Setup 'CustomSelect' plugin on all Select elements
      */
     if(!$('html').hasClass('ie')) {
+        $("select").each(function() {
+            new CustomSelect($(this));
+        });
+    }
+
+    /**
+     * Toggle the navigation
+     */
+    $('.js-toggle-nav').on('click', function() {
+        // 1. Toggle the Nav
+        body.toggleClass('is-active-nav');
+
+        // 2. Toggle Icons to show whether Nav is active or not
+        toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
+    });
+    /**
+     * Setup 'CustomSelect' plugin on all Select elements
+     */
+    if(!html.hasClass('ie')) {
         $("select").each(function() {
             new CustomSelect($(this));
         });

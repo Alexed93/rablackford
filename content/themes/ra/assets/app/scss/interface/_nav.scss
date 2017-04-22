@@ -25,6 +25,7 @@ $color-nav: $color-link;
 \*----------------------------------------------------------------*/
 
 .nav-container {
+    position: relative;
 }
 
 
@@ -38,9 +39,35 @@ $color-nav: $color-link;
 }
 
 .nav__item {
+    margin-bottom: 0;
+
+    @include respond-min($bp3) {
+        display: inline-block;
+        margin-left: $base;
+
+        &:first-child {
+            margin-left: 0;
+        }
+
+        &.is-current .nav__link {
+            color: $color-brand-secondary;
+        }
+    }
 }
 
 .nav__link {
+    display: block;
+    padding: $base*0.4 $base;
+    color: $white;
+    transition: color .3s;
+
+    @include respond-min($bp3) {
+        padding: 0;
+    }
+
+    &:hover, &:focus {
+        color: $color-brand-secondary;
+    }
 }
 
 
@@ -49,6 +76,23 @@ $color-nav: $color-link;
 \*----------------------------------------------------------------*/
 
 .nav--primary {
+    font-size: 1.2rem;
+
+    @include respond-min($bp3) {
+        margin-top: $base*2.14;
+        font-size: 1.1666666rem;
+
+        .nav__link {
+            // &:hover {
+            //     color: $color-brand-secondary;
+            // }
+        }
+    }
+
+    @include respond-min($bp4) {
+        margin-top: $base*1.325;
+        font-size: 1.555555rem;
+    }
 }
 
 
@@ -57,6 +101,25 @@ $color-nav: $color-link;
 \*----------------------------------------------------------------*/
 
 .nav--secondary {
+    .nav__link {
+        font-size: 1.2rem;
+    }
+
+    @include respond-min($bp3) {
+        position: absolute;
+        top: 0;
+        right: 0;
+
+        .nav__item.is-current {
+            .nav__link {
+                color: $color-brand-secondary;
+            }
+        }
+
+        .nav__link {
+            font-size: $base;
+        }
+    }
 }
 
 

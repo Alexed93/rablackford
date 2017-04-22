@@ -57,6 +57,15 @@ input[type="submit"],
     @include btn($white, $grey);
 }
 
+.btn--white {
+    @include btn($color-brand-primary, $white);
+}
+
+.btn--bordered-white {
+    @include btn($white, transparent, $color-brand-secondary, $white);
+    border: solid 1px $white;
+}
+
 .btn--secondary {}
 .btn--tertiary {}
 .btn--invert {}

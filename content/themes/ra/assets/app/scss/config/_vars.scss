@@ -38,15 +38,15 @@ $black:               #000000;
 
 /* shades */
 $grey:                #888888;
-$grey-dark:           #252525;
+$grey-dark:           #505050;
 $grey-light:          #CCCCCC;
 $grey-lighter:        #F1F1F1;
 
 /* primary */
-$blue:                #005994;
+$blue:                #E8F0FF;
 $red:                 #D62323;
 $green:               #34AB00;
-$yellow:              #1B49BE;
+$yellow:              #ffff00;
 
 /* secondary */
 $blue-light:          #28AAE1;
@@ -58,13 +58,11 @@ $blue-light:          #28AAE1;
 /* shades */
 $color-text:          $grey-dark;
 $color-background:    $white;
-$color-link:          $blue-light;
+$color-link:          #59863A;
 
 /* palette */
-$color-brand-blue:    $blue;
-$color-brand-red:     $red;
-$color-brand-green:   $green;
-$color-brand-yellow:  $yellow;
+$color-brand-primary:    #72AA4B;
+$color-brand-secondary:     #FFFF00;
 
 /* states */
 $color-success:       #2ECC71;
@@ -75,11 +73,11 @@ $color-error:         #E74C3C;
 /* $. Typography
 \*----------------------------------------------------------------*/
 
-$font: Corbel, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans-serif;
+$font: "proxima-nova", “Helvetica Neue”, Helvetica, Arial, sans-serif;
 
 $weight-normal:  300;
 $weight-medium:  500;
-$weight-bold:    700;
+$weight-semi-bold: 600;
 
 
 

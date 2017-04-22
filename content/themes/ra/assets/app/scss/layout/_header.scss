@@ -21,6 +21,11 @@
 .header {
     @extend %cf;
     position: relative;
+    background: $color-brand-primary;
+
+    @include respond-min($bp3) {
+        padding: $base*1.5 0;
+    }
 }
 
 
@@ -28,6 +33,33 @@
 \*----------------------------------------------------------------*/
 
 .header__logo {
+    float: left;
+
+    h1 {
+        color: $white;
+    }
+
+    p {
+        color: $color-brand-secondary;
+    }
+
+    // img {
+    //     width: 162px;
+    //     padding: $base/2;
+    // }
+
+    @include respond-min($bp1) {
+        // img {
+        //     width: 190px;
+        // }
+    }
+
+    @include respond-min($bp3) {
+        // img {
+        //     width: 217px;
+        //     padding: 0;
+        // }
+    }
 }
 
 
@@ -35,7 +67,22 @@
 \*----------------------------------------------------------------*/
 
 .header__nav {
+    clear: both;
+    display: none;
+    position: relative;
+    z-index: $z-index-2;
+    background-color: $color-brand-primary;
+
+    @include respond-min($bp3) {
+        display:block;
+        clear: none;
+        float: right;
+        text-align: right;
+        background-color: transparent;
+    }
+
     .is-active-nav & {
+        display: block;
     }
 }
 
@@ -45,7 +92,11 @@
 \*----------------------------------------------------------------*/
 
 .header__toggle {
+    display: block;
+    float: right;
+
     @include respond-min($bp3) {
+        display: none;
     }
 }
 
