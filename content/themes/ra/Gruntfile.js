@@ -15,6 +15,7 @@ module.exports = function( grunt ) {
     grunt.loadNpmTasks( 'grunt-svgmin' );
     grunt.loadNpmTasks( 'grunt-grunticon' );
     grunt.loadNpmTasks( 'grunt-sass' );
+    grunt.loadNpmTasks( 'grunt-browser-sync' );
 
     // Keep directories in variable for easy changes and CMS integration
     var dirs = {
@@ -156,6 +157,23 @@ module.exports = function( grunt ) {
             }
         },
 
+        // Browsersync
+        browserSync: {
+            bsFiles: {
+                src : [
+                    '<%= dirs.assets_input %>/css/*.css',
+                    '<%= dirs.assets_input %>/js/*.js',
+                    '**/*.php',
+                    '**/*.html',
+                    '**/*.htm'
+                ]
+            },
+            options: {
+                watchTask: true,
+                proxy: 'rablackford.dev'
+            }
+        },
+
         // Watch Task
         watch: {
             scripts: {
@@ -207,6 +225,14 @@ module.exports = function( grunt ) {
             'pixrem',
             'postcss',
             'uglify'
+        ]
+    );
+
+    grunt.registerTask(
+        'bs',
+        [
+            'browserSync',
+            'watch'
         ]
     );
 
