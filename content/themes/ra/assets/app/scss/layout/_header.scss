@@ -21,7 +21,12 @@
 .header {
     @extend %cf;
     position: relative;
+    padding: $base/2 0;
     background: $color-brand-primary;
+
+    @include respond-min($bp2) {
+        padding: $base 0;
+    }
 
     @include respond-min($bp3) {
         padding: $base*1.5 0;
@@ -70,14 +75,14 @@
     clear: both;
     display: none;
     position: relative;
-    z-index: $z-index-2;
+    text-align: right;
     background-color: $color-brand-primary;
+    z-index: $z-index-2;
 
     @include respond-min($bp3) {
         display:block;
         clear: none;
         float: right;
-        text-align: right;
         background-color: transparent;
     }
 
@@ -94,6 +99,8 @@
 .header__toggle {
     display: block;
     float: right;
+    padding: 1em 1.5em;
+    background: lighten($color-brand-primary, 10%);
 
     @include respond-min($bp3) {
         display: none;
