@@ -17,7 +17,7 @@
 <a href="#navigation" class="is-hidden">Skip to Navigation</a>
 
 <header class="header">
-    <div class="container">
+    <div class="container cf">
         <a href="/" class="logo | header__logo">
             <span class="is-hidden"><?php bloginfo( 'name' ); ?></span>
             <h1 class="alpha u-weight-semi-bold | u-zero-bottom">R.A BLACKFORD</h1>

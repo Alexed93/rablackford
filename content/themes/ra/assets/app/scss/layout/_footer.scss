@@ -16,6 +16,8 @@
 
 .footer {
     @extend %cf;
+    padding: $base 0;
+    border-top: 3px solid $grey-lighter;
 }
 
 .footer__logo {
