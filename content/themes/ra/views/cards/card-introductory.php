@@ -16,10 +16,16 @@ $card_image = get_field('cardintro_image');
 
 ?>
 
-<div class="card cf">
+<div class="card card__introductory cf">
     <div class="card__content">
-        <h1 class="beta"><?php echo $card_title; ?></h1>
-        <p><?php echo $card_text; ?></p>
+        <?php if( $card_title ): ?>
+            <h1 class="beta"><?php echo $card_title; ?></h1>
+        <?php endif; ?>
+        <?php if( $card_text ): ?>
+            <p><?php echo $card_text; ?></p>
+        <?php endif; ?>
     </div>
-    <div class="card__image" style="background-image: url('<?php echo $card_image['sizes']['large']; ?>')"></div>
+    <?php if( $card_image ): ?>
+        <div class="card__image" style="background-image: url('<?php echo $card_image['sizes']['large']; ?>')"></div>
+    <?php endif; ?>
 </div>

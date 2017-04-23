@@ -12,13 +12,22 @@
 
 /* $. Base
 \*----------------------------------------------------------------*/
+$grid-space: 1.12em;
+
+.cards {
+    @include respond-min($bp2) {
+        margin: $grid-space 0;
+    }
+}
 
 .card {
     background: $grey-light;
     padding: $base;
+    margin-bottom: $grid-space;
 
     @include respond-min($bp2) {
         padding: 1.7em;
+
     }
 }
 
@@ -36,14 +45,38 @@
         font-weight: $weight-medium;
         margin-bottom: $base/4;
     }
+}
 
+.card-list {
+    margin: 0;
+    overflow: hidden;
+}
+
+.card-list__item {
+    float: left;
+    margin-bottom: 0;
+    font-size: 1.3rem;
+    line-height: 2.25rem;
+
+    &:before {
+        margin-right: $base/2;
+        color: $color-link;
+        font-weight: $weight-semi-bold;
+        content: "\003e";
+    }
+}
+
+/* $. Variations
+\*----------------------------------------------------------------*/
+
+.card__introductory .card__content {
     @include respond-min($bp3) {
         width: calc(50% - 1em);
         float: left;
     }
 }
 
-.card__image {
+.card__introductory .card__image {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -56,5 +89,6 @@
     }
 }
 
-/* $. Variations
-\*----------------------------------------------------------------*/
+.card-list__item--double {
+    width: 50%;
+}
