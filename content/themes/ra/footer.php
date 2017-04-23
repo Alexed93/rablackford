@@ -38,5 +38,3 @@ $facebook = get_field('facebook', 'options');
 
 </body>
 </html>
-
-<link rel="stylesheet" href="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/css/styles.css">

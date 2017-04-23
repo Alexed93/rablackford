@@ -30,7 +30,7 @@ $intro_para = get_field('intro_para');
         </div>
     </div>
 
-    <!---                         Add illustration in here                         -->
+    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/illustration.png" title="RA Blackford and son" alt="RA Blackford and son" class="u-push-bottom@2">
 
     <div class="container">
         <?php get_template_part( 'views/cards/card-introductory' ); ?>
