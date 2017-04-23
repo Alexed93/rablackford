@@ -31,7 +31,7 @@ $gr-grid-centered: "grid--centered";        // Centers the entire Grid, which gr
 $gr-item-centered: "grid__item--centered";  // Center an individual item, rather than all items.
 
 // Sizing
-$gr-gutter: 1em;                            // The size between each grid item. Can use any CSS unit of measurement.
+$gr-gutter: 1.12em;                            // The size between each grid item. Can use any CSS unit of measurement.
 
 // Grid Alignment
 $gr-grid-direction: inherit;                // Initial direction of the $gr-grid
@@ -73,3 +73,18 @@ $gr-item-align-y: top;                      // Initial vertical alignment of the
     @include groot(12 5, "bp5");
 }
 
+/* $. Flex extension
+\*----------------------------------------------------------------*/
+
+.test--flexbox {
+
+    .grid--flex {
+        display: flex;
+        flex-wrap: wrap;
+
+        .grid__item {
+            display: flex;
+        }
+    }
+
+}

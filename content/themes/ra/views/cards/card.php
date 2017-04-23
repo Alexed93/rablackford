@@ -15,8 +15,8 @@ $children = ra_get_pages(5);
 
 ?>
 
-<div class="cards">
-    <div class="grid">
+<div class="cards test--flexbox">
+    <div class="grid grid--flex">
         <?php if ( $children->have_posts() ): ?>
             <?php while ( $children->have_posts() ): ?>
                 <div class="grid__item grid__item--6-12-bp2">

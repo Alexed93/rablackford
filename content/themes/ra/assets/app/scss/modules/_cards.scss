@@ -12,7 +12,7 @@
 
 /* $. Base
 \*----------------------------------------------------------------*/
-$grid-space: 1.12em;
+$grid-space: .9em;
 
 .cards {
     @include respond-min($bp2) {
@@ -21,13 +21,13 @@ $grid-space: 1.12em;
 }
 
 .card {
-    background: $grey-light;
+    width: 100%;
     padding: $base;
     margin-bottom: $grid-space;
+    background: $grey-light;
 
     @include respond-min($bp2) {
         padding: 1.7em;
-
     }
 }
 
