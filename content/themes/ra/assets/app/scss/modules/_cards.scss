@@ -16,7 +16,7 @@ $grid-space: .9em;
 
 .cards {
     @include respond-min($bp2) {
-        margin: $grid-space 0;
+        margin: $grid-space 0 0;
     }
 }
 
@@ -66,17 +66,21 @@ $grid-space: .9em;
     }
 }
 
+.card-list__item--double {
+    width: 50%;
+}
+
 /* $. Variations
 \*----------------------------------------------------------------*/
 
-.card__introductory .card__content {
+.card--introductory .card__content {
     @include respond-min($bp3) {
         width: calc(50% - 1em);
         float: left;
     }
 }
 
-.card__introductory .card__image {
+.card--introductory .card__image {
     background-position: center center;
     background-repeat: no-repeat;
     background-size: cover;
@@ -89,6 +93,17 @@ $grid-space: .9em;
     }
 }
 
-.card-list__item--double {
-    width: 50%;
+.card--featured {
+    background: $blue-light;
+}
+
+.card--featured .card__content {
+    h1 {
+        font-weight: $weight-semi-bold;
+    }
+
+    @include respond-min($bp3) {
+        width: 75%;
+        margin: 0 auto;
+    }
 }

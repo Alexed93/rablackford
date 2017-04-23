@@ -16,7 +16,7 @@ $card_image = get_field('cardintro_image');
 
 ?>
 
-<div class="card card__introductory cf">
+<div class="card card--introductory cf">
     <div class="card__content">
         <?php if( $card_title ): ?>
             <h1 class="beta"><?php echo $card_title; ?></h1>
