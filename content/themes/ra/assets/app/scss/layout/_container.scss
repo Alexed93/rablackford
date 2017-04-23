@@ -27,7 +27,7 @@
 /* $. Custom
 \*----------------------------------------------------------------*/
 .container--introduction {
-    @include respond-min($bp2) {
+    @include respond-min($bp3) {
         width: 60%;
     }
 }

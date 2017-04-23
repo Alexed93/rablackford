@@ -29,7 +29,14 @@ $intro_para = get_field('intro_para');
             <p class="gamma"><?php echo $intro_para; ?></p>
         </div>
     </div>
-    <!-- .container -->
+
+    <!---                         Add illustration in here                         -->
+
+    <div class="container">
+        <?php get_template_part( 'views/cards/card-introductory' ); ?>
+        <?php get_template_part( 'views/cards/card' ); ?>
+        <?php get_template_part( 'views/cards/card-featured' ); ?>
+    </div>
 </main>
 
 <?php get_footer(); ?>

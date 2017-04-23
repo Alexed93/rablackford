@@ -1,0 +1,60 @@
+/**
+ * Title:
+ *    Cards
+ * Description:
+ *    Responsible for all sizes and styling of card elements
+ * Sections:
+ *    $. Base
+ *    $. Variations
+ *
+ */
+
+
+/* $. Base
+\*----------------------------------------------------------------*/
+
+.card {
+    background: $grey-light;
+    padding: $base;
+
+    @include respond-min($bp2) {
+        padding: 1.7em;
+    }
+}
+
+.card, .card__image {
+    border-radius: 10px;
+}
+
+
+
+/* $. Elements
+\*----------------------------------------------------------------*/
+
+.card__content {
+    h1 {
+        font-weight: $weight-medium;
+        margin-bottom: $base/4;
+    }
+
+    @include respond-min($bp3) {
+        width: calc(50% - 1em);
+        float: left;
+    }
+}
+
+.card__image {
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    height: 280px;
+
+    @include respond-min($bp3) {
+        width: calc(50% - 3em);
+        float: right;
+        height: 280px;
+    }
+}
+
+/* $. Variations
+\*----------------------------------------------------------------*/
