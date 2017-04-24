@@ -11,7 +11,14 @@
  */
 
 // Get children
-$children = ra_get_pages(5);
+$children = '';
+
+if ( is_page(5) || is_front_page() ):
+    $children = ra_get_pages(5);
+else:
+    $children = ra_get_pages($post->ID);
+endif;
+
 $card_title_style = '';
 
 if ( !is_page_template('tpl-section-A.php', 'tpl-section-B.php') ):
