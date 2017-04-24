@@ -26,7 +26,7 @@ $intro_para = get_field('intro_para');
     <div class="container">
         <div class="container--introduction">
             <h1 class="headline"><?php echo $intro_title; ?></h1>
-            <p class="gamma"><?php echo $intro_para; ?></p>
+            <p class="introduction_text"><?php echo $intro_para; ?></p>
         </div>
     </div>
 

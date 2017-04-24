@@ -40,10 +40,12 @@ $color-nav: $color-link;
 
 .nav__item {
     margin-bottom: 0;
+    border-top: 2px solid darken($color-brand-primary, 2%);
 
     @include respond-min($bp3) {
         display: inline-block;
         margin-left: $base;
+        border-top: none;
 
         &:first-child {
             margin-left: 0;
@@ -57,7 +59,7 @@ $color-nav: $color-link;
 
 .nav__link {
     display: block;
-    padding: $base*0.4 $base;
+    padding: $base*0.4 $base/4;
     color: $white;
     transition: color .3s;
 
@@ -76,7 +78,7 @@ $color-nav: $color-link;
 \*----------------------------------------------------------------*/
 
 .nav--primary {
-    font-size: 1.2rem;
+    font-size: 1.4rem;
 
     @include respond-min($bp3) {
         margin-top: $base*2.14;
@@ -95,29 +97,30 @@ $color-nav: $color-link;
     }
 }
 
+.nav--primary .nav__item {
+    &:first-child {
+        border-top: 0;
+    }
+}
+
 
 
 /* $. Secondary
 \*----------------------------------------------------------------*/
 
 .nav--secondary {
-    .nav__link {
-        font-size: 1.2rem;
-    }
+    font-size: 1.2rem;
 
     @include respond-min($bp3) {
         position: absolute;
         top: 0;
         right: 0;
+        font-size: $base;
 
         .nav__item.is-current {
             .nav__link {
                 color: $color-brand-secondary;
             }
-        }
-
-        .nav__link {
-            font-size: $base;
         }
     }
 }

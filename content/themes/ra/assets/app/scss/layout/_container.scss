@@ -43,7 +43,7 @@
     position: relative;
     width: 100%;
 
-    @include respond-min($bp3) {
+    @include respond-min($bp2) {
         width: 85%;
     }
 }
