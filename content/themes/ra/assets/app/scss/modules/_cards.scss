@@ -24,7 +24,6 @@ $grid-space: .9em;
     width: 100%;
     padding: $base;
     margin-bottom: $grid-space;
-    background: $grey-light;
 
     @include respond-min($bp2) {
         padding: 1.7em;
@@ -57,17 +56,19 @@ $grid-space: .9em;
     margin-bottom: 0;
     font-size: 1.3rem;
     line-height: 2.25rem;
+}
 
+.card-list__item--double {
+    width: 50%;
+}
+
+.card-list__item, .card__title {
     &:before {
         margin-right: $base/2;
         color: $color-link;
         font-weight: $weight-semi-bold;
         content: "\003e";
     }
-}
-
-.card-list__item--double {
-    width: 50%;
 }
 
 /* $. Variations
@@ -94,6 +95,7 @@ $grid-space: .9em;
 }
 
 .card--featured {
+    margin-bottom: 0;
     background: $blue-light;
 }
 
@@ -106,4 +108,12 @@ $grid-space: .9em;
         width: 75%;
         margin: 0 auto;
     }
+}
+
+.card--grey {
+    background: $grey-light;
+}
+
+.card--green {
+    background: #D3EAC4;
 }

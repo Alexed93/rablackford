@@ -14,9 +14,17 @@ $card_title = get_field('cardintro_title');
 $card_text = get_field('cardintro_text');
 $card_image = get_field('cardintro_image');
 
+$background = '';
+
+if ( is_front_page() ):
+    $background = 'card--grey';
+else:
+    $background = 'card--green';
+endif;
+
 ?>
 
-<div class="card card--introductory cf">
+<div class="card card--introductory cf | <?php echo $background; ?>">
     <div class="card__content">
         <?php if( $card_title ): ?>
             <h1 class="beta"><?php echo $card_title; ?></h1>
