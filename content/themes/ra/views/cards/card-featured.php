@@ -17,16 +17,18 @@ $card_btnlink = get_field('cardfeatured_link', 'options');
 
 ?>
 
-<div class="card card--featured | u-align-center">
-    <div class="card__content">
-        <?php if( $card_title ): ?>
-            <h1 class="beta"><?php echo $card_title; ?></h1>
-        <?php endif; ?>
-        <?php if( $card_text ): ?>
-            <p><?php echo $card_text; ?></p>
-        <?php endif; ?>
-        <a href="<?php echo $card_btnlink; ?>" class="btn btn--primary">
-            <?php echo $card_btn; ?>
-        </a>
+<?php if ( $card_title ): ?>
+    <div class="card card--featured | u-align-center">
+        <div class="card__content">
+            <?php if( $card_title ): ?>
+                <h1 class="beta"><?php echo $card_title; ?></h1>
+            <?php endif; ?>
+            <?php if( $card_text ): ?>
+                <p><?php echo $card_text; ?></p>
+            <?php endif; ?>
+            <a href="<?php echo $card_btnlink; ?>" class="btn btn--primary">
+                <?php echo $card_btn; ?>
+            </a>
+        </div>
     </div>
-</div>
+<?php endif; ?>
