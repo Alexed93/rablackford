@@ -40,6 +40,8 @@ $grid-space: .9em;
 \*----------------------------------------------------------------*/
 
 .card__content {
+    // position: relative;
+
     h1 {
         font-weight: $weight-medium;
         margin-bottom: $base/4;
@@ -47,6 +49,8 @@ $grid-space: .9em;
 }
 
 .card-list {
+    // position: absolute;
+    // bottom: 0;
     margin: 0;
     overflow: hidden;
 }
