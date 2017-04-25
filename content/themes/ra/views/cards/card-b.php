@@ -24,7 +24,11 @@ $children = ra_get_pages($post->ID);
                     <article class="card card--grey">
                         <div class="card__content">
                             <a href="<?php echo get_permalink(); ?>" class="u-display-inline"><h1 class="card__title beta"><?php echo the_title(); ?></h1></a>
-                            <p class="u-zero-bottom"><?php echo get_the_excerpt($id); ?></p>
+                            <?php
+                                $permalink = get_permalink();
+                                $pageid = url_to_postid( $permalink );
+                            ?>
+                            <p class="u-zero-bottom"><?php echo ra_get_excerpt_by_id($pageid); ?></p>
                         </div>
                     </article>
                 </div>
