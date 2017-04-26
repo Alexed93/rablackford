@@ -1,10 +1,6 @@
 figure {
     margin: 0;
 }
-.gform_wrapper .gform_footer {
-    margin-top: 0 !important;
-    padding: 0 !important;
-}
 
 .gmap {
     margin: $base*2 0;
@@ -13,4 +9,37 @@ figure {
         padding-top: $base*2;
         border-top: 3px solid $grey-lighter !important;
     }
+}
+
+/* $. Gravity form
+\*----------------------------------------------------------------*/
+
+
+.gform_wrapper .gfield_required {
+    color: $color-text !important;
+    font-size: 1.2rem;
+}
+
+.gform_wrapper input,
+.gform_wrapper select,
+.gform_wrapper textarea {
+    padding: $base/2 !important;
+    width: 100% !important;
+    border: 1px solid #B2B2B2;
+
+    &:hover, &:active, &:focus {
+        border: 1px solid $color-brand-primary;
+    }
+}
+
+.gform_wrapper textarea {
+    height: 160px !important;
+}
+
+.gform_wrapperm, .gform_wrapper .gform_footer {
+    margin: 0 !important;
+}
+
+#field_1_1 label.gfield_label {
+    margin-top: 0 !important;
 }
