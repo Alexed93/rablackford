@@ -1,3 +1,5 @@
+.icon--address { background-image: url('png/address.png'); background-repeat: no-repeat; }
+
 .icon--faacebook { background-image: url('png/faacebook.png'); background-repeat: no-repeat; }
 
 .icon--facebook { background-image: url('png/facebook.png'); background-repeat: no-repeat; }
@@ -6,6 +8,8 @@
 
 .icon--logo-mixd { background-image: url('png/logo-mixd.png'); background-repeat: no-repeat; }
 
+.icon--mail { background-image: url('png/mail.png'); background-repeat: no-repeat; }
+
 .icon--menu-close copy { background-image: url('png/menu-close copy.png'); background-repeat: no-repeat; }
 
 .icon--menu-close { background-image: url('png/menu-close.png'); background-repeat: no-repeat; }
@@ -13,6 +17,8 @@
 .icon--menu-open copy { background-image: url('png/menu-open copy.png'); background-repeat: no-repeat; }
 
 .icon--menu-open { background-image: url('png/menu-open.png'); background-repeat: no-repeat; }
+
+.icon--phone { background-image: url('png/phone.png'); background-repeat: no-repeat; }
 
 .icon--select { background-image: url('png/select.png'); background-repeat: no-repeat; }
 

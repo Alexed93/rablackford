@@ -13,10 +13,10 @@
 \*----------------------------------------------------------------*/
 
 .content {
-    max-width: 850px;
+    max-width: 775px;
 
     > *:last-child {
-        margin-bottom: 0;
+        margin-bottom: $base;
     }
 
     a:not(.btn) {

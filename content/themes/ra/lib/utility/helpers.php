@@ -43,3 +43,14 @@ function ra_get_excerpt_by_id ( $id ) {
     return $excerpt;
 }
 
+/**
+ * Create properly formatted tel: links
+ * $input = <p>(01423) 598 008</p>
+ * $output = 01423598008
+ */
+function ra_format_tel($text){
+    $exp = "/[^0-9]/";
+    $text = preg_replace($exp, '', strip_tags($text));
+    return $text;
+}
+

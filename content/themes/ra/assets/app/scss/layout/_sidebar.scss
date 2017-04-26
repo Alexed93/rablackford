@@ -24,9 +24,12 @@
 .sidebar__section {
     @extend .panel;
     @extend .panel--grey;
+    margin-bottom: $base;
+    padding: $base;
 }
 
 .sidebar__heading {
+    margin-bottom: $base/4;
 }
 
 .sidebar__list {
