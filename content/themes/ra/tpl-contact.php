@@ -42,7 +42,7 @@ endif;
                     </div>
                     <?php the_content(); ?>
                     <?php if($addr): ?>
-                        <figure class="flexible | u-push-bottom">
+                        <figure class="flexible gmap | u-push-bottom">
                             <iframe height="250" width="500" src="https://maps.google.it/maps?q=<?php echo urlencode($addr); ?>&output=embed" style="border:0;" frameborder="0" webkitAllowFullScreen mozallowfullscreen allowFullScreen></iframe>
                         </figure>
                     <?php endif; ?>

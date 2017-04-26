@@ -43,7 +43,7 @@ add_filter( 'gform_validation_message', 'ra_update_validation_message', 10, 2 );
 
 // Update the Form submit button
 function ra_gforms_submit_button( $btn, $form ){
-    $output  = '<button type="submit" class="btn btn--primary" id="gform_submit_button_' . $form['id'] . '">';
+    $output  = '<button type="submit" class="btn btn--contact" id="gform_submit_button_' . $form['id'] . '">';
     $output .= $form['button']['text'];
     $output .= '</button>';
 

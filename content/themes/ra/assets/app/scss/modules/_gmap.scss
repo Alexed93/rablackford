@@ -1,3 +1,16 @@
 figure {
     margin: 0;
 }
+.gform_wrapper .gform_footer {
+    margin-top: 0 !important;
+    padding: 0 !important;
+}
+
+.gmap {
+    margin: $base*2 0;
+
+    iframe {
+        padding-top: $base*2;
+        border-top: 3px solid $grey-lighter !important;
+    }
+}
