@@ -21,6 +21,7 @@
 
     @include respond-min($bp1) {
         width: 85%;
+        position: relative;
     }
 }
 
