@@ -42,8 +42,9 @@
     <![endif]-->
 
     <!-- @font-face declarations -->
-    <script src="https://use.typekit.net/zzx6zuo.js"></script>
-    <script>try{Typekit.load({ async: true });}catch(e){}</script>
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans" rel="stylesheet">
+    <!-- <script src="https://use.typekit.net/zzx6zuo.js"></script>
+    <script>try{Typekit.load({ async: true });}catch(e){}</script> -->
 
     <!-- Scripts -->
     <noscript><link href="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/grunticon/icons.fallback.css" rel="stylesheet"></noscript>

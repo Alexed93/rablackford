@@ -17,17 +17,16 @@ $pricing_tables = get_field( 'pricing_tables' );
 ?>
 
 <?php if( $pricing_tables ): ?>
-    <?php foreach( $pricing_tables as $pricing_table): ?>
+    <div class="table__container">
+        <h2>Pricing</h2>
 
-        <div class="table__container">
-            <h2><?php echo $pricing_table['table_title']; ?></h2>
+        <?php foreach( $pricing_tables as $pricing_table): ?>
+            <h3><?php echo $pricing_table['table_title']; ?></h3>
 
             <?php
                 $weight_row = $pricing_table['weight_row'];
             ?>
-
-
-            <table class="pricing">
+            <table class="pricing | u-push-bottom@2">
                 <tr class="pricing__toprow">
                     <th>Weight</th>
                     <th colspan="3">Price (£)</th>
@@ -69,9 +68,8 @@ $pricing_tables = get_field( 'pricing_tables' );
                     <?php endif; ?>
                 </tr>
             </table>
-        </div>
-
-    <?php endforeach; ?>
+        <?php endforeach; ?>
+    </div>
 <?php endif; ?>
 
 
