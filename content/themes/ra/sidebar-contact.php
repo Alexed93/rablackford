@@ -32,7 +32,7 @@ $c_addr  = count($address);
                 <span class="icon | icon--address icon--small"></span>
                 Address
             </h2>
-            <div class="content">
+            <div class="sidebar__content">
                 <?php foreach($address as $k => $i): ?>
                     <?php if($c_addr == ($k + 1) ): ?>
                         <?php echo $i['line']; ?>
@@ -50,7 +50,7 @@ $c_addr  = count($address);
                 <span class="icon | icon--phone icon--small"></span>
                 Phone
             </h2>
-            <div class="content">
+            <div class="sidebar__content">
                 <a href="tel:<?php echo ra_format_tel($phone); ?>"><span class="sidebar__list--underline"><?php echo $phone; ?></span></a>
             </div>
         </article>
@@ -62,7 +62,7 @@ $c_addr  = count($address);
                 <span class="icon | icon--mail icon--small"></span>
                 Email
             </h2>
-            <div class="content">
+            <div class="sidebar__content">
                 <a href="mailto:<?php echo antispambot($email); ?>"><span class="sidebar__list--underline"><?php echo antispambot($email); ?></span></a>
             </div>
         </article>

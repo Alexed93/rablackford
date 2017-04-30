@@ -13,12 +13,16 @@
 \*----------------------------------------------------------------*/
 
 .content {
-    max-width: 775px;
+    max-width: 850px;
 
-    > *:last-child {
-        margin-bottom: $base;
-    }
+    // > *:last-child {
+    //     margin-bottom: $base;
+    // }
 
     a:not(.btn) {
     }
 }
+
+// .body--introduction {
+//     width: 90%;
+// }

@@ -17,6 +17,8 @@ get_header();
 
 ?>
 
+<?php get_template_part( 'views/globals/breadcrumbs' ); ?>
+
 <main class="section">
     <div class="container">
         <?php if ( have_posts() ): ?>

@@ -1,0 +1,49 @@
+/**
+ * Title:
+ *    Pricing table
+ * Description:
+ *    Responsible for the styling of pricing tables
+ * Sections:
+ *
+ *
+ *
+ */
+
+.table__container {
+    margin-top: $base;
+    text-align: left;
+
+    @include respond-min($bp2) {
+        margin-top: $base*2;
+    }
+
+    @include respond-min($bp3) {
+       max-width: 60%;
+    }
+}
+
+// Reset
+
+.pricing {
+    td, th {
+        border: none;
+    }
+}
+
+.pricing__toprow th {
+    background: $color-brand-primary;
+    color: $white;
+    text-align: center;
+}
+
+.pricing__headers td {
+    font-weight: $weight-semi-bold;
+}
+
+.pricing__row th {
+    background: $grey-light;
+}
+
+.pricing__row:nth-child(even) th {
+    background: $white;
+}

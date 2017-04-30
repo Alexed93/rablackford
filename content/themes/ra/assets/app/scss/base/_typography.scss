@@ -13,7 +13,7 @@
 
 h1, h2, h3, h4, h5, h6 {
     margin-top: 0;
-    margin-bottom: $base;
+    margin-bottom: $base/2;
     line-height: 1;
 }
 
@@ -43,10 +43,12 @@ h1, .alpha {
 
 h2, .beta {
     font-size: 1.875rem;
+    font-weight: $weight-semi-bold;
 }
 
 h3, .gamma {
     font-size: 1.5rem;
+    font-weight: $weight-semi-bold;
 }
 
 h4, .delta {

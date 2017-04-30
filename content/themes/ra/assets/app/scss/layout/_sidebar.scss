@@ -14,6 +14,7 @@
 \*----------------------------------------------------------------*/
 
 .sidebar {
+    font-size: 1.2rem;
 }
 
 
@@ -33,4 +34,25 @@
 }
 
 .sidebar__list {
+    list-style: none;
+    margin: $base/2 0 0 0;
+
+    :last-of-type {
+        margin-bottom: 0;
+    }
+}
+
+.sidebar__list li {
+    margin-bottom: $base/4;
+
+    &:before {
+        margin-right: $base/2;
+        color: $color-link;
+        font-weight: $weight-semi-bold;
+        content: "\003e";
+    }
+}
+
+.sidebar__list li.is-current:before {
+    color: $color-text;
 }
