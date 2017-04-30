@@ -20,8 +20,8 @@ $tagline = get_field('tagline', 'options');
     <div class="container cf">
         <a href="/" class="logo | header__logo">
             <span class="is-hidden"><?php bloginfo( 'name' ); ?></span>
-            <h1 class="alpha u-weight-semi-bold | u-zero-bottom">R.A BLACKFORD</h1>
-            <p class="epsilon u-weight-medium | u-zero-bottom"><?php echo $tagline; ?></p>
+            <h1 class="u-weight-semi-bold | u-zero-bottom">R.A BLACKFORD</h1>
+            <p class="u-weight-medium | u-zero-bottom"><?php echo $tagline; ?></p>
         </a>
 
         <button class="toggle | js-toggle-nav | header__toggle header__toggle--nav" role="button" aria-label="Toggle navigation">

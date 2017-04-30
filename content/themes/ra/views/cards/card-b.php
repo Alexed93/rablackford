@@ -19,11 +19,11 @@ $children = ra_get_pages($post->ID);
     <div class="grid grid--flex">
         <?php if ( $children->have_posts() ): ?>
             <?php while ( $children->have_posts() ): ?>
-                <div class="grid__item grid__item--6-12-bp2">
+                <div class="grid__item grid__item--6-12-bp3">
                     <?php $children->the_post(); ?> <?php setup_postdata($children); ?>
                     <article class="card card--grey">
                         <div class="card__content">
-                            <a href="<?php echo get_permalink(); ?>" class="u-display-inline"><h1 class="card__title beta"><?php echo the_title(); ?></h1></a>
+                            <a href="<?php echo get_permalink(); ?>"><h1 class="card__title beta"><?php echo the_title(); ?></h1></a>
                             <?php
                                 $permalink = get_permalink();
                                 $pageid = url_to_postid( $permalink );

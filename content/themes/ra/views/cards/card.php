@@ -33,11 +33,11 @@ endif;
     <div class="grid grid--flex">
         <?php if ( $children->have_posts() ): ?>
             <?php while ( $children->have_posts() ): ?>
-                <div class="grid__item grid__item--6-12-bp2">
+                <div class="grid__item grid__item--6-12-bp3">
                     <?php $children->the_post(); ?> <?php setup_postdata($children); ?>
                     <article class="card card--grey">
                         <div class="card__content">
-                            <a href="<?php echo get_permalink(); ?>" class="u-display-inline"><h1 class="<?php echo $card_title_style; ?> beta"><?php echo the_title(); ?></h1></a>
+                            <a href="<?php echo get_permalink(); ?>"><h1 class="<?php echo $card_title_style; ?> beta"><?php echo the_title(); ?></h1></a>
 
                             <?php if ( !is_page_template('tpl-section-A.php') ): ?>
                                 <p><?php echo ra_get_excerpt_by_id($id); ?></p>
@@ -49,7 +49,7 @@ endif;
                                     <ul class="card-list">
                                         <?php while ( $grandchildren->have_posts() ): ?>
                                             <?php $grandchildren->the_post(); ?> <?php setup_postdata($grandchildren); ?>
-                                            <li class="card-list__item card-list__item--double | u-display-inline">
+                                            <li class="card-list__item card-list__item--double">
                                                 <a href="<?php echo get_permalink(); ?>" class="u-weight-medium"><?php echo the_title(); ?></a>
                                             </li>
                                          <?php endwhile; ?>
