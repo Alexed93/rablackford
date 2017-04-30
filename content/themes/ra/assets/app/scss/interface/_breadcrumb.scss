@@ -22,7 +22,7 @@
 
 .breadcrumbs {
     position: relative;
-    margin: 0;
+    padding-top: $base/2;
     font-size: .8rem;
 
     @include respond-min($bp3) {
