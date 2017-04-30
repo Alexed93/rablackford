@@ -43,6 +43,7 @@
         // 2. Toggle Icons to show whether Nav is active or not
         toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
     });
+
     /**
      * Setup 'CustomSelect' plugin on all Select elements
      */
@@ -51,6 +52,37 @@
             new CustomSelect($(this));
         });
     }
+
+    /**
+    * $. News Achive Accordion
+    */
+
+     var allPanels = $('.list--accordion .list__sub');
+     allPanels.hide();
+
+     $('.list__major').click(function() {
+       if( $(this).hasClass('is-active') ){
+           //closing
+           $(this).siblings('.list__sub').slideUp();
+
+           $(this).removeClass('is-active')
+               .addClass('sidebar__list--open')
+               .removeClass('sidebar__list--close');
+
+       } else {
+           //opening
+           $(this).addClass('sidebar__list--close')
+                   .addClass('is-active')
+                   .removeClass('sidebar__list--open');
+
+           $(this).siblings('.list__sub').slideDown();
+           allPanels.slideUp();
+
+       }
+
+       return false;
+
+     });
 
 })(jQuery);
 

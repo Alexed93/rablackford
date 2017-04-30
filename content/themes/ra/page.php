@@ -45,7 +45,7 @@ get_header();
                 </div> <!-- .grid -->
             <?php endwhile; ?>
         <?php else: ?>
-            <?php get_template_part( 'views/errors/404-posts' ); ?>
+            <?php get_template_part( 'views/errors/404-page' ); ?>
         <?php endif; ?>
     </div> <!-- .container -->
 </main>

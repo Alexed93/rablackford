@@ -54,3 +54,35 @@ function ra_format_tel($text){
     return $text;
 }
 
+function ra_term_links( $post_id, $taxonomy, $wrap = true ){
+    $terms = wp_get_object_terms($post_id, $taxonomy);
+    $str_output = '';
+
+    if(!is_wp_error($terms) && $terms ):
+        if ($wrap) {
+            $str_output .= '<ul class="list list--unset list--inline list--box">';
+        }
+
+        foreach($terms as $term):
+            if ($wrap) {
+                $str_output .= '<li class="zeta">';
+            }
+
+            $url = get_term_link($term , $taxonomy);
+            $str_output .= '<a href="'.$url.'">'.$term->name.'</a>';
+
+            if ($wrap) {
+                $str_output .= '</li>';
+            }
+
+        endforeach;
+
+        if ($wrap) {
+           $str_output .= '</ul>';
+        }
+
+    endif;
+
+    return $str_output;
+
+}

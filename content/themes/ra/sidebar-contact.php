@@ -2,7 +2,7 @@
 
 /**
  ***************************************************************************
- * Sidebar - Default
+ * Sidebar - Contact
  ***************************************************************************
  *
  * The sidebar is used to define any side-information to be presented

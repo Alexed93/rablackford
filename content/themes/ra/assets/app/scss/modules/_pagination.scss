@@ -1,0 +1,32 @@
+.pagination {
+    padding-top: $base;
+    font-size: 1.2rem;
+    border-top: 3px solid $grey-lighter;
+
+    @include respond-min($bp2) {
+        margin: 0;
+    }
+
+    .wp-pagenavi a, .wp-pagenavi span.current {
+        border: none;
+        padding: $base/4 $base/2;
+        background: lighten($color-brand-primary, 40%);
+    }
+
+    .wp-pagenavi span, .wp-pagenavi a {
+        margin: 0 $base/4 0 0;
+        transition: all .5s ease;
+
+        &:hover {
+            color: darken($color-link, 10%);
+        }
+    }
+
+    .wp-pagenavi span.current {
+        color: darken($color-link, 10%);
+    }
+
+    .pages, .nextpostslink, .previouspostslink {
+        display: none;
+    }
+}

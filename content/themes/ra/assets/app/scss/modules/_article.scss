@@ -1,0 +1,9 @@
+.article__body {
+    border-top: 3px solid $grey-lighter;
+    padding-top: $base;
+    margin-bottom: $base;
+
+    @include respond-min($bp2) {
+        margin-bottom: $base*2;
+    }
+}

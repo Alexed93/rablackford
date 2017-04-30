@@ -22,6 +22,7 @@
  ******************************************************************************/
 
 require_once( 'controllers/post-types/page.php' );
+require_once( 'controllers/post-types/post.php' );
 
 
 
