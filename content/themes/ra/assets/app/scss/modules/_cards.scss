@@ -52,9 +52,24 @@ $grid-space: .9em;
     }
 }
 
+.card__content--home {
+    @include respond-min($bp4) {
+        height: 100%;
+        position: relative;
+        padding-bottom: 4em;
+    }
+}
+
 .card-list {
+    width: 100%;
     margin: 0;
     overflow: hidden;
+
+    @include respond-min($bp4) {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+    }
 }
 
 .card-list__item {

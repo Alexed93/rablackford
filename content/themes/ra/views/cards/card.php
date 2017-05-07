@@ -27,6 +27,12 @@ else:
     $card_title_style = 'card__title';
 endif;
 
+$card_style = '';
+
+if ( is_front_page() ):
+    $card_style = 'card__content--home';
+endif;
+
 ?>
 
 <div class="cards test--flexbox">
@@ -36,7 +42,7 @@ endif;
                 <div class="grid__item grid__item--6-12-bp3">
                     <?php $children->the_post(); ?> <?php setup_postdata($children); ?>
                     <article class="card card--grey">
-                        <div class="card__content">
+                        <div class="card__content <?php echo $card_style; ?>">
                             <a href="<?php echo get_permalink(); ?>"><h1 class="<?php echo $card_title_style; ?> beta"><?php echo the_title(); ?></h1></a>
 
                             <?php if ( !is_page_template('tpl-section-A.php') ): ?>
