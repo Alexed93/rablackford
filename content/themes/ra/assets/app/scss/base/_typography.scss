@@ -43,12 +43,12 @@ h1, .alpha {
 
 h2, .beta {
     font-size: 1.875rem;
-    font-weight: $weight-semi-bold;
+    font-weight: $weight-medium;
 }
 
 h3, .gamma {
     font-size: 1.5rem;
-    font-weight: $weight-semi-bold;
+    font-weight: $weight-medium;
 }
 
 h4, .delta {
@@ -73,7 +73,7 @@ h6, .zeta {
 
 .headline {
     margin-bottom: $base/4;
-    font-weight: $weight-semi-bold;
+    font-weight: $weight-medium;
     font-size: 1.9rem;
 
     @include respond-min($bp2) {

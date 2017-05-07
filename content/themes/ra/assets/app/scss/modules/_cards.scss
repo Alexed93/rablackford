@@ -113,7 +113,7 @@ $grid-space: .9em;
 
 .card--featured .card__content {
     h1 {
-        font-weight: $weight-semi-bold;
+        //font-weight: $weight-semi-bold;
     }
 
     @include respond-min($bp3) {
