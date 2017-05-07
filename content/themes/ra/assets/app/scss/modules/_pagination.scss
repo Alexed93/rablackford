@@ -1,9 +1,10 @@
 .pagination {
     padding-top: $base;
+    margin-bottom: $base;
     font-size: 1.2rem;
     border-top: 3px solid $grey-lighter;
 
-    @include respond-min($bp2) {
+    @include respond-min($bp4) {
         margin: 0;
     }
 
