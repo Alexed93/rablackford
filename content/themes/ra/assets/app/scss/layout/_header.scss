@@ -39,19 +39,22 @@
 
 .header__logo {
     float: left;
+    padding-top: .25rem;
     z-index: 10;
 
     h1 {
-        font-size: 1.7rem;
+        font-size: 1.8rem;
         color: $white;
     }
 
     p {
-        font-size: .7rem;
+        font-size: .8rem;
         color: $color-brand-secondary;
     }
 
     @include respond-min($bp2) {
+        padding-top: 0;
+
         h1 {
             font-size: 2.25rem;
         }
