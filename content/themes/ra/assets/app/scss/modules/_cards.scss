@@ -53,10 +53,14 @@ $grid-space: .9em;
 }
 
 .card__content--home {
+    p {
+        margin-bottom: 0;
+    }
+
     @include respond-min($bp4) {
         height: 100%;
-        position: relative;
-        padding-bottom: 4em;
+        // position: relative;
+        // padding-bottom: 4em;
     }
 }
 
@@ -64,12 +68,13 @@ $grid-space: .9em;
     width: 100%;
     margin: 0;
     overflow: hidden;
+    margin-top: $base;
 
-    @include respond-min($bp4) {
-        position: absolute;
-        bottom: 0;
-        left: 0;
-    }
+    // @include respond-min($bp4) {
+    //     position: absolute;
+    //     bottom: 0;
+    //     left: 0;
+    // }
 }
 
 .card-list__item {
