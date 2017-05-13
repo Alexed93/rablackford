@@ -37,6 +37,10 @@
     list-style: none;
     margin: $base/2 0 0 0;
 
+    li.is-current, li.is-current a {
+        color: $color-text;
+    }
+
     :last-of-type {
         margin-bottom: 0;
     }
