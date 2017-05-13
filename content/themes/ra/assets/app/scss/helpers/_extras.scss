@@ -107,3 +107,21 @@
         display: none;
     }
 }
+
+.acm-home {
+    height: 75px;
+
+    @include respond-min($bp3) {
+        height: 100px
+    }
+}
+
+.home-intro {
+    margin-top: $base;
+
+    @include respond-min($bp2) {
+        width: 75%;
+        margin-left: $base;
+        margin-top: 0;
+    }
+}

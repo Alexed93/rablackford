@@ -27,11 +27,12 @@
 
 /* $. Custom
 \*----------------------------------------------------------------*/
-.container--introduction {
-    @include respond-min($bp3) {
-        width: 60%;
-    }
-}
+// .container--introduction {
+//     // width: 75%;
+//     // @include respond-min($bp3) {
+//     //     width: 60%;
+//     // }
+// }
 
 /* $. Modifications
 \*----------------------------------------------------------------*/
