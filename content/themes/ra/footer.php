@@ -4,7 +4,7 @@ $twitter = get_field('twitter', 'options');
 $facebook = get_field('facebook', 'options');
 
 ?>
-
+<?php get_template_part( 'views/globals/openhours' ); ?>
 <footer class="footer">
     <div class="container">
         <div class="grid">

@@ -23,6 +23,11 @@ $phone = get_field('phone_number', 'options');
  */
 $c_addr  = count($address);
 
+/**
+ * Count address lines
+ */
+$c_openh  = count($open_hours);
+
 ?>
 
 <aside class="sidebar" role="complementary">
