@@ -118,11 +118,16 @@
 
 .home-intro {
     margin-top: $base;
+    clear: both;
 
     @include respond-min($bp2) {
-        width: 75%;
-        margin-left: $base;
         margin-top: 0;
+    }
+
+    @include respond-min($bp3) {
+        float: left;
+        clear: none;
+        margin-left: $base;
     }
 }
 
@@ -135,4 +140,13 @@
 
 .celebration {
     max-height: 70px;
+}
+
+.celebration--home {
+    @include respond-min($bp2) {
+        max-height: 80px;
+    }
+    @include respond-min($bp3) {
+        max-height: 100px;
+    }
 }

@@ -27,7 +27,10 @@ $intro_para = get_field('intro_para');
         <a href="http://solidfuel.co.uk/approved-coal-wood-merchants/" class="u-float-left">
             <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/acm--large.png" title="Approved Coal Merchant" alt="Approved Coal Merchant" class="acm-home">
         </a>
-        <div class="home-intro u-float-left">
+        <a href="#" class="u-float-left">
+            <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/80years.png" title="Celebrating 80 years of business" alt="Celebrating 80 years of business" class="u-push-left/2 celebration celebration--home">
+        </a>
+        <div class="home-intro">
             <h1 class="headline"><?php echo $intro_title; ?></h1>
             <p class="introduction_text"><?php echo $intro_para; ?></p>
         </div>
