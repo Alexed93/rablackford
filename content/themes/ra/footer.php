@@ -13,10 +13,13 @@ $facebook = get_field('facebook', 'options');
                     <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/acm.png" title="Approved Coal Merchant" alt="Approved Coal Merchant">
                 </a>
                 <a href="https://www.rha.uk.net/">
-                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/rha.png" title="Road Haulage Association" alt="Road Haulage Association" class="u-push-left@2">
+                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/rha.png" title="Road Haulage Association" alt="Road Haulage Association" class="u-push-left">
                 </a>
                 <a href="https://www.fsb.org.uk/">
-                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/fsb.png" title="Federation of Small Businesses" alt="Federation of Small Businesses" class="u-push-left@2">
+                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/fsb.png" title="Federation of Small Businesses" alt="Federation of Small Businesses" class="u-push-left">
+                </a>
+                <a href="#">
+                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/80years.png" title="Celebrating 80 years of business" alt="Celebrating 80 years of business" class="u-push-left celebration">
                 </a>
             </div>
             <div class="grid__item grid__item--6-12-bp2 | socialmedia">
