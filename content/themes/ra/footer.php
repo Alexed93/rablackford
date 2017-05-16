@@ -32,7 +32,7 @@ $facebook = get_field('facebook', 'options');
             </div>
         </div>
         <div class="copyright__info | u-push-top zeta">
-            Copyright &copy; <?php echo date('Y'); ?> RA Blackford | Created by <a href="#" class="link">Alex Edwards</a>
+            Copyright &copy; <?php echo date('Y'); ?> RA Blackford | Created by <a href="mailto:alexed93@gmail.com" class="link">Alex Edwards</a>
         </div>
     </div>
 </footer>
