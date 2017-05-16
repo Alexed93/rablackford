@@ -117,17 +117,17 @@
 }
 
 .home-intro {
-    margin-top: $base;
+    padding-top: $base;
     clear: both;
-
-    @include respond-min($bp2) {
-        margin-top: 0;
-    }
 
     @include respond-min($bp3) {
         float: left;
         clear: none;
         margin-left: $base;
+    }
+
+    @include respond-min($bp4) {
+        padding-top: 0;
     }
 }
 
