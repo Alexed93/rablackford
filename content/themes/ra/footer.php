@@ -24,10 +24,10 @@ $facebook = get_field('facebook', 'options');
             </div>
             <div class="grid__item grid__item--6-12-bp2 | socialmedia">
                 <?php if ($twitter): ?>
-                    <a href="<?php echo $twitter; ?>" class="icon icon--xlarge icon--facebook"></a>
+                    <a href="<?php echo $twitter; ?>" class="icon icon--xlarge icon--twitter"></a>
                 <?php endif; ?>
                 <?php if ($facebook): ?>
-                    <a href="<?php echo $facebook; ?>" class="icon icon--xlarge icon--twitter | u-push-left@2"></a>
+                    <a href="<?php echo $facebook; ?>" class="icon icon--xlarge icon--facebook | u-push-left@2"></a>
                 <?php endif; ?>
             </div>
         </div>
