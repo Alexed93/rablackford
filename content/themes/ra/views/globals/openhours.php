@@ -3,20 +3,17 @@
 ?>
 <div class="open-hours">
     <?php if($open_hours): ?>
-        <div class="container">
-            <h3 class="u-display-inline gamma">
-                <span class="icon | icon--clock icon--large"></span>
-                Open hours:
-            </h3>
-            <div class="u-display-inline delta u-push-left/2">
+        <div class="container cf">
+            <span class="icon | icon--clock icon--xlarge"></span>
+            <ul class="list--unset list--inline--bp3 | u-display-inline delta | open-hours__list">
                 <?php foreach($open_hours as $k => $i): ?>
                     <?php if($c_openh == ($k + 1) ): ?>
-                        <?php echo $i['line']; ?>
+                        <li><?php echo $i['line']; ?></li>
                     <?php else: ?>
-                        <?php echo $i['line']; ?>
+                         <li><?php echo $i['line']; ?></li>
                     <?php endif; ?>
                 <?php endforeach; ?>
-            </div>
+            </ul>
         </div>
     <?php endif; ?>
 </div>

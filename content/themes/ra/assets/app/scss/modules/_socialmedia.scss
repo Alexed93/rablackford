@@ -1,7 +1,7 @@
 .socialmedia {
     padding-top: $base*1.5;
 
-    @include respond-min($bp2) {
+    @include respond-min($bp3) {
         padding-top: 0;
         text-align: right;
     }

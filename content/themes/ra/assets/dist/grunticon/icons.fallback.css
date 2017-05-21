@@ -4,6 +4,8 @@
 
 .icon--faacebook { background-image: url('png/faacebook.png'); background-repeat: no-repeat; }
 
+.icon--facebook--white { background-image: url('png/facebook--white.png'); background-repeat: no-repeat; }
+
 .icon--facebook { background-image: url('png/facebook.png'); background-repeat: no-repeat; }
 
 .icon--illustration { background-image: url('png/illustration.png'); background-repeat: no-repeat; }
@@ -23,6 +25,8 @@
 .icon--phone { background-image: url('png/phone.png'); background-repeat: no-repeat; }
 
 .icon--select { background-image: url('png/select.png'); background-repeat: no-repeat; }
+
+.icon--twitter--white { background-image: url('png/twitter--white.png'); background-repeat: no-repeat; }
 
 .icon--twitter { background-image: url('png/twitter.png'); background-repeat: no-repeat; }
 

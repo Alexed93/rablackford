@@ -8,7 +8,7 @@ $facebook = get_field('facebook', 'options');
 <footer class="footer">
     <div class="container">
         <div class="grid">
-            <div class="grid__item grid__item--6-12-bp2">
+            <div class="grid__item grid__item--6-12-bp3">
                 <a href="http://solidfuel.co.uk/approved-coal-wood-merchants/">
                     <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/acm.png" title="Approved Coal Merchant" alt="Approved Coal Merchant">
                 </a>
@@ -22,7 +22,7 @@ $facebook = get_field('facebook', 'options');
                     <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/dist/img/80years.png" title="Celebrating 80 years of business" alt="Celebrating 80 years of business" class="u-push-left celebration">
                 </a>
             </div>
-            <div class="grid__item grid__item--6-12-bp2 | socialmedia">
+            <div class="grid__item grid__item--6-12-bp3 | socialmedia">
                 <?php if ($twitter): ?>
                     <a href="<?php echo $twitter; ?>" class="icon icon--xlarge icon--twitter"></a>
                 <?php endif; ?>

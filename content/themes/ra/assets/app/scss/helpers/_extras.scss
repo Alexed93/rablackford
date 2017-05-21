@@ -134,8 +134,26 @@
 .open-hours {
     background: $color-brand-primary;
     color: $white;
-    margin-bottom: $base;
     padding: $base 0 $base*1.5 0;
+}
+
+.open-hours__list {
+
+    margin-top: $base/2;
+
+    @include respond-min($bp3) {
+        position: relative;
+        top: -12px;
+        left: $base;
+    }
+
+    li {
+        margin-right: $base/2;
+
+        // @include respond-min($bp4) {
+        //     margin-right: $base*1.5;
+        // }
+    }
 }
 
 .celebration {

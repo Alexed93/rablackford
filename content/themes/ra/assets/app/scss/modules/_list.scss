@@ -25,10 +25,11 @@
 }
 
 %list--inline,
-.list--inline {
-    li, dt, dd {
-        display: inline-block;
-        margin: 0 $base/4;
+.list--inline--bp3 {
+    @include respond-min($bp3) {
+        li, dt, dd {
+            display: inline-block;
+            margin: 0 $base/4;
 
         &:first-child {
             margin-left: 0;
@@ -37,10 +38,11 @@
         &:last-child {
             margin-right: 0;
         }
-    }
+        }
 
-    dt, dd {
-        font-style: normal;
+        dt, dd {
+            font-style: normal;
+        }
     }
 }
 
