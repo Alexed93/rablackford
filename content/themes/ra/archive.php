@@ -35,9 +35,6 @@ endif;
             <?php if ( $page_title ): ?>
                 <h1 class="headline"><?php echo $page_title; ?></h1>
             <?php endif; ?>
-            <?php if ( the_excerpt() ): ?>
-                <p class="introduction_text"><?php echo get_the_excerpt(); ?></p>
-            <?php endif; ?>
         </div>
         <?php get_template_part( 'views/post/index' ) ?>
    </div> <!-- .container -->
