@@ -1,4 +1,4 @@
 source 'https://rubygems.org'
 
-gem 'capistrano', '~> 3.4'
-gem 'capistrano-slackify', '~> 2.2.0'
+gem 'capistrano', '3.11.0'
+gem 'capistrano-git-with-submodules', '2.0.3'

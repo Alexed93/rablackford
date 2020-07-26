@@ -7,6 +7,9 @@ set :stage_url, "http://www.example.com"
 server "XXX.XXX.XX.XXX", user: "SSHUSER", roles: %w{web app db}
 set :deploy_to, "/deploy/to/path"
 
+# The web user on this environment's server.
+#set :web_user, 'www'
+
 ############################################
 # Setup Git
 ############################################
