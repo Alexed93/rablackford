@@ -26,15 +26,18 @@ abstract class ameMenuItem {
 		'options-general.php' => true, 'options-media.php' => true, 'options-permalink.php' => true,
 		'options-reading.php' => true, 'options-writing.php' => true, 'plugin-editor.php' => true,
 		'plugin-install.php' => true, 'plugins.php' => true, 'post-new.php' => true, 'profile.php' => true,
+		'privacy.php' => true,
 		'theme-editor.php' => true, 'themes.php' => true, 'tools.php' => true, 'update-core.php' => true,
 		'upload.php' => true, 'user-new.php' => true, 'users.php' => true, 'widgets.php' => true,
 	);
+
+	private static $mappable_parent_whitelist = '@^(?:profile|import|post-new|edit-tags)\.php@';
 
 	/**
 	 * Convert a WP menu structure to an associative array.
 	 *
 	 * @param array $item An menu item.
-	 * @param int $position The position (index) of the the menu item.
+	 * @param int|string $position The position (index) of the the menu item.
 	 * @param string|null $parent The slug of the parent menu that owns this item. Null for top level menus.
 	 * @return array
 	 */
@@ -70,10 +73,11 @@ abstract class ameMenuItem {
 		}
 
 		//Flag plugin pages
-		$item['is_plugin_page'] = (get_plugin_page_hook($item['file'], strval($parent)) != null);
+		$has_hook = (get_plugin_page_hook($item['file'], strval($parent)) != null);
+		$item['is_plugin_page'] = $has_hook;
 
 		if ( !$item['separator'] ) {
-			$item['url'] = self::generate_url($item['file'], strval($parent));
+			$item['url'] = self::generate_url($item['file'], strval($parent), $has_hook);
 		}
 
 		$item['template_id'] = self::template_id($item, $parent);
@@ -109,6 +113,7 @@ abstract class ameMenuItem {
 	        //Internal fields that may not map directly to WP menu structures.
 			'open_in' => 'same_window', //'new_window', 'iframe' or 'same_window' (the default)
             'iframe_height' => 0,
+            'is_iframe_scroll_disabled' => false,
 			'template_id' => '', //The default menu item that this item is based on.
 			'is_plugin_page' => false,
 			'custom' => false,
@@ -161,6 +166,7 @@ abstract class ameMenuItem {
 			'icon_url' => 'dashicons-admin-generic',
 			'open_in' => 'same_window',
 			'iframe_height' => 0,
+			'is_iframe_scroll_disabled' => false,
 			'is_plugin_page' => false,
 			'page_heading' => '',
 			'colors' => false,
@@ -212,7 +218,7 @@ abstract class ameMenuItem {
 			return strval($parent_file) . '>' . $item;
 		}
 
-		if ( self::get($item, 'custom') ) {
+		if ( !empty($item['custom']) ) {
 			return '';
 		}
 
@@ -236,8 +242,15 @@ abstract class ameMenuItem {
 			}
 		}
 
-		if ($parent_file === 'profile.php') {
-			$parent_file = 'users.php';
+		//Map known alternative parents to admin parent menus. This is necessary to ensure that
+		//certain menu items have the same template ID both for admins and for regular users.
+		static $inverse_parent_map = null;
+		global $_wp_real_parent_file;
+		if ( ($inverse_parent_map === null) && !empty($_wp_real_parent_file) && is_array($_wp_real_parent_file) ) {
+			$inverse_parent_map = array_flip($_wp_real_parent_file);
+		}
+		if ( isset($inverse_parent_map[$parent_file]) && (preg_match(self::$mappable_parent_whitelist, $parent_file) === 1) ) {
+			$parent_file = $inverse_parent_map[$parent_file];
 		}
 
 		//Special case: In WP 4.0+ the URL of the "Appearance -> Customize" item is different on every admin page.
@@ -354,6 +367,16 @@ abstract class ameMenuItem {
 			unset($item['role_access']);
 		}
 
+		//There's no need to store the default position if a custom position is set.
+		//The default position will not be used, and there's no option to reset the position to default.
+		if ( isset($item['position'], $item['defaults']['position']) && ($item['defaults']['position'] === $item['position'])) {
+			unset($item['defaults']['position']);
+		}
+		//The same goes for template ID.
+		if ( isset($item['template_id']) ) {
+			unset($item['defaults']['template_id']);
+		}
+
 		if ( isset($item['items']) ) {
 			foreach($item['items'] as $index => $sub_item) {
 				$item['items'][$index] = self::normalize($sub_item);
@@ -465,7 +488,7 @@ abstract class ameMenuItem {
    * @return int
    */
 	public static function compare_position($a, $b){
-		$result = self::get($a, 'position', 0) - self::get($b, 'position', 0);
+		$result = floatval(self::get($a, 'position', 0)) - floatval(self::get($b, 'position', 0));
 		//Support for non-integer positions.
 		if ($result > 0) {
 			return 1;
@@ -480,9 +503,10 @@ abstract class ameMenuItem {
 	 *
 	 * @param string $item_slug
 	 * @param string $parent_slug
+	 * @param bool|null $has_hook
 	 * @return string An URL relative to the /wp-admin/ directory.
 	 */
-	public static function generate_url($item_slug, $parent_slug = '') {
+	public static function generate_url($item_slug, $parent_slug = '', $has_hook = null) {
 		$menu_url = is_array($item_slug) ? self::get($item_slug, 'file') : $item_slug;
 		$parent_url = !empty($parent_slug) ? $parent_slug : 'admin.php';
 
@@ -495,30 +519,35 @@ abstract class ameMenuItem {
 			return $menu_url;
 		}
 
-		if ( self::is_hook_or_plugin_page($menu_url, $parent_url) ) {
+		if ( self::is_hook_or_plugin_page($menu_url, $parent_url, $has_hook) ) {
 			$parent_file = self::remove_query_from($parent_url);
-			$base_file = self::is_wp_admin_file($parent_file) ? $parent_url : 'admin.php';
-			$url = add_query_arg(array('page' => $menu_url), $base_file);
+			$base_file = self::is_wp_admin_file($parent_file) ? html_entity_decode($parent_url) : 'admin.php';
+			//add_query_arg() might be more robust, but it's significantly slower.
+			$url = $base_file
+				. ((strpos($base_file, '?') === false) ? '?' : '&')
+				. 'page=' . urlencode($menu_url);
 		} else {
 			$url = $menu_url;
 		}
 		return $url;
 	}
 
-	private static function is_hook_or_plugin_page($page_url, $parent_page_url = '') {
+	private static function is_hook_or_plugin_page($page_url, $parent_page_url = '', $hasHook = null) {
 		if ( empty($parent_page_url) ) {
 			$parent_page_url = 'admin.php';
 		}
 		$pageFile = self::remove_query_from($page_url);
 
+		if ( $hasHook === null ) {
+			$hasHook = (get_plugin_page_hook($page_url, $parent_page_url) !== null);
+		}
+		if ( $hasHook ) {
+			return true;
+		}
+
 		//Files in /wp-admin are part of WP core so they're not plugin pages.
 		if ( self::is_wp_admin_file($pageFile) ) {
 			return false;
-		}
-
-		$hasHook = (get_plugin_page_hook($page_url, $parent_page_url) !== null);
-		if ( $hasHook ) {
-			return true;
 		}
 
 		/*
