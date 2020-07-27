@@ -3,12 +3,12 @@
 ############################################
 
 set :stage, :staging
-set :stage_url, "http://www.example.com"
-server "XXX.XXX.XX.XXX", user: "SSHUSER", roles: %w{web app db}
-set :deploy_to, "/deploy/to/path"
+set :stage_url, "https://rablackford.jimchestnutt.co.uk"
+server "cerberus.jimchestnutt.co.uk", user: "rablackford", roles: %w{web app db}
+set :deploy_to, "/sites/rablackford.jimchestnutt.co.uk/files"
 
 # The web user on this environment's server.
-#set :web_user, 'www'
+set :web_user, 'rablackford'
 
 ############################################
 # Setup Git
