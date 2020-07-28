@@ -22,7 +22,7 @@ endif;
 
 if ( $card_file ):
     $card_file = get_field('cardfeatured_file', 'options');
-    $card_fileurl = $card_file['url'];
+    $card_btnlink = $card_file['url'];
 endif;
 
 ?>
@@ -36,8 +36,8 @@ endif;
             <?php if( $card_text ): ?>
                 <p><?php echo $card_text; ?></p>
             <?php endif; ?>
-            <?php if ( $card_button || $card_fileurl ): ?>
-                <a href="<?php echo $card_btnlink; ?><?php echo $card_fileurl; ?>" class="btn btn--primary">
+            <?php if ( $card_buttontext && $card_btnlink ): ?>
+                <a href="<?php echo $card_btnlink; ?>" class="btn btn--primary">
                     <?php echo $card_buttontext; ?>
                 </a>
             <?php endif; ?>

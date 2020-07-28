@@ -21,12 +21,12 @@ $phone = get_field('phone_number', 'options');
 /**
  * Count address lines
  */
-$c_addr  = count($address);
+//$c_addr  = count($address);
 
 /**
  * Count address lines
  */
-$c_openh  = count($open_hours);
+//$c_openh  = count($open_hours);
 
 ?>
 
@@ -39,11 +39,7 @@ $c_openh  = count($open_hours);
             </h2>
             <div class="sidebar__content">
                 <?php foreach($address as $k => $i): ?>
-                    <?php if($c_addr == ($k + 1) ): ?>
-                        <?php echo $i['line']; ?>
-                    <?php else: ?>
-                        <?php echo $i['line'] . '<br>'; ?>
-                    <?php endif; ?>
+                    <?php echo $i['line'] . '<br>'; ?>
                 <?php endforeach; ?>
             </div>
         </article>
