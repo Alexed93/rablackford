@@ -19,65 +19,71 @@
 \*----------------------------------------------------------------*/
 
 @charset "UTF-8";
-@import "config/vars";
-@import "config/mixins";
-@import "config/vendors";
+@import "config/**/*.scss";
+// @import "config/vars";
+// @import "config/mixins";
+// @import "config/vendors";
 
 
 
 /* $. Base - Project defaults & Element styling
 \*----------------------------------------------------------------*/
 
-@import "base/defaults";
-@import "base/elements";
-@import "base/typography";
-@import "base/lists";
-@import "base/forms";
-@import "base/tables";
+@import "base/**/*.scss";
+// @import "base/defaults";
+// @import "base/elements";
+// @import "base/typography";
+// @import "base/lists";
+// @import "base/forms";
+// @import "base/tables";
 
 
 
 /* $. Modules - Global objects i.e. .btn, .island, etc
 \*----------------------------------------------------------------*/
 
-@import "modules/icons";
-@import "modules/media";
-@import "modules/list";
-@import "modules/btn";
-@import "modules/panel";
-@import "modules/socialmedia";
-@import "modules/cards";
-@import "modules/gmap";
-@import "modules/article";
-@import "modules/pagination";
+@import "modules/**/*.scss";
+// @import "modules/icons";
+// @import "modules/media";
+// @import "modules/list";
+// @import "modules/btn";
+// @import "modules/panel";
+// @import "modules/socialmedia";
+// @import "modules/cards";
+// @import "modules/gmap";
+// @import "modules/article";
+// @import "modules/pagination";
 
 
 
 /* $. Interface - Project specific objects i.e. .work, .product, etc
 \*----------------------------------------------------------------*/
 
-@import "interface/section";
-@import "interface/nav";
-@import "interface/breadcrumb";
-@import "interface/pricing_table";
+@import "interface/**/*.scss";
+// @import "interface/section";
+// @import "interface/nav";
+// @import "interface/breadcrumb";
+// @import "interface/pricing_table";
 
 
 
 /* $. Layout - Page based layouts i.e. .header, .page-86, etc
 \*----------------------------------------------------------------*/
 
-@import "layout/container";
-@import "layout/content";
-@import "layout/cms";
-@import "layout/header";
-@import "layout/footer";
-@import "layout/sidebar";
+@import "layout/**/*.scss";
+// @import "layout/container";
+// @import "layout/content";
+// @import "layout/cms";
+// @import "layout/header";
+// @import "layout/footer";
+// @import "layout/sidebar";
 
 
 
 /* $. Helpers - i.e. Clearfixes, accessbility hidden, etc
 \*----------------------------------------------------------------*/
 
-@import "helpers/extras";
-@import "helpers/utility";
-@import "helpers/debug";
+@import "helpers/**/*.scss";
+// @import "helpers/extras";
+// @import "helpers/utility";
+// @import "helpers/debug";

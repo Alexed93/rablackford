@@ -1,8 +1,8 @@
-(function( $ ) {
+jQuery(document).ready(function($) {
 
-    var CustomSelect = function(realSelectBox) {
+    CustomSelect = function (realSelectBox) {
         //wrap select div around select element
-        realSelectBox.wrap("<div class='select icon--select'></div>");
+        realSelectBox.wrap("<div class='customselect'></div>");
 
         //element to display selected option
         var fakeSelect = $('<div/>', {
@@ -26,11 +26,13 @@
         });
 
         //display text of selected option on change
-        realSelectBox.on("change", function(event)
-        {
+        realSelectBox.on("change", function (event) {
             var textValue = $(this).find("option:selected").text();
             fakeSelect.text(textValue);
         });
     };
 
-}( jQuery ));
+    $("select.customselect").each(function () {
+        new CustomSelect($(this));
+    });
+});

@@ -9,13 +9,27 @@
  *    $. Your Scripts
  */
 
+ // import jquery. sort some namespaces out, as this will be largely handled by webpack.
+import $ from 'jquery';
+
+window.jQuery = $;
+window.$ = $;
+
+// import modernizr build
+require('./vendor/modernizr.js');
+
+
 
 
 /* $. Your Scripts - To go within the SIAF (Self invoking annonymous function)
 \*----------------------------------------------------------------*/
 
+
+
 (function($) {
 
-    // Start your scripts here
+    $(document).ready(function() {
+        require('./partials/custom-select.js');
+    });
 
 })(jQuery);

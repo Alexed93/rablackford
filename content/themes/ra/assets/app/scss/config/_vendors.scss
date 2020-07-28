@@ -47,7 +47,7 @@ $gr-item-align-y: top;                      // Initial vertical alignment of the
 /* $. Imports
 \*----------------------------------------------------------------*/
 
-@import "./node_modules/node.normalize.scss/normalize";
+@import "./node_modules/normalize-scss/sass/normalize/import-now";
 @import "./node_modules/groot-sass/groot";
 
 
@@ -55,7 +55,7 @@ $gr-item-align-y: top;                      // Initial vertical alignment of the
 /* $. Configuration
 \*----------------------------------------------------------------*/
 
-@include groot(12);
+//@include groot(12);
 
 @include respond-min($bp1) {
     @include groot(12, "bp1");

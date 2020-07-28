@@ -1,23 +1,28 @@
-/**
- * Title:
- *    Main Javascript
- * Description:
- *    The main Javascript file where you will write the bulk
- *    of your scripts. Make sure to include this just before
- *    the closing </body> tag.
- * Sections:
- *    $. Your Scripts
- *    $. Grunticon Loader
- */
+/*
+* JS external modules/libraries
+*/
 
+// import jquery. sort some namespaces out, as this will be largely handled by webpack.
+import $ from 'jquery';
 
+window.jQuery = $;
+window.$ = $;
 
-/* $. Your Scripts - To go within the SIAF (Self invoking annonymous function)
-\*----------------------------------------------------------------*/
+// import modernizr build
+require('./vendor/modernizr.js');
 
-(function($) {
+// slick carousel
+// const slick = require('slick-carousel');
 
-    /**
+// partials not reliant on jquery
+require('./partials/debounce.js');
+
+$(document).ready(function () {
+
+  require('./vendor/custom-select.jquery.js');
+  require('./partials/responsive-svg.js');
+
+  /**
      * Set variable to pool DOM only once.
      */
     var html = $('html');
@@ -84,11 +89,8 @@
 
      });
 
-})(jQuery);
+});
 
+$(window).on('load', function () {
 
-
-/* $. Grunticon Load
-\*----------------------------------------------------------------*/
-
-//grunticon([ "/content/themes/ra/assets/dist/grunticon/icons.data.svg.css", "/content/themes/ra/assets/dist/grunticon/icons.data.png.css", "/content/themes/ra/assets/dist/grunticon/icons.fallback.css" ]);
+});

@@ -99,23 +99,106 @@ add_action( 'wp_footer', 'ra_deregister_oembed' );
  * $. Queue jQuery correctly
  ******************************************************************************/
 
-function ra_requeue_jquery () {
-    $js_head = get_stylesheet_directory_uri() . '/assets/dist/js/head.min.js';
-    $js_main = get_stylesheet_directory_uri() . '/assets/dist/js/main.min.js';
+// function ra_requeue_jquery () {
+//     $js_head = get_stylesheet_directory_uri() . '/assets/dist/js/head.min.js';
+//     $js_main = get_stylesheet_directory_uri() . '/assets/dist/js/main.min.js';
 
-    wp_deregister_script( 'jquery' );
+//     wp_deregister_script( 'jquery' );
 
-    wp_register_script( 'jquery', $js_head, '', '', false );
-    wp_enqueue_script( 'jquery' );
+//     wp_register_script( 'jquery', $js_head, '', '', false );
+//     wp_enqueue_script( 'jquery' );
 
-    wp_register_script( 'js-main', $js_main, '', '', true );
-    wp_enqueue_script( 'js-main' );
+//     wp_register_script( 'js-main', $js_main, '', '', true );
+//     wp_enqueue_script( 'js-main' );
+// }
+
+// if ( !is_admin() ) {
+//     add_action( 'wp_enqueue_scripts', 'ra_requeue_jquery', 11 );
+// }
+
+add_action('wp_enqueue_scripts', 'liv_load_js', 100);
+
+function liv_load_js()
+{
+    if (!is_admin()) {
+        global $wp_query;
+
+        wp_deregister_script('jquery');
+        //wp_deregister_script('jquery-ui-core');
+        wp_deregister_script('jquery-migrate');
+        wp_deregister_script('wp-embed');
+
+        wp_register_script(
+            'jquery',
+            get_stylesheet_directory_uri() . '/assets/dist/js/jquery.min.js',
+            array(),
+            null,
+            false
+        );
+
+       wp_enqueue_script('jquery');
+
+       wp_register_script(
+            'jquery-migrate',
+            get_stylesheet_directory_uri() . '/assets/dist/js/jquery-migrate.min.js',
+            array(),
+            '3.3.1',
+            false
+        );
+
+        wp_enqueue_script('jquery-migrate');
+
+        // register dist scripts with hashes produced by webpack
+        $manifest = file_get_contents(get_stylesheet_directory() . '/assets/dist/manifest.json');
+        $manifestList = json_decode($manifest);
+        foreach ($manifestList as $file) {
+
+            // JS files
+            if (pathinfo($file, PATHINFO_EXTENSION) === 'js') {
+                $fullName = basename($file);
+                $fullNameArray = explode(".", $fullName);
+                $name = $fullNameArray[0];
+                $is_jquery = (substr($fullName, 0, 6) === 'jquery') ? true : false;
+
+                // enqueue each non-jquery script
+                if ($fullName && !$is_jquery) {
+                    wp_enqueue_script($name, get_template_directory_uri() . '/assets/dist/' . $fullName, array(), null, false);
+                    wp_localize_script($name, $name . '_ajax', array(
+                        'ajaxurl' => admin_url('admin-ajax.php'),
+                        'post_id' => get_the_ID(),
+                        'posts' => json_encode($wp_query->query_vars),
+                        'current_page' => get_query_var('paged') ? get_query_var('paged') : 1,
+                        'max_page' => $wp_query->max_num_pages
+                    ));
+                }
+            }
+
+            // CSS files
+            if (pathinfo($file, PATHINFO_EXTENSION) === 'css') {
+                $fullName = basename($file);
+                $fullNameArray = explode(".", $fullName);
+                $name = $fullNameArray[0];
+
+                // enqueue each script
+                if ($fullName) {
+                    wp_enqueue_style($name, get_template_directory_uri() . '/assets/dist/' . $fullName, array(), null);
+                }
+            }
+        }
+
+        // wp_register_script(
+        //     'google-maps',
+        //     "https://maps.googleapis.com/maps/api/js?key=" . esc_attr(get_field('google_maps_api_key', 'options')),
+        //     array(),
+        //     '1.0.0',
+        //     true
+        // );
+
+        // wp_enqueue_script('google-maps');
+
+    }
+
 }
-
-if ( !is_admin() ) {
-    add_action( 'wp_enqueue_scripts', 'ra_requeue_jquery', 11 );
-}
-
 
 
 /**
