@@ -46,11 +46,11 @@ function ra_remove_json_api () {
      * Remove API scripts from header/footer
      */
 
-    remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
+    //remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
     remove_action( 'wp_head', 'wp_oembed_add_discovery_links', 10 );
     remove_action( 'wp_head', 'wp_oembed_add_discovery_links' );
     remove_action( 'wp_head', 'wp_oembed_add_host_js' );
-    remove_action( 'rest_api_init', 'wp_oembed_register_route' );
+    //remove_action( 'rest_api_init', 'wp_oembed_register_route' );
     remove_filter( 'oembed_dataparse', 'wp_filter_oembed_result', 10 );
     add_filter( 'embed_oembed_discover', '__return_false' );
 
@@ -58,10 +58,10 @@ function ra_remove_json_api () {
      * Disable API from working all together
      */
 
-    add_filter('json_enabled', '__return_false');
-    add_filter('rest_enabled', '__return_false');
-    add_filter('json_jsonp_enabled', '__return_false');
-    add_filter('rest_jsonp_enabled', '__return_false');
+    // add_filter('json_enabled', '__return_false');
+    // add_filter('rest_enabled', '__return_false');
+    // add_filter('json_jsonp_enabled', '__return_false');
+    // add_filter('rest_jsonp_enabled', '__return_false');
 
     // Remove pingback
     remove_action( 'wp_head', 'rest_output_link_wp_head', 10 );
@@ -231,3 +231,19 @@ if ( get_option("large_crop") === false ) {
  ******************************************************************************/
 
 add_theme_support('html5', ['caption', 'comment-form', 'comment-list', 'gallery']);
+add_theme_support('woocommerce');
+
+
+/**
+ * Add Debug class for breakpoint monitoring
+ */
+function liv_add_debug( $classes ) {
+    if (WP_DEBUG === true) {
+        global $template;
+        //$classes[] = 'debug';
+        $classes[] = 'debug" data-template="' . basename($template);
+    }
+    return $classes;
+}
+
+add_filter( 'body_class', 'liv_add_debug' );

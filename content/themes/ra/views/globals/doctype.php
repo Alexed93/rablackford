@@ -44,4 +44,4 @@
     <?php wp_head(); ?>
 </head>
 
-<body class="">
+<body <?php body_class(); ?>>

@@ -46,3 +46,4 @@ require_once( 'config/navigation.php' );
  ******************************************************************************/
 
 require_once( 'config/vendors.php' );
+require_once( 'config/woocommerce.php' );
