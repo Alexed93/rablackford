@@ -2063,25 +2063,35 @@ input[type="submit"],
   margin: 0;
   overflow: hidden;
   margin-top: 1em; }
+  @media screen and (min-width: 78em) {
+    .card-list {
+      column-count: 2; } }
 
 .card-list__item {
   font-size: 1.3rem;
-  list-style: none; }
+  list-style: none;
+  position: relative; }
   @media screen and (min-width: 78em) {
     .card-list__item {
-      float: left;
-      margin-bottom: 0;
-      line-height: 2.25rem; } }
-
-@media screen and (min-width: 78em) {
-  .card-list__item--double {
-    width: 50%; } }
+      line-height: 1.3; } }
 
 .card-list__item:before, .card__title:before {
   margin-right: 0.5em;
   color: #59863A;
   font-weight: 600;
-  content: "\003e"; }
+  content: "\003e";
+  position: absolute;
+  left: 0; }
+
+.card-list__item > a, .card__title > a {
+  margin-left: 1.8rem;
+  line-height: 1.3;
+  vertical-align: text-top; }
+
+.card__title {
+  position: relative;
+  padding-left: 1.8rem;
+  line-height: 1.3; }
 
 /* $. Variations
 \*----------------------------------------------------------------*/
@@ -3258,4 +3268,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
   border: 0.5em solid #FFFFFF; }
 
 
-/*# sourceMappingURL=main.dev.446c21acf5ce4823242e.css.map*/
+/*# sourceMappingURL=main.dev.21755cbbd0e742484f84.css.map*/
