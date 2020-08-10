@@ -40,6 +40,10 @@ $intro_para = get_field('intro_para');
 
     <div class="container">
         <?php get_template_part( 'views/cards/card-introductory' ); ?>
+
+        <?php
+            ra_get_component('product-categories');
+        ?>
         <?php get_template_part( 'views/cards/card' ); ?>
         <?php get_template_part( 'views/cards/card-featured' ); ?>
     </div>

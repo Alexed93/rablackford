@@ -16,6 +16,12 @@
  *
  */
 
+/**
+ * Loaders
+ ******************************************************************************/
+
+require_once 'lib/loaders/components.php';
+require_once 'lib/loaders/svgs.php';
 
 
 /**
