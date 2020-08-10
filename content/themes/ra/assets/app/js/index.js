@@ -32,11 +32,11 @@ $(document).ready(function () {
     /**
      * Setup 'CustomSelect' plugin on all Select elements
      */
-    if(!$('html').hasClass('ie')) {
-        $("select").each(function() {
-            new CustomSelect($(this));
-        });
-    }
+    // if(!$('html').hasClass('ie')) {
+    //     $("select").each(function() {
+    //         new CustomSelect($(this));
+    //     });
+    // }
 
     /**
      * Toggle the navigation
@@ -49,14 +49,6 @@ $(document).ready(function () {
         toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
     });
 
-    /**
-     * Setup 'CustomSelect' plugin on all Select elements
-     */
-    if(!html.hasClass('ie')) {
-        $("select").each(function() {
-            new CustomSelect($(this));
-        });
-    }
 
     /**
     * $. News Achive Accordion

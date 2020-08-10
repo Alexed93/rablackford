@@ -90,3 +90,10 @@ add_filter("rewrite_rules_array", function ($rules) {
   add_action("create_product_cat", "flush_rewrite_rules");
   add_action("edited_product_cat", "flush_rewrite_rules");
   add_action("delete_product_cat", "flush_rewrite_rules");
+
+
+  /**
+ * Remove woocommerce stylesheets
+ */
+
+add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );

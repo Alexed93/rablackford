@@ -127,16 +127,15 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
   /**
    * Setup 'CustomSelect' plugin on all Select elements
    */
+  // if(!$('html').hasClass('ie')) {
+  //     $("select").each(function() {
+  //         new CustomSelect($(this));
+  //     });
+  // }
 
-  if (!jquery__WEBPACK_IMPORTED_MODULE_0___default()('html').hasClass('ie')) {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()("select").each(function () {
-      new CustomSelect(jquery__WEBPACK_IMPORTED_MODULE_0___default()(this));
-    });
-  }
   /**
    * Toggle the navigation
    */
-
 
   jquery__WEBPACK_IMPORTED_MODULE_0___default()('.js-toggle-nav').on('click', function () {
     // 1. Toggle the Nav
@@ -145,18 +144,8 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
     toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
   });
   /**
-   * Setup 'CustomSelect' plugin on all Select elements
-   */
-
-  if (!html.hasClass('ie')) {
-    jquery__WEBPACK_IMPORTED_MODULE_0___default()("select").each(function () {
-      new CustomSelect(jquery__WEBPACK_IMPORTED_MODULE_0___default()(this));
-    });
-  }
-  /**
   * $. News Achive Accordion
   */
-
 
   var allPanels = jquery__WEBPACK_IMPORTED_MODULE_0___default()('.list--accordion .list__sub');
   allPanels.hide();
@@ -10906,4 +10895,4 @@ module.exports = jQuery;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=main.dev.66ecce9263fba08f8226.js.map
+//# sourceMappingURL=main.dev.b951a6095b00bbe2ad68.js.map
