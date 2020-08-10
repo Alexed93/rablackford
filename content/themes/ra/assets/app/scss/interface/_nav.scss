@@ -125,10 +125,63 @@ $color-nav: $color-link;
     }
 }
 
+// Woocommerce nav additions
+.nav__link--basket {
+    position: relative;
+    margin-right: 30px;
+
+    span {
+        position: absolute;
+        right: -30px;
+        top: calc(50% - 10px);
+        background-color: white;
+        color: $color-brand-primary;
+        font-size: 12px;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        line-height: 1.6;
+        text-align: center;
+        font-weight: $weight-semi-bold;
+    }
+}
 
 
 /* $. Tertiary
 \*----------------------------------------------------------------*/
 
-.nav--tertiary {
+.nav--footer {
+
+    font-size: .875rem;
+    margin-top: 1rem;
+
+    .nav__item {
+        border-top: none;
+
+        @include respond-min($bp2) {
+            display: inline-block;
+            margin-left: $base;
+            border-top: none;
+
+            &:first-child {
+                margin-left: 0;
+            }
+
+        }
+    }
+
+    .nav__link {
+        display: block;
+        padding: $base*0.4 0;
+        color: $color-brand-primary;
+        transition: color .3s;
+
+        @include respond-min($bp2) {
+            padding: 0;
+        }
+
+        &:hover, &:focus {
+            color: darken($color-brand-primary, 10%);
+        }
+    }
 }

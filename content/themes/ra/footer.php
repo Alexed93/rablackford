@@ -31,6 +31,11 @@ $facebook = get_field('facebook', 'options');
                 <?php endif; ?>
             </div>
         </div>
+        <div class="footer__nav">
+            <ul class="nav nav--footer">
+                <?php wp_nav_menu( array('theme_location' => 'tertiary', 'items_wrap' => '%3$s') ); ?>
+            </ul>
+        </div>
         <div class="copyright__info | u-push-top zeta">
             Copyright &copy; <?php echo date('Y'); ?> RA Blackford | Created by <a href="mailto:alexed93@gmail.com" class="link">Alex Edwards</a>
         </div>

@@ -2563,8 +2563,48 @@ span.icon--clock {
       .nav--secondary .nav__item.is-current .nav__link {
         color: #FFFF00; } }
 
+.nav__link--basket {
+  position: relative;
+  margin-right: 30px; }
+  .nav__link--basket span {
+    position: absolute;
+    right: -30px;
+    top: calc(50% - 10px);
+    background-color: white;
+    color: #72AA4B;
+    font-size: 12px;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    line-height: 1.6;
+    text-align: center;
+    font-weight: 600; }
+
 /* $. Tertiary
 \*----------------------------------------------------------------*/
+.nav--footer {
+  font-size: .875rem;
+  margin-top: 1rem; }
+  .nav--footer .nav__item {
+    border-top: none; }
+    @media screen and (min-width: 48em) {
+      .nav--footer .nav__item {
+        display: inline-block;
+        margin-left: 1em;
+        border-top: none; }
+        .nav--footer .nav__item:first-child {
+          margin-left: 0; } }
+  .nav--footer .nav__link {
+    display: block;
+    padding: 0.4em 0;
+    color: #72AA4B;
+    transition: color .3s; }
+    @media screen and (min-width: 48em) {
+      .nav--footer .nav__link {
+        padding: 0; } }
+    .nav--footer .nav__link:hover, .nav--footer .nav__link:focus {
+      color: #5a873b; }
+
 /**
  * Title:
  *    Pricing table
@@ -3218,4 +3258,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
   border: 0.5em solid #FFFFFF; }
 
 
-/*# sourceMappingURL=main.dev.673935992f05e68a53fd.css.map*/
+/*# sourceMappingURL=main.dev.446c21acf5ce4823242e.css.map*/
