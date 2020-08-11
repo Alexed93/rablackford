@@ -2,7 +2,7 @@
 
 // returns the contents of an svg
 
-function ra_get_svg($file)
+function rab_get_svg($file)
 {
     $file_path = trailingslashit(get_stylesheet_directory()) . $file . '.svg';
 

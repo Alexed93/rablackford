@@ -97,3 +97,30 @@ add_filter("rewrite_rules_array", function ($rules) {
  */
 
 add_filter( 'woocommerce_enqueue_styles', '__return_empty_array' );
+
+
+function rab_get_products_from_category_by_ID( $category ) {
+
+  $products = new WP_Query( array(
+      'post_type'   => 'product',
+      'post_status' => 'publish',
+      'posts_per_page' => -1,
+      'fields'      => 'ids',
+      'tax_query'   => array(
+          'relation' => 'AND',
+          array(
+              'taxonomy' => 'product_cat',
+              'field'    => 'term_id',
+              'terms'    => $category,
+          ),
+          array(
+              'taxonomy' => 'product_visibility',
+              'field' => 'slug',
+              'terms' => 'exclude-from-catalog',
+              'operator' => 'NOT IN'
+          )
+      ),
+
+  ) );
+  return $products->posts;
+}
