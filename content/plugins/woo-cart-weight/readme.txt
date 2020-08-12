@@ -3,9 +3,9 @@ Contributors: wpdesk,dyszczo,grola,piotrpo,marcinkolanko
 Donate link: https://www.wpdesk.net/
 Tags: woocommerce, cart, weight, woocommerce cart weight
 Requires at least: 4.5
-Tested up to: 5.4.1
+Tested up to: 5.5
 Requires PHP: 5.6
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -39,6 +39,10 @@ You can also use WordPress uploader to upload plugin zip file in menu Plugins ->
 1. Mini Cart view.
 
 == Changelog ==
+
+= 1.2.9 - 2020-08-10 =
+* Added support for WordPress 5.5
+* Added support for WooCommerce 4.4
 
 = 1.2.8 - 2020-05-18 =
 * Fixed .pot file

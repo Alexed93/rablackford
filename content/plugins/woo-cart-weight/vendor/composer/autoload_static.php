@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb546779a20ab25775afd9c6303ac997c
+class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
 {
     public static $prefixLengthsPsr4 = array (
         'W' => 
@@ -255,6 +255,7 @@ class ComposerStaticInitb546779a20ab25775afd9c6303ac997c
         'WCWeightVendor\\WPDesk_Tracker_Factory' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper-override/src/Helper/TrackerFactory.php',
         'WCWeightVendor\\WPDesk_Tracker_Factory_Prefixed' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-tracker/src/class-wpdesk-tracker-factory-prefixed.php',
         'WCWeightVendor\\WPDesk_Tracker_Interface' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper-override/src/Interop/Tracker/class-wpdesk-tracker-interface.php',
+        'WCWeightVendor\\WPDesk_Tracker_Persistence_Consent' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-tracker/src/persistence/class-wpdesk-tracker-persistence-consent.php',
         'WCWeightVendor\\WPDesk_Tracker_Sender' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper-override/src/Interop/Tracker/class-wpdesk-tracker-sender.php',
         'WCWeightVendor\\WPDesk_Tracker_Sender_Exception_WpError' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-tracker/src/sender/Exception/class-wpdesk-tracker-sender-exception-wperror.php',
         'WCWeightVendor\\WPDesk_Tracker_Sender_Logged' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-tracker/src/sender/class-wpdesk-tracker-sender-logged.php',
@@ -273,9 +274,9 @@ class ComposerStaticInitb546779a20ab25775afd9c6303ac997c
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb546779a20ab25775afd9c6303ac997c::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb546779a20ab25775afd9c6303ac997c::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitb546779a20ab25775afd9c6303ac997c::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9::$classMap;
 
         }, null, ClassLoader::class);
     }

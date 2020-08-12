@@ -103,7 +103,9 @@ class WPDeskLoggerFactory extends \WCWeightVendor\WPDesk\Logger\BasicLoggerFacto
     private function appendMainLog($logger)
     {
         $wpCapture = $this->captureWPLog();
-        $this->appendFileLog($logger, $wpCapture->get_log_file());
+        if (\is_writable($wpCapture->get_log_file())) {
+            $this->appendFileLog($logger, $wpCapture->get_log_file());
+        }
     }
     /**
      * @param Logger $logger
