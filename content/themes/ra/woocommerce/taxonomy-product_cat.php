@@ -19,19 +19,11 @@ defined( 'ABSPATH' ) || exit;
 
 get_header( 'shop' );
 
-$post_id = $post->ID;
+$tax_obj = get_queried_object();
+$tax_id = $tax_obj->term_id;
+$acf_tax_id = 'category_' .$tax_id;
 
-if( is_shop() ) {
-	$post_id = get_option( 'woocommerce_shop_page_id' );
-}
-
-// $tax_obj = get_queried_object();
-
-// var_dump($tax_obj);
-// $tax_id = $tax_obj->term_id;
-// $acf_tax_id = 'category_' .$tax_id;
-
-// $excerpt = get_field('excerpt', $acf_tax_id);
+$excerpt = get_field('excerpt', $acf_tax_id);
 
 ?>
 <?php
@@ -54,7 +46,9 @@ do_action( 'woocommerce_before_main_content' );
 
 		<div class="container--introduction">
 			<h1 class="headline"><?php woocommerce_page_title(); ?></h1>
-			<p class="introduction_text"><?php echo get_the_excerpt($post_id); ?></p>
+			<?php if ($excerpt) : ?>
+				<p class="introduction_text"><?php echo $excerpt; ?></p>
+			<?php endif; ?>
 		</div>
 		<?php get_template_part( 'views/cards/card-introductory' ); ?>
 		<?php get_template_part( 'views/cards/card-b' ); ?>

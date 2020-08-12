@@ -124,3 +124,5 @@ function rab_get_products_from_category_by_ID( $category ) {
   ) );
   return $products->posts;
 }
+
+remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
