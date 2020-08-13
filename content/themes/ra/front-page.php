@@ -42,9 +42,13 @@ $intro_para = get_field('intro_para');
         <?php get_template_part( 'views/cards/card-introductory' ); ?>
 
         <?php
-            rab_get_component('product-categories');
+            rab_get_component(
+                'product-categories',
+                [
+                    'parent' => 30
+                ]
+            );
         ?>
-        <?php get_template_part( 'views/cards/card' ); ?>
         <?php get_template_part( 'views/cards/card-featured' ); ?>
     </div>
 </main>

@@ -82,7 +82,7 @@ do_action( 'woocommerce_before_main_content' );
 					'product-categories',
 					[
 						'slim' => true,
-						'top_level' => true
+						'parent' => '0'
 					]
 				);
 			}
