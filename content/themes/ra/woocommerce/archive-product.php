@@ -56,26 +56,14 @@ do_action( 'woocommerce_before_main_content' );
 			<h1 class="headline"><?php woocommerce_page_title(); ?></h1>
 			<p class="introduction_text"><?php echo get_the_excerpt($post_id); ?></p>
 		</div>
-		<?php get_template_part( 'views/cards/card-introductory' ); ?>
-		<?php get_template_part( 'views/cards/card-b' ); ?>
-		<?php get_template_part( 'views/cards/card-featured' ); ?>
+		<?php
+			rab_get_component(
+				'card-introductory',
+				[
+					'id' => $post_id
+				]);
+		?>
 
-
-		<header class="woocommerce-products-header">
-			<?php if ( apply_filters( 'woocommerce_show_page_title', true ) ) : ?>
-				<h1 class="woocommerce-products-header__title page-title"><?php woocommerce_page_title(); ?></h1>
-			<?php endif; ?>
-
-			<?php
-			/**
-			 * Hook: woocommerce_archive_description.
-			 *
-			 * @hooked woocommerce_taxonomy_archive_description - 10
-			 * @hooked woocommerce_product_archive_description - 10
-			 */
-			do_action( 'woocommerce_archive_description' );
-			?>
-		</header>
 		<?php
 		if ( woocommerce_product_loop() ) {
 
@@ -88,22 +76,34 @@ do_action( 'woocommerce_before_main_content' );
 			 */
 			do_action( 'woocommerce_before_shop_loop' );
 
-			woocommerce_product_loop_start();
-
-			if ( wc_get_loop_prop( 'total' ) ) {
-				while ( have_posts() ) {
-					the_post();
-
-					/**
-					 * Hook: woocommerce_shop_loop.
-					 */
-					do_action( 'woocommerce_shop_loop' );
-
-					wc_get_template_part( 'content', 'product' );
-				}
+			// replace woocommerce loop with custom category cards
+			if (is_shop()) {
+				rab_get_component(
+					'product-categories',
+					[
+						'slim' => true,
+						'top_level' => true
+					]
+				);
 			}
 
-			woocommerce_product_loop_end();
+
+			// woocommerce_product_loop_start();
+
+			// if ( wc_get_loop_prop( 'total' ) ) {
+			// 	while ( have_posts() ) {
+			// 		the_post();
+
+			// 		/**
+			// 		 * Hook: woocommerce_shop_loop.
+			// 		 */
+			// 		do_action( 'woocommerce_shop_loop' );
+
+			// 		wc_get_template_part( 'content', 'product' );
+			// 	}
+			// }
+
+			// woocommerce_product_loop_end();
 
 			/**
 			 * Hook: woocommerce_after_shop_loop.
@@ -121,6 +121,8 @@ do_action( 'woocommerce_before_main_content' );
 		}
 
 		?>
+
+		<?php get_template_part( 'views/cards/card-featured' ); ?>
 	</div>
 </section>
 <?php
