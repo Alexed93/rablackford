@@ -24,9 +24,10 @@ $tax_id = $tax_obj->term_id;
 $acf_tax_id = 'category_' .$tax_id;
 
 $excerpt = get_field('excerpt', $acf_tax_id);
+$content = $tax_obj->description;
 
 $cat_args = [
-	'hide_empty' => true,
+	'hide_empty' => false,
 	'parent' => $tax_id
 ];
 
@@ -57,6 +58,14 @@ do_action( 'woocommerce_before_main_content' );
 				<p class="introduction_text"><?php echo $excerpt; ?></p>
 			<?php endif; ?>
 		</div>
+		<?php if ($content) : ?>
+			<div class="grid">
+				<div class="grid__item grid__item--9-12-bp4">
+					<article class="content">
+						<?php echo apply_filters('the_content', $content); ?>
+				</div>
+			</div> <!-- .grid -->
+		<?php endif; ?>
 		<?php
 			rab_get_component(
 				'card-introductory',
