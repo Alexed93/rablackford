@@ -25,6 +25,13 @@ $acf_tax_id = 'category_' .$tax_id;
 
 $excerpt = get_field('excerpt', $acf_tax_id);
 
+$cat_args = [
+	'hide_empty' => true,
+	'parent' => $tax_id
+];
+
+$child_categories = get_terms('product_cat', $cat_args);
+
 ?>
 <?php
 
@@ -58,21 +65,24 @@ do_action( 'woocommerce_before_main_content' );
 				]
 			);
 
+			// either get child categories or product list
+			if (!empty($child_categories)) :
+				rab_get_component(
+					'product-categories',
+					[
+						'slim' => true,
+						'parent' => $tax_id
+					]
+				);
 
-			rab_get_component(
-				'product-categories',
-				[
-					'slim' => true,
-					'parent' => $tax_id
-				]
-			);
-
-			rab_get_component(
-				'product-cards',
-				[
-					'category' => $tax_id
-				]
-			);
+			else :
+				rab_get_component(
+					'product-cards',
+					[
+						'category' => $tax_id
+					]
+				);
+			endif;
 		?>
 
 
