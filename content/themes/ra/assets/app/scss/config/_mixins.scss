@@ -10,11 +10,7 @@
  */
 
 
-
-/* $. Media Queries - https://github.com/jakearchibald/sass-ie
-\*----------------------------------------------------------------*/
-
-@import "mixins/media-queries";
+@import "mixins/**/*.scss";
 
 
 

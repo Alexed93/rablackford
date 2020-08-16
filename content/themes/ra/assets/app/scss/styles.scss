@@ -87,3 +87,9 @@
 // @import "helpers/extras";
 // @import "helpers/utility";
 // @import "helpers/debug";
+
+
+/* $. Woocommerce
+\*----------------------------------------------------------------*/
+
+@import "woocommerce/**/*.scss";

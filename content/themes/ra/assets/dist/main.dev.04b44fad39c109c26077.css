@@ -26,8 +26,6 @@
  */
 /* $. Media Queries - https://github.com/jakearchibald/sass-ie
 \*----------------------------------------------------------------*/
-/* $. Media Queries - https://github.com/jakearchibald/sass-ie
-\*----------------------------------------------------------------*/
 /* $. Your new mixins
 \*----------------------------------------------------------------*/
 /**
@@ -3267,5 +3265,77 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
 .u-bordered {
   border: 0.5em solid #FFFFFF; }
 
+/* $. Woocommerce
+\*----------------------------------------------------------------*/
+.woocommerce-message,
+.woocommerce-error,
+.woocommerce-info {
+  padding: 1em 2em 1em 3.5em;
+  margin: 0 0 2em;
+  position: relative;
+  background-color: white;
+  color: #505050;
+  border-top: 3px solid #72AA4B;
+  list-style: none outside;
+  *zoom: 1;
+  width: auto;
+  word-wrap: break-word; }
+  .woocommerce-message::before, .woocommerce-message::after,
+  .woocommerce-error::before,
+  .woocommerce-error::after,
+  .woocommerce-info::before,
+  .woocommerce-info::after {
+    content: ' ';
+    display: table; }
+  .woocommerce-message::after,
+  .woocommerce-error::after,
+  .woocommerce-info::after {
+    clear: both; }
+  .woocommerce-message::before,
+  .woocommerce-error::before,
+  .woocommerce-info::before {
+    font-family: "WooCommerce";
+    content: "\e028";
+    display: inline-block;
+    position: absolute;
+    top: 1em;
+    left: 1.5em; }
+  .woocommerce-message .button,
+  .woocommerce-error .button,
+  .woocommerce-info .button {
+    float: right; }
+  .woocommerce-message li,
+  .woocommerce-error li,
+  .woocommerce-info li {
+    list-style: none outside !important;
+    padding-left: 0 !important;
+    margin-left: 0 !important; }
 
-/*# sourceMappingURL=main.dev.21755cbbd0e742484f84.css.map*/
+/**
+ * Right to left styles
+ */
+.rtl.woocommerce .price_label,
+.rtl.woocommerce .price_label span {
+  /* rtl:ignore */
+  direction: ltr;
+  unicode-bidi: embed; }
+
+.woocommerce-message {
+  border-top-color: #8fae1b; }
+  .woocommerce-message::before {
+    content: "\e015";
+    color: #8fae1b; }
+
+.woocommerce-info {
+  border-top-color: #1e85be; }
+  .woocommerce-info::before {
+    color: #1e85be; }
+
+.woocommerce-error {
+  border-top-color: #b81c23; }
+  .woocommerce-error::before {
+    content: "\e016";
+    color: #b81c23; }
+
+
+/*# sourceMappingURL=main.dev.04b44fad39c109c26077.css.map*/
