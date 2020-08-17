@@ -4,6 +4,7 @@
 *.sql
 *.sqlite
 database.yml
+*.sql.gz
 
 # OS generated files #
 ######################
