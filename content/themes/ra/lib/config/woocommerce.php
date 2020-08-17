@@ -126,3 +126,7 @@ function rab_get_products_from_category_by_ID( $category ) {
 }
 
 remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 );
+
+
+// product specific adjustments
+remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
