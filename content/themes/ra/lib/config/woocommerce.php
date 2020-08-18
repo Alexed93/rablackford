@@ -5,6 +5,26 @@
  */
 
 
+ /* WooCommerce Add To Cart Text */
+
+ add_filter('woocommerce_product_single_add_to_cart_text', 'woocommerce_custom_add_to_cart_text');
+
+ function woocommerce_custom_add_to_cart_text() {
+ return __('Add to basket', 'woocommerce');
+ }
+
+
+ /**
+  * Woocommerce empty cart message
+  */
+
+ remove_action( 'woocommerce_cart_is_empty', 'wc_empty_cart_message', 10 );
+ add_action( 'woocommerce_cart_is_empty', 'custom_empty_cart_message', 10 );
+
+ function custom_empty_cart_message() {
+     echo '<p class="cart-empty woocommerce-info">' . wp_kses_post( apply_filters( 'wc_empty_cart_message', __( 'Your basket is currently empty.', 'woocommerce' ) ) ) . '</p>';
+ }
+
 
 // adjust secondary menu to add WC items
 add_filter('wp_nav_menu_items', 'add_woocommerce_links', 10, 2);
