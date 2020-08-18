@@ -100,6 +100,20 @@ do_action( 'woocommerce_before_main_content' );
 
 
 		<?php
+
+		$additional_content = get_field('additional_content', $acf_tax_id);
+
+		if ($additional_content) : ?>
+			<div class="grid u-push-top@2">
+				<div class="grid__item grid__item--9-12-bp4">
+					<article class="content">
+						<?php echo apply_filters('the_content', $additional_content); ?>
+				</div>
+			</div> <!-- .grid -->
+		<?php
+
+		endif;
+
 		// if ( woocommerce_product_loop() ) {
 
 		// 	/**
