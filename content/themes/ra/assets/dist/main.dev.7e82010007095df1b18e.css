@@ -1750,25 +1750,9 @@ label {
   display: block;
   padding-bottom: 0.25em; }
 
-input[type=checkbox],
-input[type=radio] {
-  vertical-align: baseline;
-  background: none;
-  border: none;
-  height: .8em;
-  width: .8em; }
-
-input,
-select,
-textarea {
-  width: 100%;
-  padding: 0.5em;
-  border: 1px solid;
-  border-radius: 0;
-  color: #666;
-  background-color: #FFF;
-  border-color: #CCC;
-  -webkit-appearance: none; }
+input[type=checkbox] + label,
+input[type=radio] + label {
+  display: inline-block; }
 
 textarea {
   resize: vertical; }
@@ -1948,7 +1932,7 @@ h6, .zeta {
 button,
 input[type="button"],
 input[type="submit"],
-.btn, .woocommerce-tabs ul.tabs li a,
+.btn, .cart-collaterals .checkout-button, .cart-collaterals .coupon button, .cart-collaterals .apply_coupon, .woocommerce-shipping-calculator button, .woocommerce-tabs ul.tabs li a,
 .button {
   display: inline-block;
   padding: 0.5em 1em;
@@ -1964,10 +1948,10 @@ input[type="submit"],
 /**
  * Themes
  */
-.btn--primary, .single_add_to_cart_button, .woocommerce-tabs ul.tabs li a {
+.btn--primary, .cart-collaterals .checkout-button, .woocommerce-shipping-calculator button, .single_add_to_cart_button, .woocommerce-tabs ul.tabs li a {
   color: #FFFFFF;
   background: #72AA4B; }
-  .btn--primary:hover, .single_add_to_cart_button:hover, .woocommerce-tabs ul.tabs li a:hover, .btn--primary:focus, .single_add_to_cart_button:focus, .woocommerce-tabs ul.tabs li a:focus {
+  .btn--primary:hover, .cart-collaterals .checkout-button:hover, .woocommerce-shipping-calculator button:hover, .single_add_to_cart_button:hover, .woocommerce-tabs ul.tabs li a:hover, .btn--primary:focus, .cart-collaterals .checkout-button:focus, .woocommerce-shipping-calculator button:focus, .single_add_to_cart_button:focus, .woocommerce-tabs ul.tabs li a:focus {
     color: #FFFFFF;
     background: #5a873b; }
 
@@ -2008,7 +1992,7 @@ input[type="submit"],
   width: 100%;
   text-align: left; }
 
-.btn--large, .single_add_to_cart_button {
+.btn--large, .cart-collaterals .checkout-button, .single_add_to_cart_button {
   font-size: 1.2rem;
   border-radius: 30px;
   padding: 0.75em 1.25em; }
@@ -2808,6 +2792,9 @@ span.icon--clock {
 .content {
   max-width: 850px; }
 
+.content--full {
+  max-width: 100%; }
+
 /**
  * Title:
  *    Footer
@@ -3294,6 +3281,60 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
 
 /* $. Woocommerce
 \*----------------------------------------------------------------*/
+.cart-collaterals {
+  background-color: #F8F8F8;
+  padding: 30px; }
+  .cart-collaterals .checkout-button {
+    display: block;
+    margin-top: 30px;
+    text-align: center; }
+  .cart-collaterals .coupon {
+    display: flex;
+    flex-wrap: wrap;
+    max-width: 100%;
+    margin-bottom: 20px; }
+    .cart-collaterals .coupon > * {
+      flex: 1;
+      flex-basis: 100%; }
+    .cart-collaterals .coupon button {
+      margin-top: 10px; }
+  .cart-collaterals .order-total .amount {
+    font-size: 22px;
+    font-weight: 600; }
+  .cart-collaterals .shop_table th {
+    padding-left: 0;
+    padding-bottom: 0; }
+  .cart-collaterals .shop_table td,
+  .cart-collaterals .shop_table th {
+    display: block;
+    padding-left: 0;
+    padding-right: 0; }
+
+.shipping th {
+  vertical-align: top;
+  padding-top: .5em; }
+
+.shipping ul {
+  list-style: none;
+  margin: 0 0 1em;
+  padding: 0; }
+  .shipping ul input {
+    height: auto;
+    margin-right: 10px; }
+
+.woocommerce-shipping-calculator input {
+  width: 100%;
+  margin-top: 10px; }
+
+.woocommerce-shipping-calculator button {
+  margin-top: 10px; }
+
+.woocommerce-shipping-totals td {
+  display: block; }
+
+.shipping-calculator-form {
+  margin-top: 20px; }
+
 /**
  * _fonts.scss
  * Custom WooCommerce fonts.
@@ -3434,5 +3475,95 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
   .woocommerce-tabs .wc-tab {
     padding: 1em 0; }
 
+.shop_table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 2px;
+  text-align: left; }
+  .shop_table td, .shop_table th, .shop_table caption {
+    padding: 10px;
+    border: none;
+    vertical-align: top; }
+  .shop_table tr:not(.shop_table__row):last-child > td {
+    border-bottom: none; }
+  .shop_table tr:nth-child(odd) td {
+    background: none; }
+  .shop_table th, .shop_table caption {
+    font-weight: bold;
+    background: none; }
+  @media screen and (min-width: 78em) {
+    .shop_table .product-thumbnail img {
+      width: 120px;
+      height: auto; } }
+  .shop_table input {
+    height: 40px;
+    padding: 0 15px;
+    border-radius: 0;
+    border-color: #666;
+    border-width: 1px; }
+  .shop_table .product-remove a {
+    color: #D62323;
+    font-size: 26px; }
+  .shop_table .quantity {
+    max-width: 100px; }
+    .shop_table .quantity input {
+      max-width: 100%; }
 
-/*# sourceMappingURL=main.dev.592ed6646ca4aa91d224.css.map*/
+.shop_table thead {
+  background: #F8F8F8; }
+
+.shop_table thead th {
+  padding: 20px 10px;
+  outline: 2px solid #F8F8F8;
+  font-size: 14px; }
+
+.shop_table {
+  font-size: .875rem; }
+
+.shop_table td {
+  padding: 10px;
+  border-bottom: 1px dashed #dedede;
+  font-size: 1em;
+  line-height: 1.4;
+  vertical-align: middle; }
+  .shop_table td p {
+    font-size: 1em;
+    margin: initial; }
+  .shop_table td a:hover {
+    text-decoration: underline; }
+  .shop_table td-head {
+    text-align: left; }
+
+.shop_table td .bold {
+  font-weight: 600; }
+
+@media screen and (max-width: 78em) {
+  .shop_table_responsive thead {
+    display: none; }
+  .shop_table_responsive tfoot, .shop_table_responsive tbody, .shop_table_responsive tr {
+    display: block; }
+  .shop_table_responsive tr {
+    padding-top: 20px;
+    padding-bottom: 20px;
+    padding-left: 0; }
+    .shop_table_responsive tr + tr {
+      border-top: 1px dashed #c3c3c3; }
+  .shop_table_responsive td {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 6px 0;
+    border-bottom: none; }
+  .shop_table_responsive td label {
+    margin-right: 20px; }
+  .shop_table_responsive .c-table__cell-value {
+    margin-left: auto; } }
+
+@media screen and (min-width: 78em) {
+  .shop_table_responsive th {
+    padding-right: 20px; }
+  .shop_table_responsive .td label {
+    display: none; } }
+
+
+/*# sourceMappingURL=main.dev.7e82010007095df1b18e.css.map*/

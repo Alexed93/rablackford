@@ -1,0 +1,170 @@
+// shop tables
+// td, th, caption {
+//     padding: $base/2;
+//     border: 1px solid darken($color-background, 10%);
+//     vertical-align: top;
+// }
+
+// tr:nth-child(odd) td {
+//     background: darken($color-background, 5%);
+// }
+
+// th, caption {
+//     font-weight: bold;
+//     background: darken($color-background, 10%);
+// }
+
+
+.shop_table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 2px;
+    text-align: left;
+
+    td, th, caption {
+        padding: 10px;
+        border: none;
+        vertical-align: top;
+    }
+
+    tr:not(.shop_table__row):last-child {
+
+        & > td {
+            border-bottom: none;
+        }
+    }
+
+    tr:nth-child(odd) td {
+        background: none;
+    }
+
+    th, caption {
+        font-weight: bold;
+        background: none;
+    }
+
+    .product-thumbnail img {
+        @include respond-min($bp4) {
+            width: 120px;
+            height: auto;
+        }
+    }
+
+    input {
+        height: 40px;
+        padding: 0 15px;
+        border-radius: 0;
+        border-color: #666;
+        border-width: 1px;
+    }
+
+    .product-remove a {
+        color: $red;
+        font-size: 26px;
+    }
+
+    .quantity {
+        max-width: 100px;
+
+        input {
+            max-width: 100%;
+        }
+    }
+}
+
+.shop_table thead {
+    background: $grey-lighter;
+}
+
+.shop_table thead th {
+    padding: 20px 10px;
+    outline: 2px solid $grey-lighter;
+    font-size: 14px;
+}
+
+.shop_table {
+    font-size: .875rem;
+}
+
+.shop_table td {
+    padding: 10px;
+    border-bottom: 1px dashed #dedede;
+    font-size: $base;
+    line-height: 1.4;
+    vertical-align: middle;
+
+    p {
+        font-size: $base;
+        margin: initial;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+    &-head {
+        text-align: left;
+    }
+}
+
+.shop_table td .bold {
+    font-weight: $weight-semi-bold;
+}
+
+
+// -----------------------------------------------------------------------------
+// Media Queries
+// -----------------------------------------------------------------------------
+
+@include respond-max($bp4) {
+
+    .shop_table_responsive {
+
+        thead {
+            display: none;
+        }
+
+        tfoot, tbody, tr {
+            display: block;
+        }
+
+        tr {
+            padding-top: 20px;
+            padding-bottom: 20px;
+            padding-left: 0;
+
+            + tr {
+                border-top: 1px dashed #c3c3c3;
+            }
+        }
+
+        td {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 6px 0;
+            border-bottom: none;
+        }
+
+        td label {
+            margin-right: 20px;
+        }
+
+        .c-table__cell-value {
+            margin-left: auto;
+        }
+    }
+}
+
+@include respond-min($bp4) {
+
+    .shop_table_responsive {
+
+        th {
+            padding-right: 20px;
+        }
+        .td label {
+            display: none;
+        }
+    }
+}

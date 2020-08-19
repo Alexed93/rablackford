@@ -1,0 +1,100 @@
+// cart collaterals
+.cart-collaterals {
+    background-color: $grey-lighter;
+    padding: 30px;
+
+
+    .checkout-button {
+        display: block;
+        margin-top: 30px;
+        text-align: center;
+
+        @extend .btn;
+        @extend .btn--primary;
+        @extend .btn--large;
+    }
+
+    .coupon {
+        display: flex;
+        flex-wrap: wrap;
+        max-width: 100%;
+        margin-bottom: 20px;
+
+        & > * {
+            flex: 1;
+            flex-basis: 100%;
+        }
+
+        button {
+            @extend .btn;
+            margin-top: 10px;
+        }
+
+    }
+
+    .apply_coupon {
+        @extend .btn;
+    }
+
+
+
+    .order-total {
+        .amount {
+            font-size: 22px;
+            font-weight: $weight-semi-bold;
+        }
+    }
+
+    .shop_table th {
+        padding-left: 0;
+        padding-bottom: 0;
+    }
+
+    .shop_table td,
+    .shop_table th {
+        display: block;
+        padding-left: 0;
+        padding-right: 0;
+    }
+}
+
+.shipping {
+    th {
+        vertical-align: top;
+        padding-top: .5em;
+    }
+
+    ul {
+        list-style: none;
+        margin: 0 0 $base;
+        padding: 0;
+
+        input {
+            height: auto;
+            margin-right: 10px;
+        }
+    }
+}
+
+.woocommerce-shipping-calculator {
+    input {
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    button {
+        @extend .btn;
+        @extend .btn--primary;
+        margin-top: 10px;
+    }
+}
+
+.woocommerce-shipping-totals {
+    td {
+        display: block;
+    }
+}
+
+.shipping-calculator-form {
+    margin-top: 20px;
+}

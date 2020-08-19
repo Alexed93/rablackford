@@ -38,27 +38,34 @@ label {
     padding-bottom: $base/4;
 }
 
-input[type=checkbox],
-input[type=radio] {
-    vertical-align: baseline;
-    background: none;
-    border: none;
-    height: .8em;
-    width: .8em;
+input[type=checkbox] + label,
+input[type=radio] + label {
+
+        display: inline-block;
+
 }
 
-input,
-select,
-textarea {
-    width: 100%;
-    padding: $base/2;
-    border: 1px solid;
-    border-radius: 0;
-    color: #666;
-    background-color: #FFF;
-    border-color: #CCC;
-    -webkit-appearance: none;
-}
+// input[type=checkbox],
+// input[type=radio] {
+//     vertical-align: baseline;
+//     background: none;
+//     border: none;
+//     height: .8em;
+//     width: .8em;
+// }
+
+// input,
+// select,
+// textarea {
+//     width: 100%;
+//     padding: $base/2;
+//     border: 1px solid;
+//     border-radius: 0;
+//     color: #666;
+//     background-color: #FFF;
+//     border-color: #CCC;
+//     -webkit-appearance: none;
+// }
 
 textarea {
     resize: vertical;
