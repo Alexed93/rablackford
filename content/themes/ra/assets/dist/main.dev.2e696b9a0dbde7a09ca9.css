@@ -1754,6 +1754,26 @@ input[type=checkbox] + label,
 input[type=radio] + label {
   display: inline-block; }
 
+input,
+select,
+textarea {
+  width: 100%;
+  padding: 0.75em;
+  border: 1px solid;
+  border-radius: 0;
+  color: #666;
+  background-color: #FFF;
+  border-color: #CCC;
+  -webkit-appearance: none; }
+  input:hover, input:active, input:focus,
+  select:hover,
+  select:active,
+  select:focus,
+  textarea:hover,
+  textarea:active,
+  textarea:focus {
+    border-color: #888888; }
+
 textarea {
   resize: vertical; }
 
@@ -3501,6 +3521,15 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     border-radius: 0;
     border-color: #666;
     border-width: 1px; }
+  .shop_table .select2-selection--single {
+    height: 40px;
+    border-radius: 0;
+    border-color: #666; }
+  .shop_table .select2-selection__rendered {
+    line-height: 36px !important;
+    padding-left: 15px !important; }
+  .shop_table .select2-selection__arrow {
+    height: 40px !important; }
   .shop_table .product-remove a {
     color: #D62323;
     font-size: 26px; }
@@ -3566,4 +3595,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.7e82010007095df1b18e.css.map*/
+/*# sourceMappingURL=main.dev.2e696b9a0dbde7a09ca9.css.map*/

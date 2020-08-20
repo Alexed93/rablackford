@@ -54,18 +54,24 @@ input[type=radio] + label {
 //     width: .8em;
 // }
 
-// input,
-// select,
-// textarea {
-//     width: 100%;
-//     padding: $base/2;
-//     border: 1px solid;
-//     border-radius: 0;
-//     color: #666;
-//     background-color: #FFF;
-//     border-color: #CCC;
-//     -webkit-appearance: none;
-// }
+input,
+select,
+textarea {
+    width: 100%;
+    padding: $base*0.75;
+    border: 1px solid;
+    border-radius: 0;
+    color: #666;
+    background-color: #FFF;
+    border-color: #CCC;
+    -webkit-appearance: none;
+
+    &:hover,
+    &:active,
+    &:focus {
+        border-color: $grey;
+    }
+}
 
 textarea {
     resize: vertical;
