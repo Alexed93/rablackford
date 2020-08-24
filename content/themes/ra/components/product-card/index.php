@@ -1,6 +1,7 @@
 <?php
 
 $prod_id = $args['id'] ?? '';
+$price = $args['price'] ?? false;
 
 if ($prod_id) {
     $product = wc_get_product($prod_id);
@@ -21,11 +22,40 @@ if ($product) :?>
 
                 <?php
 
-                    // show manual excerpt;
-                    echo wpautop($excerpt);
+                // show manual excerpt;
+                echo wpautop($excerpt);
 
                 ?>
 
+                <div>
+                    <?php
+                    // show price if requested by parent
+                    if ($price) :
+                        $price_html = $product->get_price_html();
+                        $weight = $product->get_weight();
+
+                        $weight_html = ' per bag';
+
+                        if ($weight) {
+                            $weight_html = ' per ' . wc_format_weight($weight) . ' bag';
+                        }
+
+                        $bulk_html = '';
+                        $has_bulk_discounts = ra_product_has_bulk_discount($product);
+
+                        if ($has_bulk_discounts) {
+                            $bulk_html = ' - bulk discounts available';
+                        }
+
+                        if ($price_html) : ?>
+                            <p>
+                                <span class="price"><?php echo $price_html . $weight_html . $bulk_html; ?></span>
+                            </p>
+                        <?php endif;
+
+                    endif;
+                    ?>
+                </div>
             </div>
         </article>
     </div>

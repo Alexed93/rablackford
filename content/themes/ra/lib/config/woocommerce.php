@@ -150,3 +150,20 @@ remove_action( 'woocommerce_before_main_content', 'woocommerce_breadcrumb', 20 )
 
 // product specific adjustments
 remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+
+
+// add weight after price on single product
+function rab_get_weight_for_product_price() {
+  global $product;
+
+  $weight = $product->get_weight();
+
+  $weight_html = '<div>per bag</div>';
+
+  if ($weight) {
+      $weight_html = '<div>per ' . wc_format_weight($weight) . ' bag</div>';
+  }
+
+  echo $weight_html;
+}
+add_action('woocommerce_single_product_summary', 'rab_get_weight_for_product_price', 15);

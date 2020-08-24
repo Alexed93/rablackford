@@ -5,6 +5,7 @@
  */
 
 $category = $args['category'] ?? '';
+$price = $args['price'] ?? false;
 
 $product_list = rab_get_products_from_category_by_ID($category);
 
@@ -16,7 +17,8 @@ if ($product_list) : ?>
                     rab_get_component(
                         'product-card',
                         [
-                            'id' => $item
+                            'id' => $item,
+                            'price' => $price
                         ]
                     );
 

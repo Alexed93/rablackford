@@ -88,7 +88,8 @@ do_action( 'woocommerce_before_main_content' );
 				rab_get_component(
 					'product-cards',
 					[
-						'category' => $tax_id
+						'category' => $tax_id,
+						'price' => true
 					]
 				);
 			endif;

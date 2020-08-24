@@ -86,3 +86,38 @@ function ra_term_links( $post_id, $taxonomy, $wrap = true ){
     return $str_output;
 
 }
+
+
+/**
+ * Check for bulk discount rules
+ *
+ * @param object $product A woocommerce product object
+ * @return boolean
+ */
+function ra_product_has_bulk_discount($product) {
+
+    if (!$product || !class_exists('WDP_Functions')) {
+        return false;
+    }
+
+    // if is variant
+    if ($product->is_type('variable')) :
+        $variations = $product->get_available_variations();
+        $variations_id = wp_list_pluck( $variations, 'variation_id' );
+
+        $rules = [];
+
+        foreach ($variations_id as $variation) {
+            $rules[] = WDP_Functions::get_active_rules_for_product($variation);
+        }
+    else :
+        $rules = WDP_Functions::get_active_rules_for_product($product->get_id());
+    endif;
+
+    if (!empty($rules)) {
+        return true;
+    }
+
+    return false;
+
+}
