@@ -1,0 +1,205 @@
+.customer-account {
+
+    @media (min-width: 768px) {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    & > nav {
+        ul {
+            list-style: none;
+            padding: 0px;
+            margin: 0 0 40px;
+        }
+
+         li {
+            font-size: 16px;
+            padding: 10px 0px;
+            border-bottom: solid 1px #eaeaea;
+
+            &.is-active a {
+                font-weight: bold;
+                color: #3b3b3b;
+            }
+        }
+
+        ul ul {
+            margin-top: 10px;
+        }
+
+        ul ul li {
+            padding: 10px 0px 10px 20px;
+            border-bottom: none;
+            border-top: solid 1px #eaeaea;
+        }
+
+        ul ul li:last-of-type {
+            padding-bottom: 0px;
+        }
+
+        @media (min-width: 768px) {
+            flex: 0 0 200px;
+            max-width: 200px;
+            margin-right: 50px;
+        }
+    }
+
+    & > div {
+        flex: 1;
+    }
+
+    form {
+        padding: 30px;
+        background-color: $grey-lighter;
+
+        h3 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: .8125em;
+            line-height: 1.2;
+        }
+
+        input {
+            display: block;
+            width: 100%;
+            height: 50px;
+            padding-right: 15px;
+            padding-left: 15px;
+            border: solid 1px #cacaca;
+
+            &:focus,
+            &:active {
+                border-color: #999999;
+            }
+        }
+
+        button {
+            margin-top: 20px;
+        }
+
+        p {
+            margin-top: 20px;
+        }
+    }
+
+    fieldset {
+        margin-top: 20px;
+
+        legend {
+            //font-family: $font-sans;
+            margin-top: 0px;
+            margin-bottom: 0;
+            font-weight: $weight-semi-bold;
+            border-bottom: 0;
+        }
+    }
+}
+
+
+.woocommerce-Address {
+    flex-basis: 50%;
+    padding: 30px;
+    background-color: $grey-lighter;
+}
+
+.woocommerce-Address-title {
+    margin-bottom: 10px;
+}
+
+
+// Login
+#customer_login {
+    max-width: 960px;
+    margin: 0 auto;
+
+    & > * {
+        padding: 30px;
+        background-color: $grey-lighter;
+        margin: 0 20px 20px;
+        flex-basis: 50%;
+
+        h2 {
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: .8125em;
+            line-height: 1.2;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        input[type="email"] {
+            display: block;
+            width: 100%;
+            height: 50px;
+            padding-right: 15px;
+            padding-left: 15px;
+            border: solid 1px #cacaca;
+
+            &:focus,
+            &:active {
+                border-color: #999999;
+            }
+        }
+
+        button {
+            margin-top: 10px;
+            @extend .btn--primary;
+        }
+
+        p {
+            margin-top: 20px;
+        }
+    }
+}
+
+// reset
+.lost_reset_password {
+    padding: 30px;
+    background-color: $grey-lighter;
+    max-width: 400px;
+    margin: 0 auto;
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: .8125em;
+        line-height: 1.2;
+    }
+
+    input {
+        display: block;
+        width: 100%;
+        height: 50px;
+        padding-right: 15px;
+        padding-left: 15px;
+        border: solid 1px #cacaca;
+
+        &:focus,
+        &:active {
+            border-color: #999999;
+        }
+    }
+
+    button {
+        margin-top: 20px;
+    }
+
+    p {
+        margin-top: 20px;
+    }
+}
