@@ -44,7 +44,7 @@
     }
 
     .product-thumbnail img {
-        @include respond-min($bp4) {
+        @include respond-min($bp3) {
             width: 120px;
             height: auto;
         }

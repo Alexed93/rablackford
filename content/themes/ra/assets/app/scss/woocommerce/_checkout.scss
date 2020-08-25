@@ -1,0 +1,111 @@
+.woocommerce-checkout {
+    h2,
+    h3 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 6px;
+        font-size: .8125em;
+        line-height: 1.2;
+    }
+
+    input[type="text"],
+    input[type="password"],
+    input[type="email"],
+    input[type="tel"],
+    textarea {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        height: 50px;
+        padding-right: 15px;
+        padding-left: 15px;
+        border: solid 1px #cacaca;
+
+        &:focus,
+        &:active {
+            border-color: #999999;
+        }
+    }
+
+    textarea {
+        height: 200px;
+    }
+
+    button {
+        margin-top: 20px;
+    }
+
+    .button {
+        @extend .btn;
+        @extend .btn--primary;
+        @extend .btn--large;
+        display: block;
+        width: 100%;
+    }
+}
+
+.woocommerce-checkout-payment {
+    margin-top: 30px;
+    border-top: solid 1px $grey-light;
+    padding-top: 30px;
+
+    ul {
+        list-style: none;
+        padding-left: 0;
+    }
+}
+
+// stripe
+
+.wc-stripe-elements-field {
+    border-color: $grey-light;
+    padding: 15px;
+    margin-bottom: 10px;
+}
+
+
+.flex-checkout {
+    @include respond-min($bp3) {
+        display: flex;
+        flex-wrap: wrap;
+    }
+
+    // .woocommerce-form__label-for-checkbox {
+    //     padding-left: 20px;
+    // }
+}
+
+.flex-checkout__customer {
+
+    @include respond-min($bp3) {
+        flex: 1;
+        margin-right: 40px;
+    }
+
+    & > div > * {
+        padding: 30px;
+        background-color: $grey-lighter;
+        margin-bottom: 20px;
+
+        @include respond-min($bp3) {
+            &:last-of-type {
+                margin-bottom: 0;
+            }
+        }
+    }
+}
+
+.flex-checkout__order {
+    padding: 30px;
+    background-color: $grey-lighter;
+
+    @include respond-min($bp3) {
+        flex: 1;
+        align-self: flex-start;
+        //margin-right: 40px;
+    }
+}
