@@ -1704,7 +1704,9 @@ img {
   margin: 0 auto;
   font-style: italic;
   color: #666;
-  vertical-align: middle; }
+  vertical-align: middle;
+  max-width: 100%;
+  height: auto; }
 
 img,
 audio,
@@ -2668,8 +2670,9 @@ span.icon--clock {
 .pricing td, .pricing th {
   border: none; }
 
-.pricing__toprow th {
-  background: #72AA4B;
+.pricing__toprow th,
+.pricing__toprow td {
+  background: #72AA4B !important;
   color: #FFFFFF;
   text-align: center; }
 
@@ -3844,4 +3847,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.acd10d5c64f729d80940.css.map*/
+/*# sourceMappingURL=main.dev.f39473d09370e05d7716.css.map*/
