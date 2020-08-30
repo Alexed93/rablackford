@@ -8,7 +8,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class Woo_Conditional_Shipping_Frontend {
-  private $passed_rules = array();
+  private $passed_rule_ids = array();
 
   /**
    * Constructor
@@ -85,7 +85,7 @@ class Woo_Conditional_Shipping_Frontend {
    */
   public function filter_shipping_methods( $rates, $package ) {
     $rulesets = woo_conditional_shipping_get_rulesets( true );
-    $this->passed_rules = array();
+    $this->passed_rule_ids = array();
 
     $disable_keys = array();
     $enable_keys = array();
@@ -94,7 +94,7 @@ class Woo_Conditional_Shipping_Frontend {
       $passes = $ruleset->validate( $package );
 
       if ( $passes ) {
-        $this->passed_rules[] = $ruleset;
+        $this->passed_rule_ids[] = $ruleset->get_id();
       }
 
       foreach ( $ruleset->get_actions() as $action ) {
@@ -135,7 +135,33 @@ class Woo_Conditional_Shipping_Frontend {
       }
     }
 
+    // Store passed rule IDs into the session for later use
+    // We cannot use $this->passed_rule_ids directly since this function is not evaluated
+    // if rates are fetched from WC cache. Thus we use session which will always contain
+    // passed_rule_ids
+    WC()->session->set( 'wcp_passed_rule_ids', $this->passed_rule_ids );
+
     return $rates;
+  }
+
+  /**
+   * Get passed rules from session
+   */
+  private function get_passed_rules() {
+    $passed_rule_ids = WC()->session->get( 'wcp_passed_rule_ids' );
+    $passed_rules = array();
+
+    if ( ! empty( $passed_rule_ids ) ) {
+      $rulesets = woo_conditional_shipping_get_rulesets( true );
+
+      foreach ( $rulesets as $ruleset ) {
+        if ( in_array( $ruleset->get_id(), $passed_rule_ids, true ) ) {
+          $passed_rules[] = $ruleset;
+        }
+      }
+    }
+
+    return $passed_rules;
   }
 
   /**
@@ -144,7 +170,7 @@ class Woo_Conditional_Shipping_Frontend {
   public function shipping_notice() {
     $notices = array();
 
-    foreach ( $this->passed_rules as $ruleset ) {
+    foreach ( $this->get_passed_rules() as $ruleset ) {
       foreach ( $ruleset->get_actions() as $action ) {
         if ( $action['type'] === 'shipping_notice' && ! empty( $action['notice'] ) ) {
           $notices[] = sprintf( '<div class="conditional-shipping-notice">%s</div>', htmlspecialchars( $action['notice'], ENT_QUOTES, 'UTF-8' ) );
@@ -164,7 +190,7 @@ class Woo_Conditional_Shipping_Frontend {
     $msgs = array();
     $i = 1;
 
-    foreach ( $this->passed_rules as $ruleset ) {
+    foreach ( $this->get_passed_rules() as $ruleset ) {
       foreach ( $ruleset->get_actions() as $action ) {
         if ( $action['type'] === 'custom_error_msg' && ! empty( $action['error_msg'] ) ) {
           $msgs[] = sprintf( '<div class="conditional-shipping-custom-error-msg i-%d">%s</div>', $i, htmlspecialchars( $action['error_msg'], ENT_QUOTES, 'UTF-8' ) );

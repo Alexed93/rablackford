@@ -2,9 +2,9 @@
 Contributors: wooelements
 Tags: woocommerce shipping, conditional shipping
 Requires at least: 4.5
-Tested up to: 5.4
+Tested up to: 5.5
 Requires PHP: 5.4
-Stable tag: 2.0.4
+Stable tag: 2.1.0
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -25,7 +25,8 @@ With Conditional Shipping you can set maximum weight (30 kg) for Economy and min
 
 * Restrict WooCommerce shipping methods based on conditions
 * Works with existing shipping methods
-* WooCommerce 3+ compatible
+* [Support for dynamic shipping rates](https://wooelements.com/guide/conditional-shipping-pro-guide/#elementor-toc__heading-anchor-4) such as USPS and DHL
+* WooCommerce 3.x and 4.x compatible
 
 = Available Conditions =
 
@@ -54,7 +55,7 @@ With Conditional Shipping you can set maximum weight (30 kg) for Economy and min
 
 = Support Policy =
 
-If you need any help with the plugin, feel free to contact us either by email (support@wooelements.com) or [WordPress plugin support forum](https://wordpress.org/support/plugin/conditional-shipping-for-woocommerce).
+If you need any help with the plugin, please create a new post on the [WordPress plugin support forum](https://wordpress.org/support/plugin/conditional-shipping-for-woocommerce/). It will be checked regularly but please note that response cannot be guaranteed to all issues. Priority email support is available for the Pro version.
 
 = Other Useful Plugins =
 
@@ -75,6 +76,12 @@ Conditional Shipping is installed just like any other WordPress plugin.
 Once the plugin is activated, you should see "Conditions" for shipping methods created with shipping zones.
 
 == Changelog ==
+
+= 2.1.0 =
+
+* Added Health Check to catch common issues with rulesets
+* Added AJAX toggle for ruleset state (enabled / disabled)
+* Excluded taxes from the subtotal condition if the store displays subtotal excluding tax (_WooCommerce > Settings > Tax > Display prices during cart and checkout_). *Please note!* Ensure rulesets are working correctly after updating if you have subtotal conditions.
 
 = 2.0.4 =
 

@@ -24,16 +24,13 @@ class Woo_Conditional_Shipping_Admin {
     // Add link to conditions to the plugins page
     add_filter( 'plugin_action_links_' . WOO_CONDITIONAL_SHIPPING_BASENAME, array( $this, 'add_conditions_link' ) );
 
-    // Legacy: show message about moved settings
-    if ( get_option( 'wcs_conditions', false ) ) {
-			add_filter( 'woocommerce_shipping_zone_shipping_methods', array( $this, 'add_fields_modal'), 10, 4 );
-			add_filter( 'woocommerce_settings_shipping', array( $this, 'add_fields'), 20, 0 );
-		}
-
 		// Hide default settings from conditions settings
 		// WooCommerce 3.6.2 at least has a bug which causes default shipping options to be output
 		// without standard section
-		add_filter( 'woocommerce_get_settings_shipping', array( $this, 'hide_default_settings' ), 100, 2 );
+    add_filter( 'woocommerce_get_settings_shipping', array( $this, 'hide_default_settings' ), 100, 2 );
+    
+    // Admin AJAX action for toggling ruleset activity
+    add_action( 'wp_ajax_wcs_toggle_ruleset', array( $this, 'toggle_ruleset' ) );
 	}
 	
   /**
@@ -54,7 +51,15 @@ class Woo_Conditional_Shipping_Admin {
     
     wp_enqueue_script( 'woo_conditional_shipping_admin_js', plugin_dir_url( __FILE__ ) . '../../admin/js/woo-conditional-shipping.js', array( 'jquery', 'wp-util' ), WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION );
     
-		wp_enqueue_style( 'woo_conditional_shipping_admin_css', plugin_dir_url( __FILE__ ) . '../../admin/css/woo-conditional-shipping.css', array(), WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION );
+    wp_enqueue_style( 'woo_conditional_shipping_admin_css', plugin_dir_url( __FILE__ ) . '../../admin/css/woo-conditional-shipping.css', array(), WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION );
+    
+		$ajax_url = add_query_arg( array(
+			'action' => 'wcs_toggle_ruleset',
+		), admin_url( 'admin-ajax.php' ) );
+
+		wp_localize_script( 'woo_conditional_shipping_admin_js', 'woo_conditional_shipping', array(
+			'ajax_url' => $ajax_url,
+		) );
   }
   
   /**
@@ -98,6 +103,8 @@ class Woo_Conditional_Shipping_Admin {
         $hide_save_button = true;
 
         $rulesets = woo_conditional_shipping_get_rulesets();
+
+        $health = $this->health_check();
         
         include 'views/settings.html.php';
       }
@@ -152,7 +159,118 @@ class Woo_Conditional_Shipping_Admin {
       wp_safe_redirect( $url );
       exit;
     }
-	}
+  }
+  
+  /**
+   * Toggle reulset
+   */
+  public function toggle_ruleset() {
+    if ( ! current_user_can( 'manage_woocommerce' ) ) {
+      http_response_code( 403 );
+      die( 'Permission denied' );
+    }
+
+    $ruleset_id = $_POST['id'];
+
+    $post = get_post( $ruleset_id );
+
+    if ( $post && get_post_type( $post ) === 'wcs_ruleset' ) {
+      $enabled = get_post_meta( $post->ID, '_wcs_enabled', true ) === 'yes';
+      $new_status = $enabled ? 'no' : 'yes';
+      update_post_meta( $post->ID, '_wcs_enabled', $new_status );
+
+      // Increments the transient version to invalidate cache.
+		  WC_Cache_Helper::get_transient_version( 'shipping', true );
+
+      echo json_encode( array(
+        'enabled' => ( get_post_meta( $post->ID, '_wcs_enabled', true ) === 'yes' ),
+      ) );
+      
+      die;
+    }
+
+    http_response_code(422);
+    die;
+  }
+
+  /**
+   * Health check
+   */
+  private function health_check() {
+    return array(
+      'enables' => $this->health_check_enables(),
+      'disables' => $this->health_check_disables(),
+    );
+  }
+
+  /**
+   * Check if there are disabled shipping methods in the rulesets
+   * 
+   * Conditional Shipping can only process shipping methods which are enabled
+   * in the shipping zones
+   */
+  private function health_check_disables() {
+    // Get all rulesets
+    $rulesets = woo_conditional_shipping_get_rulesets( true );
+
+    $shipping_method_actions = array(
+      'enable_shipping_methods', 'disable_shipping_methods',
+      'set_price', 'increase_price', 'decrease_price',
+    );
+
+    $disables = array();
+    foreach ( $rulesets as $ruleset ) {
+      foreach ( $ruleset->get_actions() as $action ) {
+        if ( in_array( $action['type'], $shipping_method_actions, true ) && isset( $action['shipping_method_ids'] ) && is_array( $action['shipping_method_ids'] ) ) {
+          foreach ( $action['shipping_method_ids'] as $instance_id ) {
+            $instance = woo_conditional_shipping_method_get_instance( $instance_id );
+
+            if ( $instance && ! $instance->is_enabled ) {
+              $disables[] = array(
+                'instance_id' => $instance_id,
+                'zone_id' => $instance->zone_id,
+                'ruleset' => $ruleset,
+                'action' => $action,
+              );
+            }
+          }
+        }
+      }
+    }
+
+    return $disables;
+  }
+
+  /**
+   * Check for multiple "Enable shipping methods" for the same shipping method
+   */
+  private function health_check_enables() {
+    // Get all rulesets
+    $rulesets = woo_conditional_shipping_get_rulesets( true );
+
+    // Check if there are overlapping "Enable shipping methods"
+    $enables = array();
+    foreach ( $rulesets as $ruleset ) {
+      foreach ( $ruleset->get_actions() as $action ) {
+        if ( $action['type'] === 'enable_shipping_methods' && isset( $action['shipping_method_ids'] ) && is_array( $action['shipping_method_ids'] ) ) {
+          foreach ( $action['shipping_method_ids'] as $id ) {
+            if ( ! isset( $enables[$id] ) ) {
+              $enables[$id] = array();
+            }
+
+            $enables[$id][] = $ruleset->get_id();
+          }
+        }
+      }
+    }
+
+    // Filter out if there is only one "Enable shipping methods" for a shipping method
+    $enables = array_filter( $enables, function( $ruleset_ids ) {
+      return count( $ruleset_ids ) > 1;
+    } );
+
+    return $enables;
+  }
 
 	/**
 	 * Hide default settings from condition settings
@@ -163,59 +281,5 @@ class Woo_Conditional_Shipping_Admin {
 		}
 
 		return $settings;
-	}
-
-	/**
-	 * Add fields to a shipping method settings in a modal
-	 * 
-	 * @legacy
-	 */
-	public function add_fields_modal( $methods, $raw_methods, $allowed_classes, $wc_shipping_zone ) {
-		foreach ( $methods as $instance_id => $method ) {
-			if ( $method->has_settings ) {
-				// Do not add settings to the modal if there are no other settings. Plugins
-				// like USPS only show settings in a separate window.
-				if ( ! empty ( $method->settings_html ) ) {
-					$methods[$instance_id]->settings_html .= $this->generate_settings_html( $method );
-				}
-			}
-		}
-
-		return $methods;
-	}
-
-	/**
-	 * Add fields to a shipping method settings in a separate page
-	 * 
-	 * @legacy
-	 */
-	public function add_fields() {
-		if ( isset( $_REQUEST['instance_id'] ) && ! empty( $_REQUEST['instance_id'] ) ) {
-			$instance_id = absint( $_REQUEST['instance_id'] );
-			$zone = WC_Shipping_Zones::get_zone_by( 'instance_id', $instance_id );
-			$shipping_method = WC_Shipping_Zones::get_shipping_method( $instance_id );
-
-			if ( ! $shipping_method || ! $zone || ! $shipping_method->has_settings() ) {
-				return;
-			}
-
-			echo $this->generate_settings_html( $shipping_method );
-		}
-	}
-
-	/**
-	 * Generate settings HTML for conditions
-	 * 
-	 * @legacy
-	 */
-	public function generate_settings_html( $method ) {
-		$output = '';
-
-		$output .= '<h3 class="wc-settings-sub-title">' . wp_kses_post( __( 'Conditions', 'woo-conditional-shipping' ) ) . '</h3>';
-
-		$url = admin_url( 'admin.php?page=wc-settings&tab=shipping&section=woo_conditional_shipping' );
-		$output .= '<p>' . sprintf( __( 'As of version 2.0.0 conditions are moved to <a href="%s">separate settings page</a>.', 'woo-conditional-shipping' ), $url ) . '</p>';
-
-		return $output;
 	}
 }

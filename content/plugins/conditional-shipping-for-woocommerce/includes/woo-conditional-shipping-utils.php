@@ -114,11 +114,11 @@ function woo_conditional_shipping_filter_groups() {
  */
 function woo_conditional_shipping_actions() {
   return apply_filters( 'woo_conditional_shipping_actions', array(
-    'enable_shipping_methods' => array(
-      'title' => __( 'Enable shipping methods', 'woo-conditional-shipping' ),
-    ),
     'disable_shipping_methods' => array(
       'title' => __( 'Disable shipping methods', 'woo-conditional-shipping' ),
+    ),
+    'enable_shipping_methods' => array(
+      'title' => __( 'Enable shipping methods', 'woo-conditional-shipping' ),
     ),
   ) );
 }
@@ -325,4 +325,80 @@ function woo_conditional_shipping_time_mins_options() {
   }
 
   return $options;
+}
+
+/**
+ * Get shipping method title by instance ID
+ */
+function woo_conditional_shipping_get_method_title( $instance_id ) {
+  $options = woo_conditional_shipping_get_shipping_method_options();
+
+  foreach ( $options as $zone_id => $data ) {
+    foreach ( $data['options'] as $id => $option ) {
+      if ( $instance_id == $id ) {
+        return $option['title'];
+      }
+    }
+  }
+
+  return $instance_id;
+}
+
+/**
+ * Get shipping zone ULR
+ */
+function woo_conditional_shipping_get_zone_url( $zone_id ) {
+  return add_query_arg( array(
+    'page' => 'wc-settings',
+    'tab' => 'shipping',
+    'zone_id' => $zone_id,
+  ), admin_url( 'admin.php' ) );
+}
+
+/**
+ * Get shipping method instance
+ */
+function woo_conditional_shipping_method_get_instance( $instance_id ) {
+  if ( ! ctype_digit( strval( $instance_id ) ) ) {
+    return null;
+  }
+
+  global $wpdb;
+  $results = $wpdb->get_results( $wpdb->prepare( "SELECT zone_id, method_id, instance_id, method_order, is_enabled FROM {$wpdb->prefix}woocommerce_shipping_zone_methods WHERE instance_id = %d LIMIT 1;", $instance_id ) );
+
+  if ( count( $results ) <> 1 ) {
+    return null;
+  }
+
+  return reset( $results );
+}
+
+/**
+ * Get action title by action ID
+ */
+function woo_conditional_shipping_action_title( $action_id ) {
+  $actions = woo_conditional_shipping_actions();
+
+  if ( isset( $actions[$action_id] ) ) {
+    return $actions[$action_id]['title'];
+  }
+
+  return __( 'N/A', 'woo-conditional-shipping' );
+}
+
+/**
+ * Format ruleset IDs into a list of links
+ */
+function woo_conditional_shipping_format_ruleset_ids( $ids ) {
+  $items = array();
+
+  foreach ( $ids as $id ) {
+    $ruleset = new Woo_Conditional_Shipping_Ruleset( $id );
+
+    if ( $ruleset->get_post() ) {
+      $items[] = sprintf( '<a href="%s" target="_blank">%s</a>', $ruleset->get_admin_edit_url(), $ruleset->get_title() );
+    }
+  }
+
+  return implode( ', ', $items );
 }

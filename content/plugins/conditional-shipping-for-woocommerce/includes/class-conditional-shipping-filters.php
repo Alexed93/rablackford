@@ -108,14 +108,19 @@ class Woo_Conditional_Shipping_Filters {
 			} 
 		}
 
-		$cart = WC()->cart;
-		$cart_subtotal = $cart->subtotal;
+		$total = WC()->cart->get_displayed_subtotal();
 
-		if ( isset( $condition['subtotal_includes_coupons'] ) && $condition['subtotal_includes_coupons'] && method_exists( $cart, 'get_discount_total' ) ) {
-			$cart_subtotal -= ( floatval( $cart->get_discount_total() ) + floatval( $cart->get_discount_tax() ) );
+		if ( isset( $condition['subtotal_includes_coupons'] ) && $condition['subtotal_includes_coupons'] && method_exists( WC()->cart, 'get_discount_total' ) ) {
+			$total -= floatval( WC()->cart->get_discount_total() );
+
+			if ( WC()->cart->display_prices_including_tax() ) {
+				$total -= floatval( WC()->cart->get_discount_tax() );
+			}
 		}
 
-		return $cart_subtotal;
+		$total = round( $total, wc_get_price_decimals() );
+
+		return $total;
 	}
 
 	/**
@@ -128,11 +133,21 @@ class Woo_Conditional_Shipping_Filters {
 
 		$items = self::get_subset_of_items_by_shipping_class( $condition );
 
+		$incl_tax = WC()->cart->display_prices_including_tax();
+
 		foreach ( $items as $key => $item ) {
 			if ( $subtotal_includes_coupons ) {
-				$subtotal += $item['line_total'] + $item['line_tax'];
+				$subtotal += $item['line_total'];
+
+				if ( $incl_tax ) {
+					$subtotal += $item['line_tax'];
+				}
 			} else {
-				$subtotal += $item['line_subtotal'] + $item['line_subtotal_tax'];
+				$subtotal += $item['line_subtotal'];
+
+				if ( $incl_tax ) {
+					$subtotal += $item['line_subtotal_tax'];
+				}
 			}
 		}
 
@@ -173,10 +188,12 @@ class Woo_Conditional_Shipping_Filters {
 	 */
 	public static function get_order_attr( $attr ) {
 		if ( WC()->cart ) {
-			return call_user_func( array( WC()->customer, "get_{$attr}" ) );
+			$value = call_user_func( array( WC()->customer, "get_{$attr}" ) );
+		} else {
+			$value = NULL;
 		}
 
-		return NULL;
+		return apply_filters( 'woo_conditional_shipping_get_order_attr', $value, $attr );
 	}
 
 	/**
@@ -232,7 +249,7 @@ class Woo_Conditional_Shipping_Filters {
 			}
 		}
 
-		return $total_weight;
+		return apply_filters( 'woo_conditional_shipping_package_weight', $total_weight, $package );
 	}
 
 	/**

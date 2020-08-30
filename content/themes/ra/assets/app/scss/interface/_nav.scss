@@ -167,6 +167,10 @@ $color-nav: $color-link;
                 margin-left: 0;
             }
 
+            &.is-current .nav__link {
+                color: darken($color-brand-primary, 10%);
+            }
+
         }
     }
 

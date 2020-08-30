@@ -199,6 +199,12 @@ table.woo-conditional-shipping-rulesets {
 		}
 	}
 
+	.woo-conditional-shipping-ruleset-status {
+		.woocommerce-input-toggle {
+			cursor: pointer;
+		}
+	}
+
 	tfoot {
 		input, select {
 			vertical-align: middle !important;
@@ -212,4 +218,64 @@ table.woo-conditional-shipping-rulesets {
 
 .ui-autocomplete {
 	z-index: 150000 !important;
+}
+
+/**
+ * Health check
+ */
+.woo-conditional-shipping-health-check {
+	.issue-container {
+		margin-bottom: 10px;
+		line-height: 24px;
+		font-size: 14px;
+		background: #fff9db;
+		color: #91300a;
+		border: 1px solid #ffd8a8;
+		
+		.title {
+			border-bottom: 1px solid #ffd8a8;
+			padding: 10px 20px;
+			font-weight: bold;
+			cursor: pointer;
+
+			.toggle-indicator {
+
+				&::before {
+					content: "\f140";
+					display: inline-block;
+					font: normal 20px/1 dashicons;
+					speak: none;
+					-webkit-font-smoothing: antialiased;
+					-moz-osx-font-smoothing: grayscale;
+					text-decoration: none;
+					float: right;
+				}
+
+				&.open {
+					&::before {
+						content: "\f142";
+					}
+				}
+			}
+		}
+
+		.details {
+			display: none;
+			padding: 20px;
+
+			.fix {
+				margin-top: 10px;
+	
+				ul {
+					font-weight: normal;
+					list-style: disc;
+					padding-left: 20px;
+					margin: 10px 0 0;
+					
+					li {
+					}
+				}
+			}
+		}
+	}
 }

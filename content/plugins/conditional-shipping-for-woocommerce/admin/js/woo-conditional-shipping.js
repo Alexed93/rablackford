@@ -326,4 +326,55 @@ jQuery(document).ready(function($) {
 	$( document ).on( 'click', '.woo-conditional-shipping-ruleset-delete', function( e ) {
 		return confirm( "Are you sure?" );
 	} );
+
+	/**
+	 * Open health check issue
+	 */
+	$( document ).on( 'click', '.woo-conditional-shipping-health-check .issue-container .title', function( e ) {
+		var container = $( this ).closest( '.issue-container' );
+
+		$( '.details', container ).slideToggle();
+		$( '.toggle-indicator' ).toggleClass( 'open' );
+	} );
+
+	/**
+	 * AJAX toggle
+	 */
+	$( document ).on( 'click', '.woo-conditional-shipping-ruleset-status .woocommerce-input-toggle', function( e ) {
+		e.preventDefault();
+
+		var self = this;
+
+		var data = {
+			id: $( this ).data( 'id' ),
+		};
+
+		$.ajax( {
+			type: 'post',
+			url: woo_conditional_shipping.ajax_url,
+			data: data,
+			dataType: 'json',
+			beforeSend: function() {
+				$( self ).removeClass( 'woocommerce-input-toggle--enabled woocommerce-input-toggle--disabled' );
+				$( self ).addClass( 'woocommerce-input-toggle--loading' );
+			},
+			success: function( response ) {
+				$( self ).removeClass( 'woocommerce-input-toggle--loading' );
+
+				if ( response.enabled ) {
+					var cssClass = 'woocommerce-input-toggle--enabled';
+				} else {
+					var cssClass = 'woocommerce-input-toggle--disabled';
+				}
+
+				$( self ).addClass( cssClass );
+			},
+			error: function() {
+				alert( 'Unknown error' );
+			},
+			complete: function() {
+
+			}
+		} );
+	} );
 });
