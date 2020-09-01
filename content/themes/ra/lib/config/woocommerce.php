@@ -177,7 +177,7 @@ function rab_order_delivery_options(){
 
     //if (  WC()->session->get( 'chosen_shipping_methods' )[0] == targeted_shipping_method() ) :
 
-        echo '<tr class="delivery"><th>' . __('Delivery options', $domain) . '</th><td>';
+        echo '<tr class="delivery"><th>' . __('Fuel delivery method', $domain) . '</th><td>';
         echo '<ul id="delivery__methods" class="">';
 
         $chosen = WC()->session->get('chosen_delivery');
@@ -200,6 +200,12 @@ function rab_order_delivery_options(){
         <?php
 
         echo '</ul>';
+
+        $method_text = get_field('delivery_method_supporting_text', 'options');
+
+        if ($method_text) :
+            echo wpautop($method_text);
+        endif;
         echo '</td></tr>';
 
     //endif;
@@ -294,4 +300,57 @@ function wc_get_delivery_ajax_data() {
         echo json_encode( $delivery ); // Return the value to jQuery
     }
     die();
+}
+
+
+// add custom delivery method to order
+add_action( 'woocommerce_checkout_create_order', 'rab_custom_meta_to_order', 20, 1 );
+function rab_custom_meta_to_order( $order ) {
+
+    if (isset($_POST['radio_delivery'])) {
+        $delivery_method = $_POST['radio_delivery'];
+        if (!empty($delivery_method)) $order->update_meta_data('delivery_method', $delivery_method);
+    }
+
+}
+
+// show custom delivery method in admin
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'rab_custom_delivery_method_in_admin', 10, 1 );
+function rab_custom_delivery_method_in_admin($order){
+    // Get the custom field value
+    $delivery_method = get_post_meta( $order->get_id(), 'delivery_method', true );
+
+    $delivery_text = '';
+
+    if ($delivery_method == 'radio_delivery_closed') {
+        $delivery_text = 'Sealed Bags';
+    }
+
+    if ($delivery_method == 'radio_delivery_open') {
+        $delivery_text = 'Open Bags';
+    }
+    // Display the custom field:
+    if ($delivery_text) {
+        echo '<h3>' . __('Delivery Method', 'woocommerce') . ': </h3><p>' . $delivery_text . '</p>';
+    }
+}
+
+
+// show delivery method in order review and emails
+add_action( 'woocommerce_order_item_meta_end', 'rab_custom_delivery_method_review', 10, 3 );
+function rab_custom_delivery_method_review( $item_id, $item, $order ){
+    // Get the custom field value
+    $delivery_method = get_post_meta( $order->get_id(), 'delivery_method', true );
+
+    $delivery_text = '';
+
+    if ($delivery_method == 'radio_delivery_closed') {
+        $delivery_text = 'Sealed Bags';
+    }
+
+    if ($delivery_method == 'radio_delivery_open') {
+        $delivery_text = 'Open Bags';
+    }
+    // Display the custom field:
+    echo '<p class="u-pad-top"><strong>' . __('Delivery Method', 'woocommerce') . ': </strong>' . $delivery_text . '</p>';
 }
