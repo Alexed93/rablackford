@@ -167,3 +167,131 @@ function rab_get_weight_for_product_price() {
   echo $weight_html;
 }
 add_action('woocommerce_single_product_summary', 'rab_get_weight_for_product_price', 15);
+
+
+// cart custom delivery option
+add_action( 'woocommerce_review_order_after_shipping', 'rab_order_delivery_options', 20 );
+add_action('woocommerce_cart_totals_before_order_total', 'rab_order_delivery_options', 20);
+function rab_order_delivery_options(){
+    $domain = 'wocommerce';
+
+    //if (  WC()->session->get( 'chosen_shipping_methods' )[0] == targeted_shipping_method() ) :
+
+        echo '<tr class="delivery"><th>' . __('Delivery options', $domain) . '</th><td>';
+        echo '<ul id="delivery__methods" class="">';
+
+        $chosen = WC()->session->get('chosen_delivery');
+        $chosen = empty($chosen) ? WC()->checkout->get_value('delivery') : $chosen;
+        $chosen = empty($chosen) ? 'radio_delivery_open' : $chosen;
+
+        //echo $chosen;
+
+        ?>
+        <li>
+          <input type="radio" class="input-radio " value="radio_delivery_open" name="radio_delivery"  id="radio_delivery_open" <?php checked( $chosen, 'radio_delivery_open', true ); ?>/>
+          <label for="radio_delivery_open" class="radio ">Open Sacks</label>
+        </li>
+        <li>
+          <input type="radio" class="input-radio " value="radio_delivery_closed" name="radio_delivery"  id="radio_delivery_bagged" <?php checked( $chosen, 'radio_delivery_closed', true ); ?>/>
+          <label for="radio_delivery_bagged" class="radio ">Sealed Plastic Bags</label>
+        </li>
+
+
+        <?php
+
+        echo '</ul>';
+        echo '</td></tr>';
+
+    //endif;
+}
+
+
+// jQuery - Ajax script
+add_action( 'wp_footer', 'checkout_delivery_script' );
+function checkout_delivery_script() {
+    // Only checkout page
+    if ( ! is_checkout() ) return;
+    ?>
+    <script type="text/javascript">
+    jQuery( function($){
+        if (typeof wc_checkout_params === 'undefined')
+            return false;
+
+        $('form.checkout').on('change', 'input[name=radio_delivery]', function(e){
+            e.preventDefault();
+            var d = $(this).val();
+            $.ajax({
+                type: 'POST',
+                url: wc_checkout_params.ajax_url,
+                data: {
+                    'action': 'delivery',
+                    'delivery': d,
+                },
+                success: function (result) {
+                    $('body').trigger('update_checkout');
+                    //console.log(result); // just for testing | TO BE REMOVED
+                },
+                error: function(error){
+                    //console.log(error); // just for testing | TO BE REMOVED
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+
+}
+
+
+add_action( 'wp_footer', 'cart_delivery_script' );
+function cart_delivery_script() {
+
+    // Only checkout page
+    if ( ! is_cart() ) return;
+
+    ?>
+    <script type="text/javascript">
+    //console.log('cart');
+    jQuery( function($){
+        //if (typeof wc_cart_params === 'undefined')
+           // return false;
+
+        $('.woocommerce-cart').on('change', 'input[name=radio_delivery]', function(e){
+            e.preventDefault();
+            var d = $(this).val();
+
+          console.log('cart trigger');
+
+            $.ajax({
+                type: 'POST',
+                url: wc_cart_params.ajax_url,
+                data: {
+                    'action': 'delivery',
+                    'delivery': d,
+                },
+                success: function (result) {
+                  $("[name='update_cart']").trigger("click");
+                    //console.log(result); // just for testing | TO BE REMOVED
+                },
+                error: function(error){
+                    //console.log(error); // just for testing | TO BE REMOVED
+                }
+            });
+        });
+    });
+    </script>
+    <?php
+
+}
+
+
+// Get Ajax request and saving to WC session
+add_action( 'wp_ajax_delivery', 'wc_get_delivery_ajax_data' );
+add_action( 'wp_ajax_nopriv_delivery', 'wc_get_delivery_ajax_data' );
+function wc_get_delivery_ajax_data() {
+    if ( isset($_POST['delivery']) ){
+        WC()->session->set('chosen_delivery', sanitize_key( $_POST['delivery'] ) );
+        echo json_encode( $delivery ); // Return the value to jQuery
+    }
+    die();
+}

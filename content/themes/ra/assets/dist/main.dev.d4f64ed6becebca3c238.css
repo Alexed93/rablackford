@@ -3491,15 +3491,18 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     padding-left: 0;
     padding-right: 0; }
 
-.shipping th {
+.shipping th,
+.delivery th {
   vertical-align: top;
   padding-top: .5em; }
 
-.shipping ul {
+.shipping ul,
+.delivery ul {
   list-style: none;
   margin: 0 0 1em;
   padding: 0; }
-  .shipping ul input {
+  .shipping ul input,
+  .delivery ul input {
     height: auto;
     margin-right: 10px; }
 
@@ -3849,4 +3852,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.56c950d746b6f1c720c8.css.map*/
+/*# sourceMappingURL=main.dev.d4f64ed6becebca3c238.css.map*/
