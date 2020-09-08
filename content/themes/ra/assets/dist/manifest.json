@@ -1,6 +1,8 @@
 {
-  "main.css": "main.dev.4f837f1f0a670f5720ad.css",
-  "main.js": "main.dev.e13d7eae7c3ec2ddb08f.js",
-  "main.css.map": "main.dev.4f837f1f0a670f5720ad.css.map",
-  "main.js.map": "main.dev.e13d7eae7c3ec2ddb08f.js.map"
+  "main.css": "main.dev.af30a68c8fe157dd32d6.css",
+  "main.js": "main.dev.b951a6095b00bbe2ad68.js",
+  "main.css.map": "main.dev.af30a68c8fe157dd32d6.css.map",
+  "main.js.map": "main.dev.b951a6095b00bbe2ad68.js.map",
+  "js/jquery-migrate.min.js": "js/jquery-migrate.min.js",
+  "js/jquery.min.js": "js/jquery.min.js"
 }
