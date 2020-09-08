@@ -46,8 +46,8 @@ if (!\class_exists('WCWeightVendor\\WPDesk_Logger')) {
         }
         public function plugins_loaded()
         {
-            if (\defined('WCWeightVendor\\WC_VERSION')) {
-                if (\version_compare(\WCWeightVendor\WC_VERSION, '3.0', '<')) {
+            if (\defined('WC_VERSION')) {
+                if (\version_compare(\WC_VERSION, '3.0', '<')) {
                     \add_action('wpdesk_log', [$this, 'wpdesk_log'], 10, 4);
                 } else {
                     \add_action('wpdesk_log', [$this, 'wpdesk_log_30'], 10, 4);

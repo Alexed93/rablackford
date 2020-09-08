@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
+class ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f
 {
     public static $prefixLengthsPsr4 = array (
         'W' => 
@@ -20,7 +20,7 @@ class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
     public static $prefixDirsPsr4 = array (
         'WPDesk\\WooCommerceCartWeight\\' => 
         array (
-            0 => __DIR__ . '/../..' . '/classes',
+            0 => __DIR__ . '/../..' . '/src',
         ),
         'Psr\\Log\\' => 
         array (
@@ -159,6 +159,7 @@ class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
         'WCWeightVendor\\WPDesk\\Helper\\Page\\LibraryDebugPage' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/Page/LibraryDebugPage.php',
         'WCWeightVendor\\WPDesk\\Helper\\Page\\SettingsPage' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/Page/SettingsPage.php',
         'WCWeightVendor\\WPDesk\\Helper\\PrefixedHelperAsLibrary' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/PrefixedHelperAsLibrary.php',
+        'WCWeightVendor\\WPDesk\\Helper\\UpgradeSoonNotice' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/UpgradeSoonNotice.php',
         'WCWeightVendor\\WPDesk\\License\\InstalledPlugins' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/InstalledPlugins.php',
         'WCWeightVendor\\WPDesk\\License\\Page\\Action' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Page/Action.php',
         'WCWeightVendor\\WPDesk\\License\\Page\\LicensePage' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Page/LicensePage.php',
@@ -214,6 +215,16 @@ class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
         'WCWeightVendor\\WPDesk\\Plugin\\Flow\\Initialization\\Simple\\SimplePaidStrategy' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-plugin-flow/src/Initialization/Simple/SimplePaidStrategy.php',
         'WCWeightVendor\\WPDesk\\Plugin\\Flow\\Initialization\\Simple\\TrackerInstanceAsFilterTrait' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-plugin-flow/src/Initialization/TrackerInstanceAsFilterTrait.php',
         'WCWeightVendor\\WPDesk\\Plugin\\Flow\\PluginBootstrap' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-plugin-flow/src/PluginBootstrap.php',
+        'WCWeightVendor\\WPDesk\\View\\PluginViewBuilder' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/PluginViewBuilder.php',
+        'WCWeightVendor\\WPDesk\\View\\Renderer\\LoadTemplatePlugin' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Renderer/LoadTemplatePlugin.php',
+        'WCWeightVendor\\WPDesk\\View\\Renderer\\Renderer' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Renderer/Renderer.php',
+        'WCWeightVendor\\WPDesk\\View\\Renderer\\SimplePhpRenderer' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Renderer/SimplePhpRenderer.php',
+        'WCWeightVendor\\WPDesk\\View\\Resolver\\ChainResolver' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Resolver/ChainResolver.php',
+        'WCWeightVendor\\WPDesk\\View\\Resolver\\DirResolver' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Resolver/DirResolver.php',
+        'WCWeightVendor\\WPDesk\\View\\Resolver\\Exception\\CanNotResolve' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Resolver/Exception/CanNotResolve.php',
+        'WCWeightVendor\\WPDesk\\View\\Resolver\\NullResolver' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Resolver/NullResolver.php',
+        'WCWeightVendor\\WPDesk\\View\\Resolver\\Resolver' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Resolver/Resolver.php',
+        'WCWeightVendor\\WPDesk\\View\\Resolver\\WPThemeResolver' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-view/src/Resolver/WPThemeResolver.php',
         'WCWeightVendor\\WPDesk_API_KEY' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/ApiManager/class-wc-key-api.php',
         'WCWeightVendor\\WPDesk_API_MENU' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/ApiManager/class-wc-api-manager-menu.php',
         'WCWeightVendor\\WPDesk_API_Manager_With_Update_Flag' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/ApiManager/class-wc-api-manager.php',
@@ -264,7 +275,11 @@ class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
         'WCWeightVendor\\WPDesk_Translatable' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-builder/src/Plugin/WithoutNamespace/Translatable.php',
         'WCWeightVendor\\WPDesk_Update_API_Check' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/ApiManager/class-wc-plugin-update.php',
         'WPDesk\\Helper\\HelperAsLibrary' => __DIR__ . '/..' . '/wpdesk/wp-wpdesk-helper-override/src/Helper/HelperAsLibrary.php',
-        'WPDesk\\WooCommerceCartWeight\\Plugin' => __DIR__ . '/../..' . '/classes/Plugin.php',
+        'WPDesk\\WooCommerceCartWeight\\Plugin' => __DIR__ . '/../..' . '/src/Plugin.php',
+        'WPDesk\\WooCommerceCartWeight\\Renderer\\AbstractWeightRenderer' => __DIR__ . '/../..' . '/src/Renderer/AbstractWeightRenderer.php',
+        'WPDesk\\WooCommerceCartWeight\\Renderer\\CartWeightRenderer' => __DIR__ . '/../..' . '/src/Renderer/CartWeightRenderer.php',
+        'WPDesk\\WooCommerceCartWeight\\Renderer\\CheckoutWeightRenderer' => __DIR__ . '/../..' . '/src/Renderer/CheckoutWeightRenderer.php',
+        'WPDesk\\WooCommerceCartWeight\\Renderer\\WidgetWeightRenderer' => __DIR__ . '/../..' . '/src/Renderer/WidgetWeightRenderer.php',
         'WPDesk_Tracker_Data_Provider' => __DIR__ . '/..' . '/wpdesk/wp-wpdesk-helper-override/src/Interop/Tracker/class-wpdesk-tracker-data-provider.php',
         'WPDesk_Tracker_Factory' => __DIR__ . '/..' . '/wpdesk/wp-wpdesk-helper-override/src/Helper/TrackerFactory.php',
         'WPDesk_Tracker_Interface' => __DIR__ . '/..' . '/wpdesk/wp-wpdesk-helper-override/src/Interop/Tracker/class-wpdesk-tracker-interface.php',
@@ -274,9 +289,9 @@ class ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit8659ad749cf43cbb3bc4b7e9bf2eabc9::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f::$classMap;
 
         }, null, ClassLoader::class);
     }

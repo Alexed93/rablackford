@@ -5,7 +5,7 @@ Tags: woocommerce, cart, weight, woocommerce cart weight
 Requires at least: 4.5
 Tested up to: 5.5
 Requires PHP: 5.6
-Stable tag: 1.2.9
+Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -40,9 +40,13 @@ You can also use WordPress uploader to upload plugin zip file in menu Plugins ->
 
 == Changelog ==
 
+= 1.3.0 - 2020-08-31 =
+* Added support for templates
+* Added filters: woo_cart_weight/cart_weight and woo_cart_weight/weight_unit
+
 = 1.2.9 - 2020-08-10 =
 * Added support for WordPress 5.5
-* Added support for WooCommerce 4.4
+* Added support for WooCommerce 4.4
 
 = 1.2.8 - 2020-05-18 =
 * Fixed .pot file

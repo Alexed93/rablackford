@@ -6,6 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'WPDesk\\WooCommerceCartWeight\\' => array($baseDir . '/classes'),
+    'WPDesk\\WooCommerceCartWeight\\' => array($baseDir . '/src'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),
 );

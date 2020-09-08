@@ -22,13 +22,15 @@ hr {
 
 ins {
     text-decoration: none;
-    color: #000;
-    background: #ff9;
+    background-color: transparent;
+    color: $color-text;
+    font-weight: $weight-semi-bold;
 }
 
 mark {
-    font-style: italic;
-    font-weight: bold;
+    background-color: transparent;
+    color: $color-text;
+    font-weight: $weight-semi-bold;
 }
 
 pre {

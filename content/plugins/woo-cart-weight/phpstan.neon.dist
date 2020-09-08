@@ -8,7 +8,7 @@ includes:
 parameters:
     level: max
     paths:
-        - %currentWorkingDirectory%/classes/
+        - %currentWorkingDirectory%/src/
     autoload_files:
         - %currentWorkingDirectory%/vendor/autoload.php
         - %currentWorkingDirectory%/vendor/wpdesk/wp-wpdesk-composer/director/woocommerce-stubs-3.6.1.php
