@@ -206,13 +206,14 @@ add_filter( 'upload_mimes', 'ra_update_mime_types' );
  * $. Stop core updates from admin area
  ******************************************************************************/
 
-function ra_stop_core_updates ( $a ) {
-    global $wp_version;
+// function ra_stop_core_updates ( $a ) {
+//     global $wp_version;
 
-    return (object) array(
-        'last_checked' => time(),
-        'version_checked' => $wp_version,
-    );
-}
+//     return (object) array(
+//         'last_checked' => time(),
+//         'version_checked' => $wp_version,
+//     );
+// }
 
-add_filter( 'pre_site_transient_update_core', 'ra_stop_core_updates' );
+// add_filter( 'pre_site_transient_update_core', 'ra_stop_core_updates' );
+define('WP_AUTO_UPDATE_CORE', false);
