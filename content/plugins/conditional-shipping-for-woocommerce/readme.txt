@@ -4,7 +4,7 @@ Tags: woocommerce shipping, conditional shipping
 Requires at least: 4.5
 Tested up to: 5.5
 Requires PHP: 5.4
-Stable tag: 2.1.0
+Stable tag: 2.1.1
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -76,6 +76,10 @@ Conditional Shipping is installed just like any other WordPress plugin.
 Once the plugin is activated, you should see "Conditions" for shipping methods created with shipping zones.
 
 == Changelog ==
+
+= 2.1.1 =
+
+* Fixed bug with Products condition which prevented it to work with a lot of product variations
 
 = 2.1.0 =
 

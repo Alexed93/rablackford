@@ -222,7 +222,8 @@ class Woo_Conditional_Shipping_Filters {
 		$args = array(
 			'post_type' => array( 'product_variation' ),
 			'post_parent__in' => $product_ids,
-			'fields' => 'ids'
+			'fields' => 'ids',
+			'posts_per_page' => -1
 		);
 		$children_ids = get_posts( $args );
 

@@ -3,7 +3,7 @@
 /*
 Plugin Name: Conditional Shipping for WooCommerce
 Description: Disable shipping methods based on shipping classes, weight, categories and much more.
-Version:     2.1.0
+Version:     2.1.1
 Author:      Lauri Karisola / WooElements.com
 Author URI:  https://wooelements.com
 Text Domain: woo-conditional-shipping
@@ -11,7 +11,7 @@ Domain Path: /languages
 License:     GPL2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 WC requires at least: 3.0.0
-WC tested up to: 4.4.1
+WC tested up to: 4.5.1
 */
 
 /**
@@ -25,14 +25,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Plugin version
  */
 if ( ! defined( 'WOO_CONDITIONAL_SHIPPING_VERSION' ) ) {
-	define( 'WOO_CONDITIONAL_SHIPPING_VERSION', '2.1.0' );
+	define( 'WOO_CONDITIONAL_SHIPPING_VERSION', '2.1.1' );
 }
 
 /**
  * Assets version
  */
 if ( ! defined( 'WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION' ) ) {
-	define( 'WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION', '2.1.0.free' );
+	define( 'WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION', '2.1.1.free' );
 }
 
 /**
