@@ -50,7 +50,7 @@
         }
     }
 
-    input {
+    input:not([type=submit]) {
         height: 40px;
         padding: 0 15px;
         border-radius: 0;

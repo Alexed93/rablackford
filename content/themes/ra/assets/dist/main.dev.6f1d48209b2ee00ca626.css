@@ -1968,8 +1968,6 @@ h6, .zeta {
 /* $. Setup
 \*----------------------------------------------------------------*/
 button,
-input[type="button"],
-input[type="submit"],
 .btn, .cart-collaterals .checkout-button, .cart-collaterals .coupon button, .cart-collaterals .apply_coupon, .woocommerce-shipping-calculator button, .woocommerce-checkout .button, .woocommerce-tabs ul.tabs li a,
 .button {
   display: inline-block;
@@ -3791,7 +3789,7 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     .shop_table .product-thumbnail img {
       width: 120px;
       height: auto; } }
-  .shop_table input {
+  .shop_table input:not([type=submit]) {
     height: 40px;
     padding: 0 15px;
     border-radius: 0;
@@ -3871,4 +3869,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.61eea3e5785a63a4f3ff.css.map*/
+/*# sourceMappingURL=main.dev.6f1d48209b2ee00ca626.css.map*/

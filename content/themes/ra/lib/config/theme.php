@@ -69,7 +69,7 @@ function ra_remove_json_api () {
     remove_action( 'template_redirect', 'rest_output_link_header', 11 );
 }
 
-add_action( 'init', 'ra_remove_json_api' );
+//add_action( 'init', 'ra_remove_json_api' );
 
 /**
  * Remove pingback headers
