@@ -1975,7 +1975,7 @@ input[type="submit"],
   display: inline-block;
   padding: 0.5em 1em;
   border: 0;
-  border-radius: 20px;
+  border-radius: 1.5em;
   transition: all .15s ease-out;
   cursor: pointer; }
 
@@ -1992,6 +1992,17 @@ input[type="submit"],
   .btn--primary:hover, #customer_login > * button:hover, .cart-collaterals .checkout-button:hover, .woocommerce-shipping-calculator button:hover, .woocommerce-checkout .button:hover, .single_add_to_cart_button:hover, .woocommerce-tabs ul.tabs li a:hover, .btn--primary:focus, #customer_login > * button:focus, .cart-collaterals .checkout-button:focus, .woocommerce-shipping-calculator button:focus, .woocommerce-checkout .button:focus, .single_add_to_cart_button:focus, .woocommerce-tabs ul.tabs li a:focus {
     color: #FFFFFF;
     background: #5a873b; }
+
+.btn--primary-border {
+  color: #72AA4B;
+  background: #FFFFFF;
+  border: solid 2px #72AA4B; }
+  .btn--primary-border:hover, .btn--primary-border:focus {
+    color: #72AA4B;
+    background: #e6e6e6; }
+  .btn--primary-border:hover {
+    color: white;
+    background: #72AA4B; }
 
 .btn--white {
   color: #72AA4B;
@@ -3860,4 +3871,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.be0f8f8962fc45df2a43.css.map*/
+/*# sourceMappingURL=main.dev.61eea3e5785a63a4f3ff.css.map*/

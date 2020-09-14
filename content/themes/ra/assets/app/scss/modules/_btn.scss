@@ -18,7 +18,7 @@
     display: inline-block;
     padding: ($base/2) $base;
     border: 0;
-    border-radius: 20px;
+    border-radius: $base * 1.5;
     transition: all .15s ease-out;
     cursor: pointer;
 }
@@ -58,6 +58,17 @@ input[type="submit"],
 
 .btn--primary {
     @include btn($white, $color-brand-primary);
+}
+
+.btn--primary-border {
+    @include btn($color-brand-primary, $white, );
+
+    border: solid 2px $color-brand-primary;
+
+    &:hover {
+        color: white;
+        background: $color-brand-primary;
+    }
 }
 
 .btn--white {

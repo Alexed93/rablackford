@@ -206,6 +206,7 @@ function rab_order_delivery_options(){
         if ($method_text) :
             echo wpautop($method_text);
         endif;
+
         echo '</td></tr>';
 
     //endif;
@@ -226,12 +227,13 @@ function checkout_delivery_script() {
         $('form.checkout').on('change', 'input[name=radio_delivery]', function(e){
             e.preventDefault();
             var d = $(this).val();
+
             $.ajax({
                 type: 'POST',
                 url: wc_checkout_params.ajax_url,
                 data: {
                     'action': 'delivery',
-                    'delivery': d,
+                    'delivery': d
                 },
                 success: function (result) {
                     $('body').trigger('update_checkout');
@@ -266,14 +268,14 @@ function cart_delivery_script() {
             e.preventDefault();
             var d = $(this).val();
 
-          console.log('cart trigger');
+          //console.log('cart trigger');
 
             $.ajax({
                 type: 'POST',
                 url: wc_cart_params.ajax_url,
                 data: {
                     'action': 'delivery',
-                    'delivery': d,
+                    'delivery': d
                 },
                 success: function (result) {
                   $("[name='update_cart']").trigger("click");
