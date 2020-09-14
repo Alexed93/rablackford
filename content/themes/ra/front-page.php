@@ -19,6 +19,8 @@ get_header();
 
 $intro_title = get_field('intro_title');
 $intro_para = get_field('intro_para');
+$shop_intro = get_field('show_shop_introduction');
+$shop_id = get_option( 'woocommerce_shop_page_id' );
 
 ?>
 
@@ -37,6 +39,18 @@ $intro_para = get_field('intro_para');
     </div>
 
     <div class="container">
+
+        <?php if ($shop_intro && $shop_id) :
+
+            rab_get_component(
+                'card-introductory',
+                [
+                    'id' => $shop_id,
+                    'style' => 'green'
+                ]
+            );
+
+        endif; ?>
 
         <?php
             rab_get_component(

@@ -12,6 +12,7 @@
  */
 
 $id = $args['id'] ?? get_the_ID();
+$style = $args['style'] ?? '';
 
 $card_title = get_field('cardintro_title', $id);
 $card_text = get_field('cardintro_text', $id);
@@ -22,6 +23,10 @@ $background = '';
 if ( is_front_page() ):
     $background = 'card--grey';
 else:
+    $background = 'card--green';
+endif;
+
+if ($style == 'green') :
     $background = 'card--green';
 endif;
 
