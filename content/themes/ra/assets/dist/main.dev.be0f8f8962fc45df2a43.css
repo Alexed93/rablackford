@@ -3251,6 +3251,9 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
 .u-pad-top {
   padding-top: 1em; }
 
+.u-zero-pad-bottom {
+  padding-bottom: 0; }
+
 /* $. Positioning
 \*----------------------------------------------------------------*/
 /* Alignment */
@@ -3857,4 +3860,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.16eeca192615594ecd5d.css.map*/
+/*# sourceMappingURL=main.dev.be0f8f8962fc45df2a43.css.map*/

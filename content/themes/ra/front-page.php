@@ -22,7 +22,7 @@ $intro_para = get_field('intro_para');
 
 ?>
 
-<main class="section">
+<main class="section u-zero-bottom u-zero-pad-bottom">
     <div class="container u-space-top cf">
         <a href="http://solidfuel.co.uk/approved-coal-wood-merchants/" class="u-float-left">
             <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/acm--large.png" title="Approved Coal Merchant" alt="Approved Coal Merchant" class="acm-home">
@@ -36,10 +36,7 @@ $intro_para = get_field('intro_para');
         </div>
     </div>
 
-    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/frontpic.svg" title="RA Blackford and son" alt="RA Blackford and son" class="u-push-bottom@2 u-width-100 u-push-top@2">
-
     <div class="container">
-        <?php get_template_part( 'views/cards/card-introductory' ); ?>
 
         <?php
             rab_get_component(
@@ -49,8 +46,14 @@ $intro_para = get_field('intro_para');
                 ]
             );
         ?>
+
+        <?php get_template_part( 'views/cards/card-introductory' ); ?>
+
         <?php get_template_part( 'views/cards/card-featured' ); ?>
     </div>
+
+    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/frontpic.svg" title="RA Blackford and son" alt="RA Blackford and son" class="u-width-100 u-push-top@2">
+
 </main>
 
 <?php get_footer(); ?>
