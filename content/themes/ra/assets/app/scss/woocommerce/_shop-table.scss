@@ -50,7 +50,10 @@
         }
     }
 
-    input:not([type=submit]) {
+    input
+    :not([type=submit])
+    :not([type=checkbox])
+    :not([type=radio]) {
         height: 40px;
         padding: 0 15px;
         border-radius: 0;
