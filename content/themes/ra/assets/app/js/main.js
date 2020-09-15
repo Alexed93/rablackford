@@ -41,7 +41,8 @@
         body.toggleClass('is-active-nav');
 
         // 2. Toggle Icons to show whether Nav is active or not
-        toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
+        //toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
+        $(this).toggleClass('is-active');
     });
 
     /**

@@ -81,7 +81,7 @@ $color-nav: $color-link;
     font-size: 1.4rem;
 
     @include respond-min($bp3) {
-        margin-top: $base*2.14;
+        margin-top: $base*1.5;
         font-size: 1.1666666rem;
 
         .nav__link {
@@ -115,13 +115,17 @@ $color-nav: $color-link;
         position: absolute;
         top: 0;
         right: 0;
-        font-size: $base;
+        font-size: $base*0.875;
 
         .nav__item.is-current {
             .nav__link {
                 color: $color-brand-secondary;
             }
         }
+    }
+
+    @include respond-min($bp4) {
+        font-size: $base;
     }
 }
 

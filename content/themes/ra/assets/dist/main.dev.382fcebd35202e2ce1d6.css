@@ -2593,7 +2593,7 @@ span.icon--clock {
   font-size: 1.4rem; }
   @media screen and (min-width: 62em) {
     .nav--primary {
-      margin-top: 2.14em;
+      margin-top: 1.5em;
       font-size: 1.1666666rem; } }
   @media screen and (min-width: 78em) {
     .nav--primary {
@@ -2612,9 +2612,12 @@ span.icon--clock {
       position: absolute;
       top: 0;
       right: 0;
-      font-size: 1em; }
+      font-size: 0.875em; }
       .nav--secondary .nav__item.is-current .nav__link {
         color: #FFFF00; } }
+  @media screen and (min-width: 78em) {
+    .nav--secondary {
+      font-size: 1em; } }
 
 .nav__link--basket {
   position: relative;
@@ -2937,11 +2940,54 @@ span.icon--clock {
 .header__toggle {
   display: block;
   float: right;
-  padding: 0.75em 1em 0.5em 1em;
-  background: #8dbd6b; }
+  background: #8dbd6b;
+  position: relative;
+  width: 50px;
+  height: 50px;
+  border-radius: 4px; }
   @media screen and (min-width: 62em) {
     .header__toggle {
       display: none; } }
+
+.header__toggle--nav.is-active .header__toggle-icon {
+  background-color: transparent; }
+  .header__toggle--nav.is-active .header__toggle-icon:before, .header__toggle--nav.is-active .header__toggle-icon:after {
+    top: 0; }
+  .header__toggle--nav.is-active .header__toggle-icon:before {
+    transform: rotate(45deg);
+    background: white; }
+  .header__toggle--nav.is-active .header__toggle-icon:after {
+    transform: rotate(-45deg);
+    background: white; }
+
+.header__toggle-icon {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin-top: 0;
+  cursor: pointer;
+  border-radius: 0;
+  height: 3px;
+  width: 30px;
+  background: white;
+  position: absolute;
+  display: block;
+  content: '';
+  transition: all .3s ease-in-out; }
+  .header__toggle-icon:before, .header__toggle-icon:after {
+    cursor: pointer;
+    border-radius: 1px;
+    height: 3px;
+    width: 30px;
+    background: white;
+    position: absolute;
+    display: block;
+    content: '';
+    transition: all .3s ease-in-out; }
+  .header__toggle-icon:before {
+    top: -8px; }
+  .header__toggle-icon:after {
+    bottom: -8px; }
 
 /* $. Search
 \*----------------------------------------------------------------*/
@@ -3869,4 +3915,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.6f1d48209b2ee00ca626.css.map*/
+/*# sourceMappingURL=main.dev.382fcebd35202e2ce1d6.css.map*/

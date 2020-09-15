@@ -142,6 +142,7 @@ jquery__WEBPACK_IMPORTED_MODULE_0___default()(document).ready(function () {
     body.toggleClass('is-active-nav'); // 2. Toggle Icons to show whether Nav is active or not
 
     toggleNav.toggleClass('icon--menu-open').toggleClass('icon--menu-close');
+    jquery__WEBPACK_IMPORTED_MODULE_0___default()(this).toggleClass('is-active');
   });
   /**
   * $. News Achive Accordion
@@ -10895,4 +10896,4 @@ module.exports = jQuery;
 /***/ })
 
 /******/ });
-//# sourceMappingURL=main.dev.b951a6095b00bbe2ad68.js.map
+//# sourceMappingURL=main.dev.fa2d8a7953566dcf9104.js.map

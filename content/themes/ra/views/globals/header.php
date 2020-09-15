@@ -24,9 +24,8 @@ $tagline = get_field('tagline', 'options');
             <p class="u-weight-medium | u-zero-bottom"><?php echo $tagline; ?></p>
         </a>
 
-        <button class="toggle | js-toggle-nav | header__toggle header__toggle--nav" role="button" aria-label="Toggle navigation">
-            <span class="toggle__label | is-hidden">Toggle navigation</span>
-            <span class="toggle__icon toggle__icon--nav | icon icon--medium icon--menu-open"></span>
+        <button class="toggle | js-toggle-nav | header__toggle header__toggle--nav" role="button" aria-label="Toggle menu">
+            <span class="header__toggle-icon"></span>
         </button>
 
         <nav class="nav-container | header__nav" id="navigation" role="navigation">

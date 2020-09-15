@@ -102,8 +102,12 @@
 .header__toggle {
     display: block;
     float: right;
-    padding: 0.75em 1em 0.5em 1em;
+    //padding: 0.75em 1em 0.5em 1em;
     background: lighten($color-brand-primary, 10%);
+    position: relative;
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
 
     @include respond-min($bp3) {
         display: none;
@@ -112,6 +116,75 @@
 
 .is-active-nav .header__toggle--nav,
 .is-active-search .header__toggle--search {
+}
+
+
+// .header__toggle {
+//     width: 40px;
+//     height: 40px;
+//     padding: 10px;
+//     cursor: pointer;
+//     background-color: transparent;
+//     border: none;
+//     position: relative;
+
+// }
+
+.header__toggle--nav {
+    &.is-active {
+        .header__toggle-icon {
+            background-color: transparent;
+
+            &:before, &:after {
+                top: 0;
+            }
+
+            &:before {
+                transform: rotate(45deg);
+                background: white;
+            }
+
+            &:after {
+                transform: rotate(-45deg);
+                background: white;
+            }
+        }
+    }
+}
+
+.header__toggle-icon {
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  margin-top: 0;
+  cursor: pointer;
+  border-radius: 0;
+  height: 3px;
+  width: 30px;
+  background: white;
+  position: absolute;
+  display: block;
+  content: '';
+  transition: all .3s ease-in-out;
+
+    &:before, &:after {
+      cursor: pointer;
+      border-radius: 1px;
+      height: 3px;
+      width: 30px;
+      background: white;
+      position: absolute;
+      display: block;
+      content: '';
+      transition: all .3s ease-in-out;
+    }
+    &:before {
+      top: -8px;
+    }
+    &:after {
+      bottom: -8px;
+    }
+
 }
 
 
