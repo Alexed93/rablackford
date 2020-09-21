@@ -3183,16 +3183,22 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
   background: #72AA4B;
   color: #FFFFFF;
   padding: 1em 0 1.5em 0; }
+  @media screen and (min-width: 62em) {
+    .open-hours .icon {
+      position: absolute; } }
+  .open-hours .container {
+    min-height: 60px; }
 
 .open-hours__list {
   margin-top: 0.5em; }
   @media screen and (min-width: 62em) {
     .open-hours__list {
       position: relative;
-      top: -12px;
-      left: 1em; } }
+      top: -6px;
+      margin-left: calc(1em + 60px); } }
   .open-hours__list li {
-    margin-right: 0.5em; }
+    margin-right: 0.5em;
+    margin-left: 0; }
 
 .celebration {
   max-height: 70px; }
@@ -3630,7 +3636,7 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
   margin-top: 30px;
   border-top: solid 1px #f3f3f3;
   padding-top: 30px; }
-  .woocommerce-checkout-payment ul {
+  .woocommerce-checkout-payment ul:not(.woocommerce_error) {
     list-style: none;
     padding-left: 0; }
 
@@ -3688,6 +3694,9 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
   @media (min-width: 970px) {
     .u-columns {
       display: flex; } }
+
+.woocommerce-NoticeGroup {
+  flex-basis: 100%; }
 
 .woocommerce-message,
 .woocommerce-error,
@@ -3915,4 +3924,4 @@ form:after, .panel:after, .sidebar__section:after, .nav:after, .section:after, .
     display: none; } }
 
 
-/*# sourceMappingURL=main.dev.4e4a1b48784f2ec695fe.css.map*/
+/*# sourceMappingURL=main.dev.1fac38b61bb204c78fa4.css.map*/

@@ -135,6 +135,16 @@
     background: $color-brand-primary;
     color: $white;
     padding: $base 0 $base*1.5 0;
+
+    .icon {
+        @include respond-min($bp3) {
+            position: absolute;
+        }
+    }
+
+    .container {
+        min-height: 60px;
+    }
 }
 
 .open-hours__list {
@@ -143,12 +153,13 @@
 
     @include respond-min($bp3) {
         position: relative;
-        top: -12px;
-        left: $base;
+        top: -6px;
+        margin-left: calc(#{$base} + 60px);
     }
 
     li {
         margin-right: $base/2;
+        margin-left: 0;
 
         // @include respond-min($bp4) {
         //     margin-right: $base*1.5;

@@ -1,4 +1,6 @@
-
+.woocommerce-NoticeGroup {
+	flex-basis: 100%;
+}
 
 .woocommerce-message,
 .woocommerce-error,
@@ -33,6 +35,7 @@
 		list-style: none outside !important; // Required for default theme compatibility
 		padding-left: 0 !important; // Required for default theme compatibility
 		margin-left: 0 !important; // Required for default theme compatibility
+		//margin-left: 3em;
 	}
 }
 

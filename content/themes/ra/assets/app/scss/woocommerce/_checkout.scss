@@ -53,7 +53,7 @@
     border-top: solid 1px $grey-light;
     padding-top: 30px;
 
-    ul {
+    ul:not(.woocommerce_error) {
         list-style: none;
         padding-left: 0;
     }
