@@ -13,10 +13,11 @@
 // Get ACF fields
 
 $pricing_tables = get_field( 'pricing_tables' );
+$pricing_table_display = false;
 
 ?>
 
-<?php if( $pricing_tables ): ?>
+<?php if( $pricing_tables && $pricing_table_display ): ?>
     <div class="table__container">
         <h2>Pricing</h2>
 

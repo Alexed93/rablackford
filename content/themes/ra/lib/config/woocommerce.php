@@ -157,10 +157,15 @@ function rab_get_weight_for_product_price() {
   global $product;
 
   $weight = $product->get_weight();
+  $price = $product->get_price();
+
+  if(empty($price)) {
+    return false;
+  }
 
   $weight_html = '<div>per bag</div>';
 
-  if ($weight) {
+  if (!empty($weight)) {
       $weight_html = '<div>per ' . wc_format_weight($weight) . ' bag</div>';
   }
 
