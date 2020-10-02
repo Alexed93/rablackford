@@ -116,17 +116,22 @@
     }
 }
 
+.home-intro__wrap {
+    @include respond-min($bp3) {
+        display: flex;
+    }
+}
+.home-intro__icons {
+
+}
+
 .home-intro {
     padding-top: $base;
     clear: both;
+    flex: 1;
 
     @include respond-min($bp3) {
-        float: left;
-        clear: none;
         margin-left: $base;
-    }
-
-    @include respond-min($bp4) {
         padding-top: 0;
     }
 }

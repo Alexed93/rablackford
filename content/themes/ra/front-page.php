@@ -21,22 +21,76 @@ $intro_title = get_field('intro_title');
 $intro_para = get_field('intro_para');
 $shop_intro = get_field('show_shop_introduction');
 $shop_id = get_option( 'woocommerce_shop_page_id' );
+$latest_news = get_field('show_latest_news');
+
+$content = get_the_content();
 
 ?>
 
 <main class="section u-zero-bottom u-zero-pad-bottom">
     <div class="container u-space-top cf">
-        <a href="http://solidfuel.co.uk/approved-coal-wood-merchants/" class="u-float-left">
-            <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/acm--large.png" title="Approved Coal Merchant" alt="Approved Coal Merchant" class="acm-home">
-        </a>
-        <a href="#" class="u-float-left">
-            <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/80years.png" title="Celebrating 80 years of business" alt="Celebrating 80 years of business" class="u-push-left/2 celebration celebration--home">
-        </a>
-        <div class="home-intro">
-            <h1 class="headline"><?php echo $intro_title; ?></h1>
-            <p class="introduction_text"><?php echo $intro_para; ?></p>
+        <div class="home-intro__wrap">
+            <div class="home-intro__icons">
+                <a href="http://solidfuel.co.uk/approved-coal-wood-merchants/" class="u-float-left">
+                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/acm--large.png" title="Approved Coal Merchant" alt="Approved Coal Merchant" class="acm-home">
+                </a>
+                <a href="#" class="u-float-left">
+                    <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/img/80years.png" title="Celebrating 80 years of business" alt="Celebrating 80 years of business" class="u-push-left/2 celebration celebration--home">
+                </a>
+            </div>
+            <div class="home-intro">
+                <h1 class="headline"><?php echo $intro_title; ?></h1>
+                <p class="introduction_text"><?php echo $intro_para; ?></p>
+            </div>
         </div>
     </div>
+
+    <?php if ($content) : ?>
+        <div class="container u-space-top">
+            <article class="content">
+                <?php echo $content; ?>
+            </article>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($latest_news) :
+        $blog_id = get_option( 'page_for_posts' );
+        $blog_url = get_permalink($blog_id);
+        $latest_post = wp_get_recent_posts(
+            [
+                'numberposts' => 1,
+                'post_status' => 'publish'
+            ]
+        );
+
+        if ($blog_url && !is_wp_error($latest_post)) : ?>
+        <div class="container u-space-top">
+
+            <article class="card card--grey">
+                <div class="card__content">
+                    <a href="<?php echo $blog_url; ?>"><h1 class="beta">Latest News</h1></a>
+
+                    <?php foreach ($latest_post as $latest) :
+
+                        $latest_id = $latest['ID'];
+
+                        $type = ra_term_links($latest_id, 'category' , false );
+
+                        ?>
+                        <p class="zeta | meta | u-push-bottom">Posted <?php echo get_the_date('jS F Y', $latest_id); ?> in <?php echo $type; ?></p>
+                        <h1 class="gamma"><a href="<?php the_permalink($latest_id); ?>"><?php echo wp_kses_post($latest['post_title']); ?></a></h1>
+                        <?php if ($latest['post_excerpt']) : ?>
+                            <p>
+                                <?php echo wp_kses_post($latest['post_excerpt']); ?>
+                            </p>
+                        <?php endif; ?>
+
+                    <?php endforeach; ?>
+                </div>
+            </article>
+        </div>
+        <?php endif; ?>
+    <?php endif; ?>
 
     <div class="container">
 

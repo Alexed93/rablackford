@@ -49,6 +49,10 @@
 .u-space-top\@2     { padding-top: $base*2; }
 .u-space-top\/2     { padding-top: $base/2; }
 
+.u-space-bottom        { @include respond-min($bp2){padding-bottom: $base; }}
+.u-space-bottom\@2     { padding-bottom: $base*2; }
+.u-space-bottom\/2     { padding-bottom: $base/2; }
+
 .u-pad-top { padding-top: $base; }
 
 .u-zero-pad-bottom { padding-bottom: 0; }

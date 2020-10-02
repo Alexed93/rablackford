@@ -41,6 +41,25 @@
             "maxlength": ""
         },
         {
+            "key": "field_5f76ddccf852a",
+            "label": "Show Latest News",
+            "name": "show_latest_news",
+            "type": "true_false",
+            "instructions": "Show the most recent news item",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "message": "",
+            "default_value": 0,
+            "ui": 1,
+            "ui_on_text": "Show News",
+            "ui_off_text": "Hide News"
+        },
+        {
             "key": "field_5f5f2c3f5c6de",
             "label": "Show Shop Introduction",
             "name": "show_shop_introduction",
@@ -57,7 +76,7 @@
             "default_value": 0,
             "ui": 1,
             "ui_on_text": "Show Shop Intro",
-            "ui_off_text": "Don't show Shop Intro"
+            "ui_off_text": "Hide Shop Intro"
         }
     ],
     "location": [
@@ -82,5 +101,5 @@
     ],
     "active": true,
     "description": "",
-    "modified": 1600072848
+    "modified": 1601627095
 }
