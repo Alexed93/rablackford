@@ -53,46 +53,26 @@ $content = get_the_content();
         </div>
     <?php endif; ?>
 
-    <?php if ($latest_news) :
-        $blog_id = get_option( 'page_for_posts' );
-        $blog_url = get_permalink($blog_id);
-        $latest_post = wp_get_recent_posts(
+    <div class="container">
+
+        <?php
+
+        $card_additional_title = get_field('add_cardintro_title');
+        $card_additional_text = get_field('add_cardintro_text');
+        $card_additional_image = get_field('add_cardintro_image');
+
+        if ($card_additional_title || $card_additional_text || $card_additional_image) :
+
+        rab_get_component(
+            'card-introductory',
             [
-                'numberposts' => 1,
-                'post_status' => 'publish'
+                'title' => $card_additional_title,
+                'text' => $card_additional_text,
+                'image' => $card_additional_image,
             ]
         );
 
-        if ($blog_url && !is_wp_error($latest_post)) : ?>
-        <div class="container u-space-top">
-
-            <article class="card card--grey">
-                <div class="card__content">
-                    <a href="<?php echo $blog_url; ?>"><h1 class="beta">Latest News</h1></a>
-
-                    <?php foreach ($latest_post as $latest) :
-
-                        $latest_id = $latest['ID'];
-
-                        $type = ra_term_links($latest_id, 'category' , false );
-
-                        ?>
-                        <p class="zeta | meta | u-push-bottom">Posted <?php echo get_the_date('jS F Y', $latest_id); ?> in <?php echo $type; ?></p>
-                        <h1 class="gamma"><a href="<?php the_permalink($latest_id); ?>"><?php echo wp_kses_post($latest['post_title']); ?></a></h1>
-                        <?php if ($latest['post_excerpt']) : ?>
-                            <p>
-                                <?php echo wp_kses_post($latest['post_excerpt']); ?>
-                            </p>
-                        <?php endif; ?>
-
-                    <?php endforeach; ?>
-                </div>
-            </article>
-        </div>
-        <?php endif; ?>
-    <?php endif; ?>
-
-    <div class="container">
+        endif; ?>
 
         <?php if ($shop_intro && $shop_id) :
 
@@ -105,6 +85,42 @@ $content = get_the_content();
             );
 
         endif; ?>
+
+        <?php if ($latest_news) :
+            $blog_id = get_option( 'page_for_posts' );
+            $blog_url = get_permalink($blog_id);
+            $latest_post = wp_get_recent_posts(
+                [
+                    'numberposts' => 1,
+                    'post_status' => 'publish'
+                ]
+            );
+
+            if ($blog_url && !is_wp_error($latest_post)) : ?>
+                <article class="card card--grey">
+                    <div class="card__content">
+                        <a href="<?php echo $blog_url; ?>"><h1 class="beta">Latest News</h1></a>
+
+                        <?php foreach ($latest_post as $latest) :
+
+                            $latest_id = $latest['ID'];
+
+                            $type = ra_term_links($latest_id, 'category' , false );
+
+                            ?>
+                            <p class="zeta | meta | u-push-bottom">Posted <?php echo get_the_date('jS F Y', $latest_id); ?> in <?php echo $type; ?></p>
+                            <h1 class="gamma"><a href="<?php the_permalink($latest_id); ?>"><?php echo wp_kses_post($latest['post_title']); ?></a></h1>
+                            <?php if ($latest['post_excerpt']) : ?>
+                                <p>
+                                    <?php echo wp_kses_post($latest['post_excerpt']); ?>
+                                </p>
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
+                    </div>
+                </article>
+            <?php endif; ?>
+        <?php endif; ?>
 
         <?php
             rab_get_component(

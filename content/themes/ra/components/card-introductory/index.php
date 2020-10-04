@@ -14,9 +14,9 @@
 $id = $args['id'] ?? get_the_ID();
 $style = $args['style'] ?? '';
 
-$card_title = get_field('cardintro_title', $id);
-$card_text = get_field('cardintro_text', $id);
-$card_image = get_field('cardintro_image', $id);
+$card_title = $args['title'] ?? get_field('cardintro_title', $id);
+$card_text = $args['text'] ?? get_field('cardintro_text', $id);
+$card_image = $args['image'] ?? get_field('cardintro_image', $id);
 
 $background = '';
 
@@ -28,6 +28,10 @@ endif;
 
 if ($style == 'green') :
     $background = 'card--green';
+endif;
+
+if ($style == 'grey') :
+    $background = 'card--grey';
 endif;
 
 ?>
