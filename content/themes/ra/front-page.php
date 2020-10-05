@@ -55,24 +55,7 @@ $content = get_the_content();
 
     <div class="container">
 
-        <?php
-
-        $card_additional_title = get_field('add_cardintro_title');
-        $card_additional_text = get_field('add_cardintro_text');
-        $card_additional_image = get_field('add_cardintro_image');
-
-        if ($card_additional_title || $card_additional_text || $card_additional_image) :
-
-        rab_get_component(
-            'card-introductory',
-            [
-                'title' => $card_additional_title,
-                'text' => $card_additional_text,
-                'image' => $card_additional_image,
-            ]
-        );
-
-        endif; ?>
+        <?php get_template_part( 'views/cards/card-introductory' ); ?>
 
         <?php if ($shop_intro && $shop_id) :
 
@@ -131,7 +114,7 @@ $content = get_the_content();
             );
         ?>
 
-        <?php get_template_part( 'views/cards/card-introductory' ); ?>
+
 
         <?php get_template_part( 'views/cards/card-featured' ); ?>
     </div>
