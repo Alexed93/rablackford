@@ -74,7 +74,7 @@ $content = get_the_content();
             $blog_url = get_permalink($blog_id);
             $latest_post = wp_get_recent_posts(
                 [
-                    'numberposts' => 1,
+                    'numberposts' => 2,
                     'post_status' => 'publish'
                 ]
             );
@@ -91,8 +91,8 @@ $content = get_the_content();
                             $type = ra_term_links($latest_id, 'category' , false );
 
                             ?>
-                            <p class="zeta | meta | u-push-bottom">Posted <?php echo get_the_date('jS F Y', $latest_id); ?> in <?php echo $type; ?></p>
-                            <h1 class="gamma"><a href="<?php the_permalink($latest_id); ?>"><?php echo wp_kses_post($latest['post_title']); ?></a></h1>
+                            <p class="zeta | meta | u-push-bottom/2 u-push-top@2">Posted <?php echo get_the_date('jS F Y', $latest_id); ?> in <?php echo $type; ?></p>
+                            <h2 class="gamma"><a href="<?php the_permalink($latest_id); ?>"><?php echo wp_kses_post($latest['post_title']); ?></a></h2>
                             <?php if ($latest['post_excerpt']) : ?>
                                 <p>
                                     <?php echo wp_kses_post($latest['post_excerpt']); ?>
