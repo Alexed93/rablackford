@@ -27,6 +27,18 @@ get_header();
                         <p class="introduction_text"><?php echo get_the_excerpt(); ?></p>
                     <?php endif; ?>
                 </div>
+                <?php
+                if (is_cart()) :
+                    $notice = get_field('basket_message', 'options');
+
+                    if ($notice) : ?>
+                        <div class="card card--featured | u-push-bottom@2">
+                            <div class="card__content | u-align-center">
+                                <?php echo apply_filters('the_content', $notice); ?>
+                            </div>
+                        </div>
+                    <?php endif;
+                endif; ?>
                 <div class="grid">
                     <div class="grid__item">
                         <article class="content content--full">

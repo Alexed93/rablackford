@@ -253,6 +253,25 @@
             "maxlength": "",
             "rows": 3,
             "new_lines": "br"
+        },
+        {
+            "key": "field_5fc407078eb7f",
+            "label": "Basket Message",
+            "name": "basket_message",
+            "type": "wysiwyg",
+            "instructions": "",
+            "required": 0,
+            "conditional_logic": 0,
+            "wrapper": {
+                "width": "",
+                "class": "",
+                "id": ""
+            },
+            "default_value": "",
+            "tabs": "all",
+            "toolbar": "basic",
+            "media_upload": 0,
+            "delay": 0
         }
     ],
     "location": [
@@ -272,5 +291,5 @@
     "hide_on_screen": "",
     "active": true,
     "description": "",
-    "modified": 1598991524
+    "modified": 1606682408
 }
