@@ -2,6 +2,7 @@
 
 $twitter = get_field('twitter', 'options');
 $facebook = get_field('facebook', 'options');
+$address = get_field('postal_address', 'options');
 
 ?>
 <?php get_template_part( 'views/globals/openhours' ); ?>
@@ -36,6 +37,19 @@ $facebook = get_field('facebook', 'options');
                 <?php wp_nav_menu( array('theme_location' => 'tertiary', 'items_wrap' => '%3$s') ); ?>
             </ul>
         </div>
+        <?php if (is_array($address)) :
+            $lines = array_column($address, 'line');
+            $str_address = '';
+
+            if (is_array($lines)) {
+                $str_address = implode(', ', $lines);
+            }
+
+            ?>
+            <div class="u-push-top zeta">
+                <p><?php echo $str_address; ?></p>
+            </div>
+        <?php endif; ?>
         <div class="copyright__info | u-push-top zeta">
             Copyright &copy; <?php echo date('Y'); ?> RA Blackford | Created by <a href="mailto:alexed93@gmail.com" class="link">Alex Edwards</a>
         </div>
