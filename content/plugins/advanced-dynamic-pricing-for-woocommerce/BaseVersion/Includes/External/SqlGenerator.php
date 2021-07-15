@@ -3,217 +3,257 @@
 namespace ADP\BaseVersion\Includes\External;
 
 use ADP\BaseVersion\Includes\Common\Helpers;
+use ADP\BaseVersion\Includes\Context;
 use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class SqlGenerator {
-	protected $applied_rules = array();
+class SqlGenerator
+{
+    protected $appliedRules = array();
 
-	/**
-	 * @var array
-	 */
-	protected $join = array();
+    /**
+     * @var array
+     */
+    protected $join = array();
 
-	/**
-	 * @var array
-	 */
-	protected $where = array();
+    /**
+     * @var array
+     */
+    protected $where = array();
 
-	/**
-	 * @var array
-	 */
-	protected $custom_taxonomies = array();
+    /**
+     * @var array
+     */
+    protected $excludeWhere = array();
 
-	public function __construct() {
-		$this->custom_taxonomies = array_values( array_map( function ( $tax ) {
-			return $tax->name;
-		}, Helpers::get_custom_product_taxonomies() ) );
-	}
+    /**
+     * @var array
+     */
+    protected $customTaxonomies = array();
 
-	/**
-	 * @param SingleItemRule $rule
-	 *
-	 * @return bool
-	 */
-	public function apply_rule_to_query( $rule ) {
-		$filters = $rule->getFilters();
-		if ( ! $filters ) {
-			return false;
-		}
+    public function __construct()
+    {
+        $this->customTaxonomies = array_values(array_map(function ($tax) {
+            return $tax->name;
+        }, Helpers::getCustomProductTaxonomies()));
+    }
 
-		$filter = reset( $filters );
+    /**
+     * @param Context $context
+     * @param SingleItemRule $rule
+     *
+     * @return bool
+     */
+    public function applyRuleToQuery($context, SingleItemRule $rule)
+    {
+        $filters = $rule->getFilters();
+        if ( ! $filters) {
+            return false;
+        }
 
-		if ( ! $filter->isValid() ) {
-			return false;
-		}
+        $filter = reset($filters);
 
-		$generated = $this->generate_filter_sql_by_type( $filter->getType(), $filter->getValue() );
+        if ( ! $filter->isValid()) {
+            return false;
+        }
 
-		if ( ! empty( $generated['where'] ) ) {
-			$this->where[] = $generated['where'];
-		}
+        $generated = $this->generateFilterSqlByType($filter->getType(), $filter->getValue());
 
-		$this->applied_rules[] = $rule;
+        if ( ! empty($generated['where'])) {
+            $this->where[] = $generated['where'];
+        }
 
-		return true;
-	}
+        if ($context->getOption('allow_to_exclude_products') && $filter->getExcludeProductIds()) {
+            $ids                  = "( '" . implode("','",
+                    array_map('esc_sql', $filter->getExcludeProductIds())) . "' )";
+            $this->excludeWhere[] = "post.ID NOT IN {$ids} AND post.post_parent NOT IN {$ids}";
+        }
 
-	public function get_join() {
-		return $this->join;
-	}
+        $this->appliedRules[] = $rule;
 
-	public function get_where() {
-		return $this->where;
-	}
+        return true;
+    }
 
-	protected function generate_filter_sql_by_type( $type, $value ) {
-		if ( in_array( $type, $this->custom_taxonomies ) ) {
-			return $this->gen_sql_custom_taxonomy( $type, $value );
-		}
+    public function getJoin()
+    {
+        return $this->join;
+    }
 
-		$method_name = "gen_sql_$type";
+    public function getWhere()
+    {
+        return $this->where;
+    }
 
-		return method_exists( $this, $method_name ) ? call_user_func( array( $this, $method_name ), $value ) : false;
-	}
+    public function getExcludeWhere()
+    {
+        return $this->excludeWhere;
+    }
 
-	protected function gen_sql_products( $product_ids ) {
-		$where = array();
+    protected function generateFilterSqlByType($type, $value)
+    {
+        if (in_array($type, $this->customTaxonomies)) {
+            return $this->genSqlCustomTaxonomy($type, $value);
+        }
 
-		$ids_sql_in = "( '" . implode( "','", array_map( 'esc_sql', $product_ids ) ) . "' )";
+        $method_name = "genSql" . ucfirst($type);
 
-		$where[] = "post.ID IN {$ids_sql_in} OR post.post_parent IN {$ids_sql_in}";
+        return method_exists($this, $method_name) ? call_user_func(array($this, $method_name), $value) : false;
+    }
 
-		return array(
-			'where' => implode( " ", $where ),
-		);
-	}
+    protected function genSqlProducts($productIds)
+    {
+        $where = array();
 
-	protected function add_join( $sql_join ) {
-		$hash = md5( $sql_join );
-		if ( ! isset( $this->join[ $hash ] ) ) {
-			$this->join[ $hash ] = $sql_join;
-		}
-	}
+        $ids_sql_in = "( '" . implode("','", array_map('esc_sql', $productIds)) . "' )";
 
-	protected function gen_sql_product_sku( $skus ) {
-		global $wpdb;
+        $where[] = "post.ID IN {$ids_sql_in} OR post.post_parent IN {$ids_sql_in}";
 
-		$skus_sql_in = "( '" . implode( "','", array_map( 'esc_sql', $skus ) ) . "' )";
+        return array(
+            'where' => implode(" ", $where),
+        );
+    }
 
-		$this->add_join( "LEFT JOIN {$wpdb->postmeta} as postmeta_1 ON post.ID = postmeta_1.post_id" );
+    protected function addJoin($sqlJoin)
+    {
+        $hash = md5($sqlJoin);
+        if ( ! isset($this->join[$hash])) {
+            $this->join[$hash] = $sqlJoin;
+        }
+    }
 
-		$where   = array();
-		$where[] = "postmeta_1.meta_key = '_sku'";
-		$where[] = "postmeta_1.meta_value IN {$skus_sql_in}";
+    protected function genSqlProduct_sku($skus)
+    {
+        global $wpdb;
 
-		return array(
-			'where' => "(" . implode( " AND ", $where ) . ")",
-		);
-	}
+        $skus_sql_in = "( '" . implode("','", array_map('esc_sql', $skus)) . "' )";
 
-	protected function gen_sql_product_sellers( $sellers ) {
-		global $wpdb;
+        $this->addJoin("LEFT JOIN {$wpdb->postmeta} as postmeta_1 ON post.ID = postmeta_1.post_id");
 
-		$sellers_sql_in = "( '" . implode( "','", array_map( 'esc_sql', $sellers ) ) . "' )";
+        $where   = array();
+        $where[] = "postmeta_1.meta_key = '_sku'";
+        $where[] = "postmeta_1.meta_value IN {$skus_sql_in}";
 
-		$where = array();
-		$where[] = "post.post_author IN {$sellers_sql_in}";
+        return array(
+            'where' => "(" . implode(" AND ", $where) . ")",
+        );
+    }
 
-		return array(
-			'where' => "(" . implode( " AND ", $where ) . ")",
-		);
-	}
+    protected function genSqlProduct_sellers($sellers)
+    {
+        global $wpdb;
 
-	protected function gen_sql_product_tags( $tags ) {
-		return $this->gen_sql_by_term_ids( $tags );
-	}
+        $sellers_sql_in = "( '" . implode("','", array_map('esc_sql', $sellers)) . "' )";
 
-	protected function gen_sql_product_categories( $categories ) {
-		return $this->gen_sql_by_term_ids( $categories );
-	}
+        $where   = array();
+        $where[] = "post.post_author IN {$sellers_sql_in}";
 
-	protected function gen_sql_product_category_slug( $category_slugs ) {
-		global $wpdb;
-		$where = array();
+        return array(
+            'where' => "(" . implode(" AND ", $where) . ")",
+        );
+    }
 
-		$category_slugs_sql_in = "( '" . implode( "','", array_map( 'esc_sql', $category_slugs ) ) . "' )";
+    protected function genSqlProduct_tags($tags)
+    {
+        return $this->genSqlByTermIds('product_tag', $tags);
+    }
 
-		$this->add_join( "LEFT JOIN {$wpdb->term_relationships} as term_rel_1 ON post.ID = term_rel_1.object_id" );
-		$this->add_join( "LEFT JOIN {$wpdb->term_taxonomy} as term_tax_1 ON term_rel_1.term_taxonomy_id = term_tax_1.term_taxonomy_id" );
-		$this->add_join( "LEFT JOIN {$wpdb->terms} as term_1 ON term_tax_1.term_id = term_1.term_id" );
+    protected function genSqlProduct_categories($categories)
+    {
+        return $this->genSqlByTermIds('product_cat', $categories);
+    }
 
-		$where[] = "term_1.slug IN {$category_slugs_sql_in}";
+    protected function genSqlProduct_category_slug($categorySlugs)
+    {
+        global $wpdb;
+        $where = array();
 
-		return array(
-			'where' => implode( " ", $where ),
-		);
-	}
+        $category_slugs_sql_in = "( '" . implode("','", array_map('esc_sql', $categorySlugs)) . "' )";
 
-	protected function gen_sql_product_custom_fields( $values ) {
-		global $wpdb;
-		$where = array();
+        $this->addJoin("LEFT JOIN {$wpdb->term_relationships} as term_rel_1 ON post.ID = term_rel_1.object_id");
+        $this->addJoin("LEFT JOIN {$wpdb->term_taxonomy} as term_tax_1 ON term_rel_1.term_taxonomy_id = term_tax_1.term_taxonomy_id");
+        $this->addJoin("LEFT JOIN {$wpdb->terms} as term_1 ON term_tax_1.term_id = term_1.term_id");
 
-		$custom_fields = array();
-		foreach ( $values as $value ) {
-			$value = explode( "=", $value );
-			if ( count( $value ) !== 2 ) {
-				continue;
-			}
-			$custom_fields[] = array(
-				'key'   => $value[0],
-				'value' => $value[1],
-			);
-		}
+        $where[] = "term_1.slug IN {$category_slugs_sql_in}";
 
-		$this->add_join( "LEFT JOIN {$wpdb->postmeta} as postmeta_1 ON post.ID = postmeta_1.post_id" );
+        return array(
+            'where' => implode(" ", $where),
+        );
+    }
 
-		$tmp_where = [];
-		foreach ( $custom_fields as $custom_field ) {
-			$tmp_where[] = "postmeta_1.meta_key='{$custom_field['key']}' AND postmeta_1.meta_value='{$custom_field['value']}'";
-		}
+    protected function genSqlProduct_custom_fields($values)
+    {
+        global $wpdb;
+        $where = array();
 
-		$where[] = "( " . implode( " OR ", $tmp_where ) . " )";
+        $custom_fields = array();
+        foreach ($values as $value) {
+            $value = explode("=", $value);
+            if (count($value) !== 2) {
+                continue;
+            }
+            $custom_fields[] = array(
+                'key'   => $value[0],
+                'value' => $value[1],
+            );
+        }
+
+        $this->addJoin("LEFT JOIN {$wpdb->postmeta} as postmeta_1 ON post.ID = postmeta_1.post_id");
+
+        $tmp_where = [];
+        foreach ($custom_fields as $custom_field) {
+            $tmp_where[] = "postmeta_1.meta_key='{$custom_field['key']}' AND postmeta_1.meta_value='{$custom_field['value']}'";
+        }
+
+        $where[] = "( " . implode(" OR ", $tmp_where) . " )";
 
 
-		return array(
-			'where' => implode( " ", $where ),
-		);
-	}
+        return array(
+            'where' => implode(" ", $where),
+        );
+    }
 
-	protected function gen_sql_product_attributes( $attributes ) {
-		return $this->gen_sql_by_term_ids( $attributes );
-	}
+    protected function genSqlProduct_attributes($attributes)
+    {
+        return $this->genSqlByTermIds('product_attr', $attributes);
+    }
 
-	protected function gen_sql_custom_taxonomy( $tax_name, $values ) {
-		return $this->gen_sql_by_term_ids( $values );
-	}
+    protected function genSqlCustomTaxonomy($taxName, $values)
+    {
+        return $this->genSqlByTermIds($taxName, $values);
+    }
 
-	protected function gen_sql_by_term_ids( $term_ids ) {
-		$term_ids_sql_in = "( '" . implode( "','", array_map( 'esc_sql', $term_ids ) ) . "' )";
+    protected function genSqlByTermIds($taxName, $termIds)
+    {
+        $term_ids_sql_in = "( '" . implode("','", array_map('esc_sql', $termIds)) . "' )";
 
-		global $wpdb;
-		$where = array();
+        global $wpdb;
+        $where = array();
 
-		$this->add_join( "LEFT JOIN {$wpdb->term_relationships} as term_rel_1 ON post.ID = term_rel_1.object_id" );
-		$this->add_join( "LEFT JOIN {$wpdb->term_taxonomy} as term_tax_1 ON term_rel_1.term_taxonomy_id = term_tax_1.term_taxonomy_id" );
+        $relationshipTableName = "term_rel_$taxName";
+        $taxTableName          = "term_tax_$taxName";
 
-		$where[] = "term_tax_1.term_id IN {$term_ids_sql_in}";
+        $this->addJoin( "LEFT JOIN {$wpdb->term_relationships} as {$relationshipTableName} ON post.ID = {$relationshipTableName}.object_id" );
+        $this->addJoin( "LEFT JOIN {$wpdb->term_taxonomy} as {$taxTableName} ON {$relationshipTableName}.term_taxonomy_id = {$taxTableName}.term_taxonomy_id" );
 
-		return array(
-			'where' => implode( " ", $where ),
-		);
-	}
+        $where[] = "{$taxTableName}.term_id IN {$term_ids_sql_in}";
 
-	protected function gen_sql_any() {
-		return array(
-			'where' => array(),
-		);
-	}
+        return array(
+            'where' => implode(" ", $where),
+        );
+    }
 
-	public function is_empty() {
-		return count( $this->applied_rules ) === 0;
-	}
+    protected function genSqlAny()
+    {
+        return array(
+            'where' => array(),
+        );
+    }
+
+    public function isEmpty()
+    {
+        return count($this->appliedRules) === 0;
+    }
 }

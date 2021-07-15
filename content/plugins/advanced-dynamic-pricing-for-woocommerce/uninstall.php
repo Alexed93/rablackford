@@ -5,22 +5,27 @@ namespace ADP;
 use ADP\BaseVersion\Includes\Common\Database;
 use ADP\BaseVersion\Includes\Context;
 
-if ( defined( 'WP_UNINSTALL_PLUGIN' ) ) {
-	include_once "AutoLoader.php";
-	include_once "Factory.php";
+if (defined('WP_UNINSTALL_PLUGIN')) {
+    if ( ! class_exists("\ADP\AutoLoader")) {
+        include_once "AutoLoader.php";
+    }
 
-	\ADP\AutoLoader::register();
+    if ( ! class_exists("\ADP\Factory")) {
+        include_once "Factory.php";
+    };
 
-	$path = trailingslashit( dirname( __FILE__ ) );
+    \ADP\AutoLoader::register();
 
-	$context = new Context();
-	// delete tables  only if have value in settings
-	if ( $context->get_option( 'uninstall_remove_data' ) ) {
-		Database::delete_database();
-	}
+    $path = trailingslashit(dirname(__FILE__));
 
-	$extension_file = $path . 'ProVersion/uninstall.php';
-	if ( file_exists( $extension_file ) ) {
-		include_once $extension_file;
-	}
+    $context = new Context();
+    // delete tables  only if have value in settings
+    if ($context->getOption('uninstall_remove_data')) {
+        Database::deleteDatabase();
+    }
+
+    $extension_file = $path . 'ProVersion/uninstall.php';
+    if (file_exists($extension_file)) {
+        include_once $extension_file;
+    }
 }

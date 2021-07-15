@@ -2,251 +2,370 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Structures\Abstracts;
 
+use ADP\BaseVersion\Includes\Currency;
 use ADP\BaseVersion\Includes\Rule\Interfaces\RuleCondition;
 use ADP\BaseVersion\Includes\Rule\Interfaces\RuleLimit;
 use ADP\BaseVersion\Includes\Rule\Interfaces\CartAdjustment;
 use ADP\BaseVersion\Includes\Rule\Structures\Gift;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-abstract class BaseRule {
-	/**
-	 * @var int
-	 */
-	protected $id;
+abstract class BaseRule
+{
+    /**
+     * @var int
+     */
+    protected $id;
 
-	/**
-	 * @var string
-	 */
-	protected $title;
+    /**
+     * @var string
+     */
+    protected $title;
 
-	/**
-	 * @var int
-	 */
-	protected $priority;
+    /**
+     * @var int
+     */
+    protected $priority;
 
-	/**
-	 * @var bool
-	 */
-	protected $enabled;
+    /**
+     * @var bool
+     */
+    protected $enabled;
 
-	/**
-	 * @var RuleCondition[]
-	 */
-	protected $conditions;
+    /**
+     * @var array<int,RuleCondition>
+     */
+    protected $conditions;
 
-	/**
-	 * @var RuleLimit[]
-	 */
-	protected $limits = array();
+    /**
+     * @var array<int,RuleLimit>
+     */
+    protected $limits = array();
 
-	/**
-	 * @var CartAdjustment[] array
-	 */
-	protected $cartAdjustments = array();
+    /**
+     * @var array<int, CartAdjustment>
+     */
+    protected $cartAdjustments = array();
 
-	// additional
-	protected $conditionsRelationship;
+    // additional
+    protected $conditionsRelationship;
 
-	/**
-	 * @var Gift[]
-	 */
-	protected $gifts;
+    /**
+     * @var Gift[]
+     */
+    protected $gifts;
 
-	/**
-	 * @var int
-	 */
-	protected $giftLimit;
+    /**
+     * @var int
+     */
+    protected $giftLimit;
 
-	public function __construct() {
-		$this->enabled         = false;
-		$this->cartAdjustments = array();
-		$this->conditions      = array();
-		$this->limits          = array();
-		$this->gifts           = array();
-		$this->giftLimit       = INF;
-	}
+    /**
+     * @var Currency|null
+     */
+    protected $currency;
 
-	/**
-	 * @param int $id
-	 */
-	public function setId( $id ) {
-		$this->id = (int) $id;
-	}
+    /**
+     * @var string
+     */
+    protected $activationCouponCode;
 
-	public function activate() {
-		$this->enabled = true;
-	}
+    /**
+     * @var string
+     */
+    protected $dbHash;
 
-	public function deactivate() {
-		$this->enabled = false;
-	}
+    public function __construct()
+    {
+        $this->id                   = 0;
+        $this->enabled              = false;
+        $this->cartAdjustments      = array();
+        $this->conditions           = array();
+        $this->limits               = array();
+        $this->gifts                = array();
+        $this->giftLimit            = INF;
+        $this->currency             = null;
+        $this->activationCouponCode = null;
+    }
 
-	public function setEnabled( $enabled ) {
-		$this->enabled = $enabled === "on";
-	}
+    public function __clone()
+    {
+        $this->conditions = array_map(function ($item) {
+            return clone $item;
+        }, $this->conditions);
 
-	public function getEnabled() {
-		return $this->enabled;
-	}
+        $this->limits = array_map(function ($item) {
+            return clone $item;
+        }, $this->limits);
 
-	/**
-	 * @param RuleCondition $condition
-	 */
-	public function addCondition( $condition ) {
-		if ( $condition instanceof RuleCondition ) {
-			$this->conditions[] = $condition;
-		}
-	}
+        $this->cartAdjustments = array_map(function ($item) {
+            return clone $item;
+        }, $this->cartAdjustments);
 
-	/**
-	 * @param RuleCondition[] $conditions
-	 */
-	public function setConditions( $conditions ) {
-		$this->conditions = array();
+        $this->gifts = array_map(function ($item) {
+            return clone $item;
+        }, $this->gifts);
+    }
 
-		foreach ( $conditions as $condition ) {
-			$this->addCondition( $condition );
-		}
-	}
+    /**
+     * @param int $id
+     */
+    public function setId($id)
+    {
+        $this->id = (int)$id;
+    }
 
-	/**
-	 * @return RuleCondition[]
-	 */
-	public function getConditions() {
-		return $this->conditions;
-	}
+    public function activate()
+    {
+        $this->enabled = true;
+    }
 
-	/**
-	 * @param CartAdjustment $cartAdjustment
-	 */
-	public function addCartAdjustment( $cartAdjustment ) {
-		if ( $cartAdjustment instanceof CartAdjustment ) {
-			$this->cartAdjustments[] = $cartAdjustment;
-		}
-	}
+    public function deactivate()
+    {
+        $this->enabled = false;
+    }
 
-	/**
-	 * @param CartAdjustment[] $cartAdjustments
-	 */
-	public function setCartAdjustments( $cartAdjustments ) {
-		$this->cartAdjustments = array();
+    public function setEnabled($enabled)
+    {
+        $this->enabled = $enabled === "on";
+    }
 
-		foreach ( $cartAdjustments as $cartAdjustment ) {
-			$this->addCartAdjustment( $cartAdjustment );
-		}
-	}
+    public function getEnabled()
+    {
+        return $this->enabled;
+    }
 
-	/**
-	 * @return CartAdjustment[]
-	 */
-	public function getCartAdjustments() {
-		return $this->cartAdjustments;
-	}
+    /**
+     * @param RuleCondition $condition
+     */
+    public function addCondition($condition)
+    {
+        if ($condition instanceof RuleCondition) {
+            $this->conditions[] = $condition;
+        }
+    }
 
-	/**
-	 * @param RuleLimit $limit
-	 */
-	public function addLimit( $limit ) {
-		if ( $limit instanceof RuleLimit ) {
-			$this->limits[] = $limit;
-		}
-	}
+    /**
+     * @param array<int,RuleCondition> $conditions
+     */
+    public function setConditions($conditions)
+    {
+        $this->conditions = array();
 
-	/**
-	 * @param RuleLimit[] $limits
-	 */
-	public function setLimits( $limits ) {
-		$this->limits = array();
+        foreach ($conditions as $condition) {
+            $this->addCondition($condition);
+        }
+    }
 
-		foreach ( $limits as $limit ) {
-			$this->addLimit( $limit );
-		}
-	}
+    /**
+     * @return array<int,RuleCondition>
+     */
+    public function getConditions()
+    {
+        return $this->conditions;
+    }
 
-	/**
-	 * @return RuleLimit[]
-	 */
-	public function getLimits() {
-		return $this->limits;
-	}
+    /**
+     * @param CartAdjustment $cartAdjustment
+     */
+    public function addCartAdjustment($cartAdjustment)
+    {
+        if ($cartAdjustment instanceof CartAdjustment) {
+            $this->cartAdjustments[] = $cartAdjustment;
+        }
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getId() {
-		return $this->id;
-	}
+    /**
+     * @param array<int,CartAdjustment> $cartAdjustments
+     */
+    public function setCartAdjustments($cartAdjustments)
+    {
+        $this->cartAdjustments = array();
 
-	public function setConditionsRelationship( $rel ) {
-		$this->conditionsRelationship = $rel;
-	}
+        foreach ($cartAdjustments as $cartAdjustment) {
+            $this->addCartAdjustment($cartAdjustment);
+        }
+    }
 
-	public function getConditionsRelationship() {
-		return $this->conditionsRelationship;
-	}
+    /**
+     * @return array<int,CartAdjustment>
+     */
+    public function getCartAdjustments()
+    {
+        return $this->cartAdjustments;
+    }
 
-	/**
-	 * @param int $priority
-	 */
-	public function setPriority( $priority ) {
-		$this->priority = (int) $priority;
-	}
+    /**
+     * @param RuleLimit $limit
+     */
+    public function addLimit($limit)
+    {
+        if ($limit instanceof RuleLimit) {
+            $this->limits[] = $limit;
+        }
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getPriority() {
-		return $this->priority;
-	}
+    /**
+     * @param array<int,RuleLimit> $limits
+     */
+    public function setLimits($limits)
+    {
+        $this->limits = array();
 
-	/**
-	 * @param Gift[] $gifts
-	 */
-	public function setGifts( $gifts ) {
-		$filteredGifts = array();
-		foreach ( $gifts as $gift ) {
-			if ( $gift instanceof Gift ) {
-				$filteredGifts[] = $gift;
-			}
-		}
-		$this->gifts = $filteredGifts;
-	}
+        foreach ($limits as $limit) {
+            $this->addLimit($limit);
+        }
+    }
 
-	/**
-	 * @return Gift[]
-	 */
-	public function getGifts() {
-		return $this->gifts;
-	}
+    /**
+     * @return array<int,RuleLimit>
+     */
+    public function getLimits()
+    {
+        return $this->limits;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getGiftLimit() {
-		return $this->giftLimit;
-	}
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
-	/**
-	 * @param int $giftLimit
-	 */
-	public function setGiftLimit( $giftLimit ) {
-		$this->giftLimit = $giftLimit;
-	}
+    public function setConditionsRelationship($rel)
+    {
+        $this->conditionsRelationship = $rel;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getTitle() {
-		return $this->title;
-	}
+    public function getConditionsRelationship()
+    {
+        return $this->conditionsRelationship;
+    }
 
-	/**
-	 * @param string $title
-	 */
-	public function setTitle( $title ) {
-		$this->title = addslashes( $title );
-	}
+    /**
+     * @param int|string $priority
+     */
+    public function setPriority($priority)
+    {
+        $this->priority = (int)$priority;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPriority()
+    {
+        return $this->priority;
+    }
+
+    /**
+     * @param array<int,Gift> $gifts
+     */
+    public function setGifts($gifts)
+    {
+        $filteredGifts = array();
+        foreach ($gifts as $gift) {
+            if ($gift instanceof Gift) {
+                $filteredGifts[] = $gift;
+            }
+        }
+        $this->gifts = $filteredGifts;
+    }
+
+    /**
+     * @return array<int,Gift>
+     */
+    public function getGifts()
+    {
+        return $this->gifts;
+    }
+
+    /**
+     * @return int
+     */
+    public function getGiftLimit()
+    {
+        return $this->giftLimit;
+    }
+
+    /**
+     * @param int $giftLimit
+     */
+    public function setGiftLimit($giftLimit)
+    {
+        $this->giftLimit = $giftLimit;
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->title;
+    }
+
+    /**
+     * @param string $title
+     */
+    public function setTitle($title)
+    {
+        $this->title = addslashes($title);
+    }
+
+    /**
+     * @param Currency $currency
+     */
+    public function setCurrency($currency)
+    {
+        if ($currency instanceof Currency) {
+            $this->currency = $currency;
+        }
+    }
+
+    /**
+     * @return Currency|null
+     */
+    public function getCurrency()
+    {
+        return $this->currency;
+    }
+
+    /**
+     * @param string $code
+     */
+    public function setActivationCouponCode($code)
+    {
+        if (is_string($code) && ($code = strval($code))) {
+            $this->activationCouponCode = wc_format_coupon_code($code);
+        }
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getActivationCouponCode()
+    {
+        return $this->activationCouponCode;
+    }
+
+    /**
+     * @param string $hash
+     */
+    public function setHash($hash)
+    {
+        if (is_string($hash)) {
+            $this->dbHash = strval($hash);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->dbHash !== null ? $this->dbHash : "";
+    }
 }

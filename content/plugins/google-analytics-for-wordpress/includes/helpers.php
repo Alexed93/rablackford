@@ -47,7 +47,7 @@ function monsterinsights_track_user( $user_id = -1 ) {
 	}
 
 	$track_super_admin = apply_filters( 'monsterinsights_track_super_admins', false );
-	if ( $track_super_admin === false && is_multisite() && is_super_admin() ) {
+	if ( $user_id === -1 && $track_super_admin === false && is_multisite() && is_super_admin() ) {
 		$track_user = false;
 	}
 
@@ -325,10 +325,10 @@ function monsterinsights_is_dev_url( $url = '' ) {
 
 		$tlds_to_check = array( '.local', ':8888', ':8080', ':8081', '.invalid', '.example', '.test' );
 		foreach ( $tlds_to_check as $tld ) {
-				if ( false !== strpos( $host, $tld ) ) {
-					$is_local_url = true;
-					break;
-				}
+			if ( false !== strpos( $host, $tld ) ) {
+				$is_local_url = true;
+				break;
+			}
 
 		}
 		if ( substr_count( $host, '.' ) > 1 ) {
@@ -929,7 +929,7 @@ function monsterinsights_is_network_active() {
 	}
 
 	if ( is_multisite() && is_plugin_active_for_network( plugin_basename( MONSTERINSIGHTS_PLUGIN_FILE ) ) ) {
-	   return true;
+		return true;
 	} else {
 		return false;
 	}
@@ -1238,7 +1238,7 @@ function monsterinsights_count_third_party_ua_codes( $body ) {
  * @return array
  */
 function monsterinsights_is_code_installed_frontend() {
-		// Grab the front page html.
+	// Grab the front page html.
 	$request = wp_remote_request( home_url(), array(
 		'sslverify' => false,
 	) );
@@ -1255,10 +1255,10 @@ function monsterinsights_is_code_installed_frontend() {
 
 		$body            = wp_remote_retrieve_body( $request );
 		$current_ua_code = monsterinsights_get_ua_to_output();
-		$ua_limit        = 2;
+		$ua_limit        = 'gtag' === MonsterInsights()->get_tracking_mode() ? 4 : 2;
 		// If the ads addon is installed another UA is added to the page.
 		if ( class_exists( 'MonsterInsights_Ads' ) ) {
-			$ua_limit = 3;
+			$ua_limit++;
 		}
 		// Translators: The placeholders are for making the "We noticed you're using a caching plugin" text bold.
 		$cache_error = sprintf( esc_html__( '%1$sWe noticed you\'re using a caching plugin or caching from your hosting provider.%2$s Be sure to clear the cache to ensure the tracking appears on all pages and posts. %3$s(See this guide on how to clear cache)%4$s.', 'google-analytics-for-wordpress' ), '<b>', '</b>', ' <a href="https://www.wpbeginner.com/beginners-guide/how-to-clear-your-cache-in-wordpress/" target="_blank">', '</a>' );
@@ -1388,7 +1388,7 @@ function monsterinsights_get_current_post_type() {
 	return null;
 }
 
- /** Decode special characters, both alpha- (<) and numeric-based (').
+/** Decode special characters, both alpha- (<) and numeric-based (').
  *
  * @since 7.10.5
  *
@@ -1518,7 +1518,7 @@ function monsterinsights_tools_copy_url_to_prettylinks() {
                 localStorage.removeItem('MonsterInsightsURL');
             });
         </script>
-    <?php }
+	<?php }
 }
 add_action( 'admin_footer', 'monsterinsights_tools_copy_url_to_prettylinks' );
 
@@ -1534,7 +1534,7 @@ function monsterinsights_skip_prettylinks_welcome_screen() {
 	$monsterinsights_reference = isset( $_GET['monsterinsights_reference'] ) ? $_GET['monsterinsights_reference'] : '';
 
 	if ( 'post-new.php' === $pagenow && 'pretty-link' === $post_type && 'url_builder' === $monsterinsights_reference ) {
-	    $onboard  = get_option( 'prli_onboard' );
+		$onboard  = get_option( 'prli_onboard' );
 
 		if ( $onboard == 'welcome' || $onboard == 'update' ) {
 			update_option( 'monsterinsights_backup_prli_onboard_value', $onboard );
@@ -1592,4 +1592,213 @@ function monsterinsights_require_upgrader( $custom_upgrader = true ) {
 		require_once plugin_dir_path( $base->file ) . '/includes/admin/licensing/skin.php';
 	}
 
+}
+
+/**
+ * Load headline analyzer if wp version is higher than/equal to 5.4
+ *
+ * @return boolean
+ * @since 7.12.3
+ *
+ */
+function monsterinsights_load_gutenberg_app() {
+	global $wp_version;
+
+	if ( version_compare( $wp_version, '5.4', '<' ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Helper function for frontend script attributes
+ *
+ * @return string
+ * @since 7.12.3
+ *
+ *
+ */
+function monsterinsights_get_frontend_analytics_script_atts() {
+	$attr_string = '';
+
+	$attributes = apply_filters( 'monsterinsights_tracking_analytics_script_attributes', array(
+		'type'         => "text/javascript",
+		'data-cfasync' => 'false'
+	) );
+
+	if ( ! empty( $attributes ) ) {
+		foreach ( $attributes as $attr_name => $attr_value ) {
+			if ( ! empty( $attr_name ) ) {
+				$attr_string .= ' ' . sanitize_key( $attr_name ) . '="' . esc_attr( $attr_value ) . '"';
+			} else {
+				$attr_string .= ' ' . esc_attr( $attr_value );
+			}
+		}
+	}
+
+	return $attr_string;
+}
+
+/**
+ * Get native english speaking countries
+ *
+ * @return array
+ *
+ * @since 7.12.3
+ */
+function monsterinsights_get_english_speaking_countries() {
+	return array(
+		'AG' => __( 'Antigua and Barbuda', 'google-analytics-for-wordpress' ),
+		'AU' => __( 'Australia', 'google-analytics-for-wordpress' ),
+		'BB' => __( 'Barbados', 'google-analytics-for-wordpress' ),
+		'BZ' => __( 'Belize', 'google-analytics-for-wordpress' ),
+		'BW' => __( 'Botswana', 'google-analytics-for-wordpress' ),
+		'BI' => __( 'Burundi', 'google-analytics-for-wordpress' ),
+		'CM' => __( 'Cameroon', 'google-analytics-for-wordpress' ),
+		'CA' => __( 'Canada', 'google-analytics-for-wordpress' ),
+		'DM' => __( 'Dominica', 'google-analytics-for-wordpress' ),
+		'FJ' => __( 'Fiji', 'google-analytics-for-wordpress' ),
+		'GD' => __( 'Grenada', 'google-analytics-for-wordpress' ),
+		'GY' => __( 'Guyana', 'google-analytics-for-wordpress' ),
+		'GM' => __( 'Gambia', 'google-analytics-for-wordpress' ),
+		'GH' => __( 'Ghana', 'google-analytics-for-wordpress' ),
+		'IE' => __( 'Ireland', 'google-analytics-for-wordpress' ),
+		'IN' => __( 'India', 'google-analytics-for-wordpress' ),
+		'JM' => __( 'Jamaica', 'google-analytics-for-wordpress' ),
+		'KE' => __( 'Kenya', 'google-analytics-for-wordpress' ),
+		'KI' => __( 'Kiribati', 'google-analytics-for-wordpress' ),
+		'LS' => __( 'Lesotho', 'google-analytics-for-wordpress' ),
+		'LR' => __( 'Liberia', 'google-analytics-for-wordpress' ),
+		'MW' => __( 'Malawi', 'google-analytics-for-wordpress' ),
+		'MT' => __( 'Malta', 'google-analytics-for-wordpress' ),
+		'MH' => __( 'Marshall Islands', 'google-analytics-for-wordpress' ),
+		'MU' => __( 'Mauritius', 'google-analytics-for-wordpress' ),
+		'FM' => __( 'Micronesia', 'google-analytics-for-wordpress' ),
+		'NZ' => __( 'New Zealand', 'google-analytics-for-wordpress' ),
+		'NA' => __( 'Namibia', 'google-analytics-for-wordpress' ),
+		'NR' => __( 'Nauru', 'google-analytics-for-wordpress' ),
+		'NG' => __( 'Nigeria', 'google-analytics-for-wordpress' ),
+		'PK' => __( 'Pakistan', 'google-analytics-for-wordpress' ),
+		'PW' => __( 'Palau', 'google-analytics-for-wordpress' ),
+		'PG' => __( 'Papua New Guinea', 'google-analytics-for-wordpress' ),
+		'PH' => __( 'Philippines', 'google-analytics-for-wordpress' ),
+		'RW' => __( 'Rwanda', 'google-analytics-for-wordpress' ),
+		'SG' => __( 'Singapore', 'google-analytics-for-wordpress' ),
+		'KN' => __( 'St Kitts and Nevis', 'google-analytics-for-wordpress' ),
+		'LC' => __( 'St Lucia', 'google-analytics-for-wordpress' ),
+		'VC' => __( 'St Vincent and the Grenadines', 'google-analytics-for-wordpress' ),
+		'SZ' => __( 'Swaziland', 'google-analytics-for-wordpress' ),
+		'WS' => __( 'Samoa', 'google-analytics-for-wordpress' ),
+		'SC' => __( 'Seychelles', 'google-analytics-for-wordpress' ),
+		'SL' => __( 'Sierra Leone', 'google-analytics-for-wordpress' ),
+		'SB' => __( 'Solomon Islands', 'google-analytics-for-wordpress' ),
+		'ZA' => __( 'South Africa', 'google-analytics-for-wordpress' ),
+		'SS' => __( 'South Sudan', 'google-analytics-for-wordpress' ),
+		'SD' => __( 'Sudan', 'google-analytics-for-wordpress' ),
+		'TT' => __( 'Trinidad and Tobago', 'google-analytics-for-wordpress' ),
+		'BS' => __( 'The Bahamas', 'google-analytics-for-wordpress' ),
+		'TZ' => __( 'Tanzania', 'google-analytics-for-wordpress' ),
+		'TO' => __( 'Tonga', 'google-analytics-for-wordpress' ),
+		'TV' => __( 'Tuvalu', 'google-analytics-for-wordpress' ),
+		'GB' => __( 'United Kingdom', 'google-analytics-for-wordpress' ),
+		'US' => __( 'United States of America', 'google-analytics-for-wordpress' ),
+		'UG' => __( 'Uganda', 'google-analytics-for-wordpress' ),
+		'VU' => __( 'Vanuatu', 'google-analytics-for-wordpress' ),
+		'ZM' => __( 'Zambia', 'google-analytics-for-wordpress' ),
+		'ZW' => __( 'Zimbabwe', 'google-analytics-for-wordpress' ),
+	);
+}
+
+/**
+ * Helper function to check if the current user can install a plugin.
+ *
+ * @return bool
+ */
+function monsterinsights_can_install_plugins() {
+
+	if ( ! current_user_can( 'install_plugins' ) ) {
+		return false;
+	}
+
+	// Determine whether file modifications are allowed.
+	if ( function_exists( 'wp_is_file_mod_allowed' ) && ! wp_is_file_mod_allowed( 'monsterinsights_can_install' ) ) {
+		return false;
+	}
+
+	return true;
+}
+
+/**
+ * Check if current date is between given dates. Date format: Y-m-d.
+ *
+ * @since 7.13.2
+ *
+ * @param string $start_date Start Date. Eg: 2021-01-01.
+ * @param string $end_date   End Date. Eg: 2021-01-14.
+ *
+ * @return bool
+ */
+function monsterinsights_date_is_between( $start_date, $end_date ) {
+
+	$current_date = current_time( 'Y-m-d' );
+
+	$start_date = date( 'Y-m-d', strtotime( $start_date ) );
+	$end_date   = date( 'Y-m-d', strtotime( $end_date ) );
+
+	if ( ( $current_date >= $start_date ) && ( $current_date <= $end_date ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Check is All-In-One-Seo plugin is active or not.
+ *
+ * @since 7.17.0
+ *
+ * @return bool
+ */
+function monsterinsights_is_aioseo_active() {
+
+	if ( function_exists( 'aioseo' ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Return AIOSEO Dashboard URL if plugin is active.
+ *
+ * @since 7.17.0
+ *
+ * @return string
+ */
+function monsterinsights_aioseo_dashboard_url() {
+	$url = '';
+
+	if ( function_exists( 'aioseo' ) ) {
+		$url = is_multisite() ? network_admin_url( 'admin.php?page=aioseo' ) : admin_url( 'admin.php?page=aioseo' );
+	}
+
+	return $url;
+}
+
+/**
+ * Check if AIOSEO Pro version is installed or not.
+ *
+ * @since 7.17.10
+ *
+ * @return bool
+ */
+function monsterinsights_is_installed_aioseo_pro() {
+	$installed_plugins = get_plugins();
+
+	if ( array_key_exists( 'all-in-one-seo-pack-pro/all_in_one_seo_pack.php', $installed_plugins ) ) {
+		return true;
+	}
+
+	return false;
 }

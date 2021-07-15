@@ -83,11 +83,7 @@ class MiscTab extends PageAbstract {
 						<br>
 						<?php
 						if ( $options->is_const_defined( 'general', 'do_not_send' ) ) {
-							printf( /* translators: %1$s - constant that was used; %2$s - file where it was used. */
-								esc_html__( 'The value of this field was set using a constant %1$s most likely inside %2$s of your WordPress installation.', 'wp-mail-smtp' ),
-								'<code>WPMS_DO_NOT_SEND</code>',
-								'<code>wp-config.php</code>'
-							);
+							echo $options->get_const_set_message( 'WPMS_DO_NOT_SEND' ); //phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						} else {
 							printf(
 								wp_kses( /* translators: %s - The URL to the constants support article. */
@@ -174,6 +170,24 @@ class MiscTab extends PageAbstract {
 				</div>
 			</div>
 
+			<!-- Hide Dashboard Widget -->
+			<div id="wp-mail-smtp-setting-row-dashboard_widget_hidden" class="wp-mail-smtp-setting-row wp-mail-smtp-setting-row-checkbox wp-mail-smtp-clear">
+				<div class="wp-mail-smtp-setting-label">
+					<label for="wp-mail-smtp-setting-dashboard_widget_hidden">
+						<?php esc_html_e( 'Hide Dashboard Widget', 'wp-mail-smtp' ); ?>
+					</label>
+				</div>
+				<div class="wp-mail-smtp-setting-field">
+					<input name="wp-mail-smtp[general][dashboard_widget_hidden]" type="checkbox"
+						   value="true" <?php checked( true, $options->get( 'general', 'dashboard_widget_hidden' ) ); ?>
+						   id="wp-mail-smtp-setting-dashboard_widget_hidden"
+					>
+					<label for="wp-mail-smtp-setting-dashboard_widget_hidden">
+						<?php esc_html_e( 'Check this if you would like to hide the WP Mail SMTP Dashboard Widget.', 'wp-mail-smtp' ); ?>
+					</label>
+				</div>
+			</div>
+
 			<!-- Uninstall -->
 			<div id="wp-mail-smtp-setting-row-uninstall" class="wp-mail-smtp-setting-row wp-mail-smtp-setting-row-checkbox wp-mail-smtp-clear">
 				<div class="wp-mail-smtp-setting-label">
@@ -241,6 +255,9 @@ class MiscTab extends PageAbstract {
 		if ( empty( $data['general']['email_delivery_errors_hidden'] ) ) {
 			$data['general']['email_delivery_errors_hidden'] = false;
 		}
+		if ( empty( $data['general']['dashboard_widget_hidden'] ) ) {
+			$data['general']['dashboard_widget_hidden'] = false;
+		}
 		if ( empty( $data['general']['uninstall'] ) ) {
 			$data['general']['uninstall'] = false;
 		}
@@ -248,10 +265,8 @@ class MiscTab extends PageAbstract {
 			$data['general'][ UsageTracking::SETTINGS_SLUG ] = false;
 		}
 
-		$to_save = Options::array_merge_recursive( $options->get_all(), $data );
-
 		// All the sanitization is done there.
-		$options->set( $to_save );
+		$options->set( $data, false, false );
 
 		WP::add_admin_notice(
 			esc_html__( 'Settings were successfully saved.', 'wp-mail-smtp' ),

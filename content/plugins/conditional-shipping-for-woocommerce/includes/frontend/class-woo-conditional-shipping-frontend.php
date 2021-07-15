@@ -9,25 +9,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Woo_Conditional_Shipping_Frontend {
   private $passed_rule_ids = array();
+  private $debug;
 
   /**
    * Constructor
    */
   public function __construct() {
-    add_filter( 'woocommerce_package_rates', array( $this, 'filter_shipping_methods' ), 100, 2 );
-
-    // For price related actions we need to use woocommerce_shipping_method_add_rate_args filter
-    add_filter( 'woocommerce_shipping_method_add_rate_args', array( $this, 'shipping_method_price_actions' ), 100, 2 );
-
-    // Custom "no shipping methods available" message
-    add_filter( 'woocommerce_cart_no_shipping_available_html', array( $this, 'no_shipping_message' ), 100, 1 );
-    add_filter( 'woocommerce_no_shipping_available_html', array( $this, 'no_shipping_message' ), 100, 1 );
-    
-    // Custom "shipping notice" message
-    add_action( 'woocommerce_review_order_before_shipping', array( $this, 'shipping_notice' ), 100, 0 );
+    $this->debug = Woo_Conditional_Shipping_Debug::instance();
 
     // Load frontend styles and scripts
-		add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 10, 0 );
+    add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ), 10, 0 );
+
+    if ( ! get_option( 'wcs_disable_all', false ) ) {
+      add_filter( 'woocommerce_package_rates', array( $this, 'filter_shipping_methods' ), 100, 2 );
+
+      // For price related actions we need to use woocommerce_shipping_method_add_rate_args filter
+      add_filter( 'woocommerce_shipping_method_add_rate_args', array( $this, 'shipping_method_price_actions' ), 100, 2 );
+  
+      // Custom "no shipping methods available" message
+      add_filter( 'woocommerce_cart_no_shipping_available_html', array( $this, 'no_shipping_message' ), 100, 1 );
+      add_filter( 'woocommerce_no_shipping_available_html', array( $this, 'no_shipping_message' ), 100, 1 );
+      
+      // Custom "shipping notice" message
+      add_action( 'woocommerce_review_order_before_shipping', array( $this, 'shipping_notice' ), 100, 0 );
+    }
   }
 
   /**
@@ -37,9 +42,11 @@ class Woo_Conditional_Shipping_Frontend {
 		wp_enqueue_script(
 			'woo-conditional-shipping-js',
 			plugin_dir_url( __FILE__ ) . '../../frontend/js/woo-conditional-shipping.js',
-			array( 'jquery' ),
+			array( 'jquery', 'jquery-cookie' ),
 			WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION
     );
+
+    wp_enqueue_style( 'woo_conditional_shipping_css', plugin_dir_url( __FILE__ ) . '../../frontend/css/woo-conditional-shipping.css', array(), WOO_CONDITIONAL_SHIPPING_ASSETS_VERSION );
   }
 
   /**
@@ -59,18 +66,36 @@ class Woo_Conditional_Shipping_Frontend {
       $passes = $ruleset->validate( $args['package'] );
 
       if ( $passes ) {
-        foreach ( $ruleset->get_actions() as $action ) {
+        foreach ( $ruleset->get_actions() as $action_index => $action ) {
           if ( $instance_id !== false && isset( $action['shipping_method_ids'] ) && in_array( $instance_id, (array) $action['shipping_method_ids'] ) ) {
+            $this->debug->add_action( $ruleset->get_id(), $passes, $action_index, $action );
+
             if ( $action['type'] === 'set_price' ) {
               $args['cost'] = floatval( $action['price'] );
             }
 
             if ( $action['type'] === 'increase_price' ) {
-              $args['cost'] += floatval( $action['price'] );
+              if ( is_array( $args['cost'] ) ) {
+                $args['cost'][] = floatval( $action['price'] );
+              } else {
+                $args['cost'] += floatval( $action['price'] );
+              }
             }
 
             if ( $action['type'] === 'decrease_price' ) {
-              $args['cost'] -= floatval( $action['price'] );
+              if ( is_array( $args['cost'] ) ) {
+                $args['cost'][] = floatval( $action['price'] ) * -1;
+
+                if ( array_sum( $args['cost'] ) < 0 ) {
+                  $args['cost'][] = array_sum( $args['cost'] ) * -1;
+                }
+              } else {
+                $args['cost'] -= floatval( $action['price'] );
+
+                if ( $args['cost'] < 0 ) {
+                  $args['cost'] = 0;
+                }
+              }
             }
           }
         }
@@ -97,7 +122,7 @@ class Woo_Conditional_Shipping_Frontend {
         $this->passed_rule_ids[] = $ruleset->get_id();
       }
 
-      foreach ( $ruleset->get_actions() as $action ) {
+      foreach ( $ruleset->get_actions() as $action_index => $action ) {
         if ( $action['type'] === 'disable_shipping_methods' ) {
           if ( $passes ) {
             foreach ( $rates as $key => $rate ) {
@@ -108,6 +133,8 @@ class Woo_Conditional_Shipping_Frontend {
                 unset( $enable_keys[$key] );
               }
             }
+
+            $this->debug->add_action( $ruleset->get_id(), $passes, $action_index, $action );
           }
         }
 
@@ -125,6 +152,8 @@ class Woo_Conditional_Shipping_Frontend {
               }
             }
           }
+
+          $this->debug->add_action( $ruleset->get_id(), $passes, $action_index, $action );
         }
       }
     }
@@ -171,16 +200,18 @@ class Woo_Conditional_Shipping_Frontend {
     $notices = array();
 
     foreach ( $this->get_passed_rules() as $ruleset ) {
-      foreach ( $ruleset->get_actions() as $action ) {
+      foreach ( $ruleset->get_actions() as $action_index => $action ) {
         if ( $action['type'] === 'shipping_notice' && ! empty( $action['notice'] ) ) {
-          $notices[] = sprintf( '<div class="conditional-shipping-notice">%s</div>', htmlspecialchars( $action['notice'], ENT_QUOTES, 'UTF-8' ) );
+          $notice = do_shortcode( $action['notice'] );
+
+          $notices[] = sprintf( '<div class="conditional-shipping-notice">%s</div>', $notice );
+
+          $this->debug->add_action( $ruleset->get_id(), true, $action_index, $action );
         }
       }
     }
 
-    if ( ! empty( $notices ) ) {
-      echo '<script type="text/javascript">var conditionalShippingNotices = ' . json_encode( $notices ) . ';</script>';
-    }
+    echo '<script type="text/javascript">var conditionalShippingNotices = ' . json_encode( $notices ) . ';</script>';
   }
 
   /**
@@ -191,10 +222,12 @@ class Woo_Conditional_Shipping_Frontend {
     $i = 1;
 
     foreach ( $this->get_passed_rules() as $ruleset ) {
-      foreach ( $ruleset->get_actions() as $action ) {
+      foreach ( $ruleset->get_actions() as $action_index => $action ) {
         if ( $action['type'] === 'custom_error_msg' && ! empty( $action['error_msg'] ) ) {
           $msgs[] = sprintf( '<div class="conditional-shipping-custom-error-msg i-%d">%s</div>', $i, htmlspecialchars( $action['error_msg'], ENT_QUOTES, 'UTF-8' ) );
           $i++;
+
+          $this->debug->add_action( $ruleset->get_id(), true, $action_index, $action );
         }
       }
     }

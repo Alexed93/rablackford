@@ -13,200 +13,216 @@ use ADP\BaseVersion\Includes\Rule\Structures\RangeDiscount;
 use ADP\BaseVersion\Includes\Rule\Structures\SetDiscount;
 use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule;
 use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule\ProductsRangeAdjustments;
+use ADP\Factory;
 
-class TierUpItems {
-	/**
-	 * @var Rule
-	 */
-	protected $rule;
+class TierUpItems
+{
+    /**
+     * @var Rule
+     */
+    protected $rule;
 
-	/**
-	 * @var ProductsRangeAdjustments|PackageRangeAdjustments
-	 */
-	protected $handler;
+    /**
+     * @var ProductsRangeAdjustments|PackageRangeAdjustments
+     */
+    protected $handler;
 
-	/**
-	 * @var Cart
-	 */
-	protected $cart;
+    /**
+     * @var Cart
+     */
+    protected $cart;
 
-	const MARK_CALCULATED = 'tier_calculated';
+    const MARK_CALCULATED = 'tier_calculated';
 
-	/**
-	 * @param SingleItemRule|PackageRule $rule
-	 * @param Cart $cart
-	 */
-	public function __construct( $rule, $cart ) {
-		$this->rule    = $rule;
-		$this->cart    = $cart;
-		$this->handler = $rule->getProductRangeAdjustmentHandler();
-	}
+    /**
+     * @param SingleItemRule|PackageRule $rule
+     * @param Cart $cart
+     */
+    public function __construct($rule, $cart)
+    {
+        $this->rule    = $rule;
+        $this->cart    = $cart;
+        $this->handler = $rule->getProductRangeAdjustmentHandler();
+    }
 
-	/**
-	 * @param CartItem[] $items
-	 *
-	 * @return CartItem[]
-	 */
-	public function executeItems( $items ) {
-		foreach ( $this->handler->getRanges() as $range ) {
-			$items = $this->processRange( $items, $range );
-		}
+    /**
+     * @param array<int,CartItem> $items
+     *
+     * @return array<int,CartItem>
+     */
+    public function executeItems($items)
+    {
+        foreach ($this->handler->getRanges() as $range) {
+            $items = $this->processRange($items, $range);
+        }
 
-		foreach ( $items as $item ) {
-			$item->removeMark( self::MARK_CALCULATED );
-		}
+        foreach ($items as $index => $item) {
+            if ( ! $item->hasMark(self::MARK_CALCULATED)) {
+                unset($items[$index]);
+                array_splice($items, 0, 0, array($item));
+            }
+        }
+        $items = array_values($items);
 
-		return $items;
-	}
+        foreach ($items as $item) {
+            $item->removeMark(self::MARK_CALCULATED);
+        }
 
-	/**
-	 * @param CartItem[] $items
-	 * @param float      $customQty
-	 *
-	 * @return CartItem[]
-	 */
-	public function executeItemsWithCustomQty( $items, $customQty ) {
-		if ( $customQty === floatval( 0 ) ) {
-			return $items;
-		}
+        return $items;
+    }
 
-		foreach ( $this->handler->getRanges() as $range ) {
-			if ( ! is_null( $customQty ) && $range->isIn( $customQty ) ) {
-				$range = new RangeDiscount( $range->getFrom(), $customQty, $range->getData() );
-				$items = $this->processRange( $items, $range );
-				break;
-			}
+    /**
+     * @param array<int,CartItem> $items
+     * @param float $customQty
+     *
+     * @return array<int,CartItem>
+     */
+    public function executeItemsWithCustomQty($items, $customQty)
+    {
+        if ($customQty === floatval(0)) {
+            return $items;
+        }
 
-			$items = $this->processRange( $items, $range );
-		}
+        foreach ($this->handler->getRanges() as $range) {
+            if ( ! is_null($customQty) && $range->isIn($customQty)) {
+                $range = new RangeDiscount($range->getFrom(), $customQty, $range->getData());
+                $items = $this->processRange($items, $range);
+                break;
+            }
 
-		foreach ( $items as $item ) {
-			$item->removeMark( self::MARK_CALCULATED );
-		}
+            $items = $this->processRange($items, $range);
+        }
 
-		return $items;
-	}
+        foreach ($items as $item) {
+            $item->removeMark(self::MARK_CALCULATED);
+        }
 
-	/**
-	 * @param CartSet[] $items
-	 *
-	 * @return CartSet[]
-	 */
-	public function executeSets( $items ) {
-		foreach ( $this->handler->getRanges() as $range ) {
-			$items = $this->processRange( $items, $range );
-		}
+        return $items;
+    }
 
-		foreach ( $items as $item ) {
-			$item->removeMark( self::MARK_CALCULATED );
-		}
+    /**
+     * @param array<int,CartSet> $items
+     *
+     * @return array<int,CartSet>
+     */
+    public function executeSets($items)
+    {
+        foreach ($this->handler->getRanges() as $range) {
+            $items = $this->processRange($items, $range);
+        }
 
-		return $items;
-	}
+        foreach ($items as $item) {
+            $item->removeMark(self::MARK_CALCULATED);
+        }
 
-	/**
-	 * @param CartItem[]|CartSet[] $elements
-	 * @param RangeDiscount        $range
-	 *
-	 * @return CartItem[]|CartSet[]
-	 */
-	protected function processRange( $elements, $range ) {
-		$processedQty          = 1;
-		$newElements           = array();
-		$indexOfItemsToProcess = array();
-		foreach ( $elements as $element ) {
-			if ( $element->hasMark( self::MARK_CALCULATED ) ) {
-				$newElements[] = $element;
-				$processedQty  += $element->getQty();
-				continue;
-			}
+        return $items;
+    }
 
-			if ( $range->isLess( $processedQty ) ) {
-				if ( $range->isIn( $processedQty + $element->getQty() ) ) {
-					$requireQty = $processedQty + $element->getQty() - $range->getFrom();
+    /**
+     * @param array<int,CartItem>|array<int,CartSet> $elements
+     * @param RangeDiscount $range
+     *
+     * @return array<int,CartItem>|array<int,CartSet>
+     */
+    protected function processRange($elements, $range)
+    {
+        $processedQty          = 1;
+        $newElements           = array();
+        $indexOfItemsToProcess = array();
+        foreach ($elements as $element) {
+            if ($element->hasMark(self::MARK_CALCULATED)) {
+                $newElements[] = $element;
+                $processedQty  += $element->getQty();
+                continue;
+            }
 
-					if ( $requireQty > 0 ) {
-						$newItem = clone $element;
-						$newItem->setQty( $requireQty );
-						$newElements[]           = $newItem;
-						$indexOfItemsToProcess[] = count( $newElements ) - 1;
-						$processedQty            += $requireQty;
-					}
+            if ($range->isLess($processedQty)) {
+                if ($range->isIn($processedQty + $element->getQty())) {
+                    $requireQty = $processedQty + $element->getQty() - $range->getFrom();
 
-					if ( ( $element->getQty() - $requireQty ) > 0 ) {
-						$newItem = clone $element;
-						$newItem->setQty( $element->getQty() - $requireQty );
-						$newElements[] = $newItem;
-						$processedQty  += $element->getQty() - $requireQty;
-					}
-				} elseif ( $range->isGreater( $processedQty + $element->getQty() ) ) {
-					$requireQty = $range->getQtyInc();
+                    if ($requireQty > 0) {
+                        $newItem = clone $element;
+                        $newItem->setQty($requireQty);
+                        $newElements[]           = $newItem;
+                        $indexOfItemsToProcess[] = count($newElements) - 1;
+                        $processedQty            += $requireQty;
+                    }
 
-					if ( $requireQty > 0 ) {
-						$newItem = clone $element;
-						$newItem->setQty( $requireQty );
-						$newElements[]           = $newItem;
-						$indexOfItemsToProcess[] = count( $newElements ) - 1;
-						$processedQty            += $requireQty;
-					}
+                    if (($element->getQty() - $requireQty) > 0) {
+                        $newItem = clone $element;
+                        $newItem->setQty($element->getQty() - $requireQty);
+                        $newElements[] = $newItem;
+                        $processedQty  += $element->getQty() - $requireQty;
+                    }
+                } elseif ($range->isGreater($processedQty + $element->getQty())) {
+                    $requireQty = $range->getQtyInc();
 
-					if ( ( $element->getQty() - $requireQty ) > 0 ) {
-						$newItem = clone $element;
-						$newItem->setQty( $element->getQty() - $requireQty );
-						$newElements[] = $newItem;
-						$processedQty  += $element->getQty() - $requireQty;
-					}
+                    if ($requireQty > 0) {
+                        $newItem = clone $element;
+                        $newItem->setQty($requireQty);
+                        $newElements[]           = $newItem;
+                        $indexOfItemsToProcess[] = count($newElements) - 1;
+                        $processedQty            += $requireQty;
+                    }
 
-				} else {
-					$newElements[] = $element;
-					$processedQty  += $element->getQty();
-				}
-			} elseif ( $range->isIn( $processedQty ) ) {
-				$requireQty = $range->getTo() + 1 - $processedQty;
-				$requireQty = $requireQty < $element->getQty() ? $requireQty : $element->getQty();
+                    if (($element->getQty() - $requireQty) > 0) {
+                        $newItem = clone $element;
+                        $newItem->setQty($element->getQty() - $requireQty);
+                        $newElements[] = $newItem;
+                        $processedQty  += $element->getQty() - $requireQty;
+                    }
 
-				if ( $requireQty > 0 ) {
-					$newItem = clone $element;
-					$newItem->setQty( $requireQty );
-					$newElements[]           = $newItem;
-					$indexOfItemsToProcess[] = count( $newElements ) - 1;
-					$processedQty            += $requireQty;
-				}
+                } else {
+                    $newElements[] = $element;
+                    $processedQty  += $element->getQty();
+                }
+            } elseif ($range->isIn($processedQty)) {
+                $requireQty = $range->getTo() + 1 - $processedQty;
+                $requireQty = $requireQty < $element->getQty() ? $requireQty : $element->getQty();
 
-				if ( ( $element->getQty() - $requireQty ) > 0 ) {
-					$newItem = clone $element;
-					$newItem->setQty( $element->getQty() - $requireQty );
-					$newElements[] = $newItem;
-					$processedQty  += $element->getQty() - $requireQty;
-				}
+                if ($requireQty > 0) {
+                    $newItem = clone $element;
+                    $newItem->setQty($requireQty);
+                    $newElements[]           = $newItem;
+                    $indexOfItemsToProcess[] = count($newElements) - 1;
+                    $processedQty            += $requireQty;
+                }
 
-			} elseif ( $range->isGreater( $processedQty ) ) {
-				$newElements[] = $element;
-				$processedQty  += $element->getQty();
-			}
-		}
+                if (($element->getQty() - $requireQty) > 0) {
+                    $newItem = clone $element;
+                    $newItem->setQty($element->getQty() - $requireQty);
+                    $newElements[] = $newItem;
+                    $processedQty  += $element->getQty() - $requireQty;
+                }
 
-		$discount        = $range->getData();
-		$priceCalculator = new PriceCalculator( $this->rule, $discount );
-		foreach ( $indexOfItemsToProcess as $index ) {
-			$elementToProcess = $newElements[ $index ];
+            } elseif ($range->isGreater($processedQty)) {
+                $newElements[] = $element;
+                $processedQty  += $element->getQty();
+            }
+        }
 
-			if ( $elementToProcess instanceof CartSet ) {
-				if ( $discount instanceof SetDiscount ) {
-					$priceCalculator->calculatePriceForSet( $elementToProcess, $this->cart, $this->handler );
-				} elseif ( $discount instanceof Discount ) {
-					foreach ( $elementToProcess->get_items() as $element ) {
-						$priceCalculator->applyItemDiscount( $element, $this->cart, $this->handler );
-					}
-				}
-				$elementToProcess->addMark( self::MARK_CALCULATED );
-			} elseif ( $elementToProcess instanceof CartItem ) {
-				$priceCalculator->applyItemDiscount( $elementToProcess, $this->cart, $this->handler );
-				$elementToProcess->addMark( self::MARK_CALCULATED );
-			}
+        $discount        = $range->getData();
+        /** @var PriceCalculator $priceCalculator */
+        $priceCalculator = Factory::get("Rule_PriceCalculator", $this->rule, $discount);
+        foreach ($indexOfItemsToProcess as $index) {
+            $elementToProcess = $newElements[$index];
 
-		}
+            if ($elementToProcess instanceof CartSet) {
+                if ($discount instanceof SetDiscount) {
+                    $priceCalculator->calculatePriceForSet($elementToProcess, $this->cart, $this->handler);
+                } elseif ($discount instanceof Discount) {
+                    foreach ($elementToProcess->getItems() as $element) {
+                        $priceCalculator->applyItemDiscount($element, $this->cart, $this->handler);
+                    }
+                }
+                $elementToProcess->addMark(self::MARK_CALCULATED);
+            } elseif ($elementToProcess instanceof CartItem) {
+                $priceCalculator->applyItemDiscount($elementToProcess, $this->cart, $this->handler);
+                $elementToProcess->addMark(self::MARK_CALCULATED);
+            }
 
-		return $newElements;
-	}
+        }
+
+        return $newElements;
+    }
 }

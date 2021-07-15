@@ -518,11 +518,14 @@
 	color: #000;
 }
 
-.wdp-list-container [data-wdp-title]:empty:after {
-	content: 'no name';
+.wdp-list-container .wdp-no-name {
 	color: #777;
 	display: inline;
 	font-weight: normal;
+}
+
+.wdp-list-container .cross-not-visible {
+	display: none;
 }
 
 .wdp-list-container .postbox.dirty h2 {
@@ -635,10 +638,18 @@
 .wdp-import-tools-form .wdp-import-type-options:not(.active) {
     display: none;
 }
-.products-filter__error-wrapper {
+.products-filter__error-wrapper, .bulk-ranges__error-wrapper {
 	padding: .3rem .3rem;
 	font-size: .85rem;
 	color: red;
 	border: 1px solid red;
 	border-radius: 5px;
+}
+.bulk-ranges__error-wrapper {
+  max-width: 14rem;
+}
+
+/* Wordpress 5.5 tweak */
+.postbox .handlediv {
+	float: right;
 }

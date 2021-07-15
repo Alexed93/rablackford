@@ -5,49 +5,61 @@ namespace ADP\BaseVersion\Includes\Rule\Conditions;
 use ADP\BaseVersion\Includes\Rule\ConditionsLoader;
 use WP_Taxonomy;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class ProductTaxonomy extends AbstractConditionCartItems {
-	/**
-	 * @var WP_Taxonomy
-	 */
-	protected $taxonomy;
-	protected $filter_type;
+class ProductTaxonomy extends AbstractConditionCartItems
+{
+    /**
+     * @var WP_Taxonomy
+     */
+    protected $taxonomy;
 
-	// public function __construct( $data ) {
-	// 	parent::__construct( $data );
-	// 	$this->filter_type = $data['type'];
-	// }
+    /**
+     * @var string
+     */
+    protected $filterType;
 
-	public static function getType() {
-		return 'custom_taxonomy';
-	}
+    // public function __construct( $data ) {
+    // 	parent::__construct( $data );
+    // 	$this->filter_type = $data['type'];
+    // }
 
-	public static function getLabel() {
-	}
+    public static function getType()
+    {
+        return 'custom_taxonomy';
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getTaxonomyLabel() {
-		return $this->taxonomy->name;
-	}
+    public static function getLabel()
+    {
+        return "";
+    }
 
-	/**
-	 * @param WP_Taxonomy $taxonomy
-	 */
-	public function setTaxonomy( $taxonomy ) {
-		$this->taxonomy = $taxonomy;
-		$this->filter_type = $taxonomy->name;
-	}
+    /**
+     * @return string
+     */
+    public function getTaxonomyLabel()
+    {
+        return $this->taxonomy->label . " (qty)";
+    }
 
-	public static function getTemplatePath() {
-		return WC_ADP_PLUGIN_VIEWS_PATH . 'conditions/products/product-taxonomy.php';
-	}
+    /**
+     * @param WP_Taxonomy $taxonomy
+     */
+    public function setTaxonomy(WP_Taxonomy $taxonomy)
+    {
+        $this->taxonomy   = $taxonomy;
+        $this->filterType = $taxonomy->name;
+    }
 
-	public static function getGroup() {
-		return ConditionsLoader::GROUP_CART_ITEMS;
-	}
+    public static function getTemplatePath()
+    {
+        return WC_ADP_PLUGIN_VIEWS_PATH . 'conditions/products/product-taxonomy.php';
+    }
+
+    public static function getGroup()
+    {
+        return ConditionsLoader::GROUP_CART_ITEMS;
+    }
 }

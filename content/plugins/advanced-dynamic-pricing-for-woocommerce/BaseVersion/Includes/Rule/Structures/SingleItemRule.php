@@ -10,400 +10,458 @@ use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule\ProductsRangeAdjustm
 use ADP\BaseVersion\Includes\Rule\Processors\SingleItemRuleProcessor;
 use Exception;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class SingleItemRule extends BaseRule implements Rule {
-	/**
-	 * @var Filter[]
-	 */
-	protected $filters;
+class SingleItemRule extends BaseRule implements Rule
+{
+    /**
+     * @var array<int,Filter>
+     */
+    protected $filters;
 
-	/**
-	 * @var ProductsAdjustment
-	 */
-	protected $productAdjustmentHandler;
+    /**
+     * @var ProductsAdjustment
+     */
+    protected $productAdjustmentHandler;
 
-	/**
-	 * @var ProductsRangeAdjustments
-	 */
-	protected $productRangeAdjustmentHandler;
+    /**
+     * @var ProductsRangeAdjustments
+     */
+    protected $productRangeAdjustmentHandler;
 
-	/**
-	 * @var Gift[]
-	 */
-	protected $itemGifts;
+    /**
+     * @var GiftsCollection
+     */
+    protected $itemGiftsCollection;
 
-	/**
-	 * @var int
-	 */
-	protected $itemGiftLimit;
+    /**
+     * @var int|float
+     */
+    protected $itemGiftLimit;
 
-	/**
-	 * @var bool
-	 */
-	protected $itemGiftsUseProductFromFilter = false;
+    /**
+     * @var bool
+     */
+    protected $itemGiftsUseProductFromFilter = false;
 
-	/**
-	 * @var bool
-	 */
-	protected $replaceItemGifts = false;
+    /**
+     * @var bool
+     */
+    protected $replaceItemGifts = false;
 
-	/**
-	 * @var string
-	 */
-	protected $replaceItemGiftsCode = '';
+    /**
+     * @var string
+     */
+    protected $replaceItemGiftsCode = '';
 
-	/**
-	 * @var RoleDiscount[]
-	 */
-	protected $roleDiscounts;
+    /**
+     * @var array<int,RoleDiscount>
+     */
+    protected $roleDiscounts;
 
-	/**
-	 * @var string
-	 */
-	protected $sortableApplyMode;
+    /**
+     * @var string
+     */
+    protected $sortableApplyMode;
 
-	/**
-	 * @var array
-	 */
-	protected $sortableBlocksPriority;
+    /**
+     * @var array
+     */
+    protected $sortableBlocksPriority;
 
-	/**
-	 * @var bool
-	 */
-	protected $dontApplyBulkIfRolesMatched;
+    /**
+     * @var bool
+     */
+    protected $dontApplyBulkIfRolesMatched;
 
-	/**
-	 * @var string
-	 */
-	protected $itemGiftStrategy;
+    /**
+     * @var string
+     */
+    protected $itemGiftStrategy;
 
-	/**
-	 * @var int
-	 */
-	protected $itemsCountLimit;
+    /**
+     * @var int
+     */
+    protected $itemsCountLimit;
 
-	/**
-	 * @var float
-	 */
-	protected $itemGiftSubtotalDivider;
+    /**
+     * @var float
+     */
+    protected $itemGiftSubtotalDivider;
 
-	/**
-	 * @var string
-	 */
-	protected $applyFirstTo;
+    /**
+     * @var string
+     */
+    protected $applyFirstTo;
 
-	const APPLY_FIRST_TO_EXPENSIVE = 'expensive';
-	const APPLY_FIRST_TO_CHEAP = 'cheap';
-	const APPLY_FIRST_AS_APPEAR = 'appeared';
+    const APPLY_FIRST_TO_EXPENSIVE = 'expensive';
+    const APPLY_FIRST_TO_CHEAP = 'cheap';
+    const APPLY_FIRST_AS_APPEAR = 'appeared';
 
-	const BASED_ON_LIMIT_ITEM_GIFT_STRATEGY = 'based_on_limit';
-	const BASED_ON_SUBTOTAL_ITEM_GIFT_STRATEGY = 'based_on_subtotal';
+    const BASED_ON_LIMIT_ITEM_GIFT_STRATEGY = 'based_on_limit';
+    const BASED_ON_SUBTOTAL_ITEM_GIFT_STRATEGY = 'based_on_subtotal';
 
-	public function __construct() {
-		parent::__construct();
-		$this->filters       = array();
-		$this->itemGifts     = array();
+    public function __construct()
+    {
+        parent::__construct();
+        $this->filters             = array();
+        $this->itemGiftsCollection = new GiftsCollection($this);
 
-		$this->sortableApplyMode           = 'consistently';
-		$this->sortableBlocksPriority      = array( 'roles', 'bulk-adjustments' );
-		$this->dontApplyBulkIfRolesMatched = false;
-		$this->itemsCountLimit             = - 1;
-		$this->applyFirstTo                = self::APPLY_FIRST_AS_APPEAR;
+        $this->sortableApplyMode           = 'consistently';
+        $this->sortableBlocksPriority      = array('roles', 'bulk-adjustments');
+        $this->dontApplyBulkIfRolesMatched = false;
+        $this->itemsCountLimit             = -1;
+        $this->applyFirstTo                = self::APPLY_FIRST_AS_APPEAR;
 
-		$this->itemGiftStrategy        = self::BASED_ON_LIMIT_ITEM_GIFT_STRATEGY;
-		$this->itemGiftLimit           = INF;
-		$this->itemGiftSubtotalDivider = null;
-	}
+        $this->itemGiftStrategy        = self::BASED_ON_LIMIT_ITEM_GIFT_STRATEGY;
+        $this->itemGiftLimit           = INF;
+        $this->itemGiftSubtotalDivider = null;
+        $this->roleDiscounts           = array();
+    }
 
-	/**
-	 * @param Context $context
-	 *
-	 * @return SingleItemRuleProcessor
-	 * @throws Exception
-	 */
-	public function buildProcessor( $context ) {
-		return new SingleItemRuleProcessor( $context, $this );
-	}
+    public function __clone()
+    {
+        parent::__clone();
 
-	/**
-	 * @param Filter $filter
-	 */
-	public function addFilter( $filter ) {
-		if ( $filter instanceof Filter ) {
-			$this->filters[] = $filter;
-		}
-	}
+        $this->filters = array_map(function ($item) {
+            return clone $item;
+        }, $this->filters);
 
-	/**
-	 * @param Filter[] $filters
-	 */
-	public function setFilters( $filters ) {
-		$this->filters = array();
+        $this->itemGiftsCollection = clone $this->itemGiftsCollection;
 
-		foreach ( $filters as $filter ) {
-			$this->addFilter( $filter );
-		}
-	}
+        $this->roleDiscounts = array_map(function ($item) {
+            return clone $item;
+        }, $this->roleDiscounts);
 
-	/**
-	 * @return Filter[]
-	 */
-	public function getFilters() {
-		return $this->filters;
-	}
+        if ($this->productAdjustmentHandler) {
+            $this->productAdjustmentHandler = clone $this->productAdjustmentHandler;
+        }
 
-	/**
-	 * @param ProductsAdjustment $handler
-	 */
-	public function installProductAdjustmentHandler( $handler ) {
-		if ( $handler instanceof ProductsAdjustment ) {
-			$this->productAdjustmentHandler = $handler;
-		}
-	}
+        if ($this->productRangeAdjustmentHandler) {
+            $this->productRangeAdjustmentHandler = clone $this->productRangeAdjustmentHandler;
+        }
+    }
 
-	/**
-	 * @param ProductsRangeAdjustments $handler
-	 */
-	public function installProductRangeAdjustmentHandler( $handler ) {
-		if ( $handler instanceof ProductsRangeAdjustments ) {
-			$this->productRangeAdjustmentHandler = $handler;
-		}
-	}
+    /**
+     * @param Context $context
+     *
+     * @return SingleItemRuleProcessor
+     * @throws Exception
+     */
+    public function buildProcessor($context)
+    {
+        return new SingleItemRuleProcessor($context, $this);
+    }
 
-	/**
-	 * @return ProductsAdjustment|null
-	 */
-	public function getProductAdjustmentHandler() {
-		return $this->productAdjustmentHandler;
-	}
+    /**
+     * @param Filter $filter
+     */
+    public function addFilter($filter)
+    {
+        if ($filter instanceof Filter) {
+            $this->filters[] = $filter;
+        }
+    }
 
-	/**
-	 * @return ProductsRangeAdjustments|null
-	 */
-	public function getProductRangeAdjustmentHandler() {
-		return $this->productRangeAdjustmentHandler;
-	}
+    /**
+     * @param array<int,Filter> $filters
+     */
+    public function setFilters($filters)
+    {
+        $this->filters = array();
 
-	/**
-	 * @return bool
-	 */
-	public function hasProductAdjustment() {
-		return isset( $this->productAdjustmentHandler ) && $this->productAdjustmentHandler->isValid();
-	}
+        foreach ($filters as $filter) {
+            $this->addFilter($filter);
+        }
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function hasProductRangeAdjustment() {
-		return isset( $this->productRangeAdjustmentHandler ) && $this->productRangeAdjustmentHandler->isValid();
-	}
+    /**
+     * @return array<int,Filter>
+     */
+    public function getFilters()
+    {
+        return $this->filters;
+    }
 
-	/**
-	 * @param Gift[] $gifts
-	 */
-	public function setItemGifts( $gifts ) {
-		$filteredGifts = array();
-		foreach ( $gifts as $gift ) {
-			if ( $gift instanceof Gift && $gift->isValid() ) {
-				$filteredGifts[] = $gift;
-			}
-		}
-		$this->itemGifts = $filteredGifts;
-	}
+    /**
+     * @param ProductsAdjustment $handler
+     */
+    public function installProductAdjustmentHandler($handler)
+    {
+        if ($handler instanceof ProductsAdjustment) {
+            $this->productAdjustmentHandler = $handler;
+        }
+    }
 
-	/**
-	 * @return Gift[]
-	 */
-	public function getItemGifts() {
-		return $this->itemGifts;
-	}
+    /**
+     * @param ProductsRangeAdjustments $handler
+     */
+    public function installProductRangeAdjustmentHandler($handler)
+    {
+        if ($handler instanceof ProductsRangeAdjustments) {
+            $this->productRangeAdjustmentHandler = $handler;
+        }
+    }
 
-	/**
-	 * @param bool $itemGiftsUseProductFromFilter
-	 */
-	public function setItemGiftsUseProductFromFilter( $itemGiftsUseProductFromFilter ) {
-		$this->itemGiftsUseProductFromFilter = $itemGiftsUseProductFromFilter;
-	}
+    /**
+     * @return ProductsAdjustment|null
+     */
+    public function getProductAdjustmentHandler()
+    {
+        return $this->productAdjustmentHandler;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isItemGiftsUseProductFromFilter() {
-		return $this->itemGiftsUseProductFromFilter;
-	}
+    /**
+     * @return ProductsRangeAdjustments|null
+     */
+    public function getProductRangeAdjustmentHandler()
+    {
+        return $this->productRangeAdjustmentHandler;
+    }
 
-	/**
-	 * @param string $strategy
-	 */
-	public function setItemGiftStrategy( $strategy ) {
-		if ( in_array( $strategy,
-			array( self::BASED_ON_LIMIT_ITEM_GIFT_STRATEGY, self::BASED_ON_SUBTOTAL_ITEM_GIFT_STRATEGY ) ) ) {
-			$this->itemGiftStrategy = $strategy;
-		}
-	}
+    /**
+     * @return bool
+     */
+    public function hasProductAdjustment()
+    {
+        return isset($this->productAdjustmentHandler) && $this->productAdjustmentHandler->isValid();
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getItemGiftStrategy() {
-		return $this->itemGiftStrategy;
-	}
+    /**
+     * @return bool
+     */
+    public function hasProductRangeAdjustment()
+    {
+        return isset($this->productRangeAdjustmentHandler) && $this->productRangeAdjustmentHandler->isValid();
+    }
 
-	/**
-	 * @param int $itemGiftLimit
-	 */
-	public function setItemGiftLimit( $itemGiftLimit ) {
-		$this->itemGiftLimit = $itemGiftLimit !== INF ? intval( $itemGiftLimit ) : INF;
-	}
+    /**
+     * @param array<int,Gift> $gifts
+     */
+    public function setItemGifts($gifts)
+    {
+        $this->itemGiftsCollection->purge();
+        $this->itemGiftsCollection->bulkAdd(...$gifts);
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getItemGiftLimit() {
-		return $this->itemGiftLimit;
-	}
+    /**
+     * @return GiftsCollection
+     */
+    public function getItemGiftsCollection()
+    {
+        return $this->itemGiftsCollection;
+    }
 
-	/**
-	 * @param float $itemGiftSubtotalDivider
-	 */
-	public function setItemGiftSubtotalDivider( $itemGiftSubtotalDivider ) {
-		$this->itemGiftSubtotalDivider = floatval( $itemGiftSubtotalDivider );
-	}
+    /**
+     * @param bool $itemGiftsUseProductFromFilter
+     */
+    public function setItemGiftsUseProductFromFilter($itemGiftsUseProductFromFilter)
+    {
+        $this->itemGiftsUseProductFromFilter = $itemGiftsUseProductFromFilter;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getItemGiftSubtotalDivider() {
-		return $this->itemGiftSubtotalDivider;
-	}
+    /**
+     * @return bool
+     */
+    public function isItemGiftsUseProductFromFilter()
+    {
+        return $this->itemGiftsUseProductFromFilter;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isReplaceItemGifts() {
-		return $this->replaceItemGifts;
-	}
+    /**
+     * @param string $strategy
+     */
+    public function setItemGiftStrategy($strategy)
+    {
+        if (in_array($strategy,
+            array(self::BASED_ON_LIMIT_ITEM_GIFT_STRATEGY, self::BASED_ON_SUBTOTAL_ITEM_GIFT_STRATEGY))) {
+            $this->itemGiftStrategy = $strategy;
+        }
+    }
 
-	/**
-	 * @param bool $replaceItemGifts
-	 */
-	public function setReplaceItemGifts( $replaceItemGifts ) {
-		$this->replaceItemGifts = boolval( $replaceItemGifts );
-	}
+    /**
+     * @return string
+     */
+    public function getItemGiftStrategy()
+    {
+        return $this->itemGiftStrategy;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getReplaceItemGiftsCode() {
-		return $this->replaceItemGiftsCode;
-	}
+    /**
+     * @param int|float $itemGiftLimit
+     */
+    public function setItemGiftLimit($itemGiftLimit)
+    {
+        $this->itemGiftLimit = $itemGiftLimit !== INF ? intval($itemGiftLimit) : INF;
+    }
 
-	/**
-	 * @param string $replaceItemGiftsCode
-	 */
-	public function setReplaceItemGiftsCode( $replaceItemGiftsCode ) {
-		$this->replaceItemGiftsCode = $replaceItemGiftsCode;
-	}
+    /**
+     * @return int|float
+     */
+    public function getItemGiftLimit()
+    {
+        return $this->itemGiftLimit;
+    }
 
-	/**
-	 * @return RoleDiscount[]
-	 */
-	public function getRoleDiscounts() {
-		return $this->roleDiscounts;
-	}
+    /**
+     * @param float $itemGiftSubtotalDivider
+     */
+    public function setItemGiftSubtotalDivider($itemGiftSubtotalDivider)
+    {
+        $this->itemGiftSubtotalDivider = floatval($itemGiftSubtotalDivider);
+    }
 
-	/**
-	 * @param RoleDiscount[] $roleDiscounts
-	 */
-	public function setRoleDiscounts( $roleDiscounts ) {
-		$this->roleDiscounts = array();
-		foreach ( $roleDiscounts as $roleDiscount ) {
-			if ( $roleDiscount instanceof RoleDiscount ) {
-				$this->roleDiscounts[] = $roleDiscount;
-			}
-		}
-	}
+    /**
+     * @return float
+     */
+    public function getItemGiftSubtotalDivider()
+    {
+        return $this->itemGiftSubtotalDivider;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getSortableApplyMode() {
-		return $this->sortableApplyMode;
-	}
+    /**
+     * @return bool
+     */
+    public function isReplaceItemGifts()
+    {
+        return $this->replaceItemGifts;
+    }
 
-	/**
-	 * @param string $sortableApplyMode
-	 */
-	public function setSortableApplyMode( $sortableApplyMode ) {
-		$this->sortableApplyMode = $sortableApplyMode;
-	}
+    /**
+     * @param bool $replaceItemGifts
+     */
+    public function setReplaceItemGifts($replaceItemGifts)
+    {
+        $this->replaceItemGifts = boolval($replaceItemGifts);
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getSortableBlocksPriority() {
-		return $this->sortableBlocksPriority;
-	}
+    /**
+     * @return string
+     */
+    public function getReplaceItemGiftsCode()
+    {
+        return $this->replaceItemGiftsCode;
+    }
 
-	/**
-	 * @param array $sortableBlocksPriority
-	 */
-	public function setSortableBlocksPriority( $sortableBlocksPriority ) {
-		$this->sortableBlocksPriority = $sortableBlocksPriority;
-	}
+    /**
+     * @param string $replaceItemGiftsCode
+     */
+    public function setReplaceItemGiftsCode($replaceItemGiftsCode)
+    {
+        $this->replaceItemGiftsCode = $replaceItemGiftsCode;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isDontApplyBulkIfRolesMatched() {
-		return $this->dontApplyBulkIfRolesMatched;
-	}
+    /**
+     * @return array<int,RoleDiscount>
+     */
+    public function getRoleDiscounts()
+    {
+        return $this->roleDiscounts;
+    }
 
-	/**
-	 * @param bool $dontApplyBulkIfRolesMatched
-	 */
-	public function setDontApplyBulkIfRolesMatched( $dontApplyBulkIfRolesMatched ) {
-		$this->dontApplyBulkIfRolesMatched = $dontApplyBulkIfRolesMatched;
-	}
+    /**
+     * @param array<int,RoleDiscount> $roleDiscounts
+     */
+    public function setRoleDiscounts($roleDiscounts)
+    {
+        $this->roleDiscounts = array();
+        foreach ($roleDiscounts as $roleDiscount) {
+            if ($roleDiscount instanceof RoleDiscount) {
+                $this->roleDiscounts[] = $roleDiscount;
+            }
+        }
+    }
 
-	/**
-	 * @param int $itemsCountLimit
-	 */
-	public function setItemsCountLimit( $itemsCountLimit ) {
-		$this->itemsCountLimit = intval( $itemsCountLimit );
-	}
+    /**
+     * @return string
+     */
+    public function getSortableApplyMode()
+    {
+        return $this->sortableApplyMode;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getItemsCountLimit() {
-		return $this->itemsCountLimit;
-	}
+    /**
+     * @param string $sortableApplyMode
+     */
+    public function setSortableApplyMode($sortableApplyMode)
+    {
+        $this->sortableApplyMode = $sortableApplyMode;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isItemsCountLimitExists() {
-		return $this->itemsCountLimit !== - 1;
-	}
+    /**
+     * @return array
+     */
+    public function getSortableBlocksPriority()
+    {
+        return $this->sortableBlocksPriority;
+    }
 
-	/**
-	 * @param string $applyFirstTo
-	 */
-	public function setApplyFirstTo( $applyFirstTo ) {
-		if ( in_array( $applyFirstTo,
-			array( self::APPLY_FIRST_AS_APPEAR, self::APPLY_FIRST_TO_EXPENSIVE, self::APPLY_FIRST_TO_CHEAP ) ) ) {
-			$this->applyFirstTo = $applyFirstTo;
-		}
-	}
+    /**
+     * @param array $sortableBlocksPriority
+     */
+    public function setSortableBlocksPriority($sortableBlocksPriority)
+    {
+        $this->sortableBlocksPriority = $sortableBlocksPriority;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getApplyFirstTo() {
-		return $this->applyFirstTo;
-	}
+    /**
+     * @return bool
+     */
+    public function isDontApplyBulkIfRolesMatched()
+    {
+        return $this->dontApplyBulkIfRolesMatched;
+    }
+
+    /**
+     * @param bool $dontApplyBulkIfRolesMatched
+     */
+    public function setDontApplyBulkIfRolesMatched($dontApplyBulkIfRolesMatched)
+    {
+        $this->dontApplyBulkIfRolesMatched = $dontApplyBulkIfRolesMatched;
+    }
+
+    /**
+     * @param int $itemsCountLimit
+     */
+    public function setItemsCountLimit($itemsCountLimit)
+    {
+        $this->itemsCountLimit = intval($itemsCountLimit);
+    }
+
+    /**
+     * @return int
+     */
+    public function getItemsCountLimit()
+    {
+        return $this->itemsCountLimit;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isItemsCountLimitExists()
+    {
+        return $this->itemsCountLimit !== -1;
+    }
+
+    /**
+     * @param string $applyFirstTo
+     */
+    public function setApplyFirstTo($applyFirstTo)
+    {
+        if (in_array($applyFirstTo,
+            array(self::APPLY_FIRST_AS_APPEAR, self::APPLY_FIRST_TO_EXPENSIVE, self::APPLY_FIRST_TO_CHEAP))) {
+            $this->applyFirstTo = $applyFirstTo;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getApplyFirstTo()
+    {
+        return $this->applyFirstTo;
+    }
 }

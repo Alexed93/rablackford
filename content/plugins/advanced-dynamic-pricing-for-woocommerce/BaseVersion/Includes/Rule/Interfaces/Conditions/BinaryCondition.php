@@ -2,20 +2,21 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Interfaces\Conditions;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface BinaryCondition {
-	const COMPARISON_BIN_VALUE_KEY = 'comparison_bin_value';
+interface BinaryCondition
+{
+    const COMPARISON_BIN_VALUE_KEY = 'comparison_bin_value';
 
-	/**
-	 * @param string $comparison_value
-	 */
-	public function setComparisonBinValue( $comparison_value );
+    /**
+     * @param string|bool $comparisonValue
+     */
+    public function setComparisonBinValue($comparisonValue);
 
-	/**
-	 * @return string
-	 */
-	public function getComparisonBinValue();
+    /**
+     * @return bool|null
+     */
+    public function getComparisonBinValue();
 }

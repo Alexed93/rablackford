@@ -17,9 +17,18 @@ jQuery( document ).ready( function ( $ ) {
 			return true;
 		}
 
+    let attributes = {};
+
+    jQuery('form.variations_form[data-product_id=' + variable_id + '] select').each(function (index, item) {
+      if ( jQuery(item).attr("data-attribute_name") ) {
+        attributes[jQuery(item).attr("data-attribute_name")] = jQuery(this).val();
+      }
+    });
+
 		var data = {
 			action: 'get_table_with_product_bulk_table',
 			product_id: parseInt( product_id ),
+      attributes: attributes,
 		};
 
 		return jQuery.ajax( {
@@ -29,7 +38,8 @@ jQuery( document ).ready( function ( $ ) {
 			type: 'POST',
 			success: function ( response ) {
 				if ( response.success ) {
-					jQuery( '.wdp_bulk_table_content' ).html( response.data )
+					jQuery( '.wdp_bulk_table_content' ).replaceWith( response.data )
+          init_custom_event();
 					if ( product_id === variable_id ) {
 						variable_bulk_table = response.data;
 					}
@@ -42,6 +52,16 @@ jQuery( document ).ready( function ( $ ) {
 			}
 		} );
 	}
+
+	function init_custom_event() {
+    jQuery('.wdp_bulk_table_content').on('get_table', function (e, $obj_id) {
+      if (typeof $obj_id === 'undefined' || !$obj_id) {
+        get_table(variable_id);
+      } else {
+        get_table($obj_id);
+      }
+    });
+  }
 
 	function init_events() {
 		if ( jQuery( '.wdp_bulk_table_content' ).length > 0 ) {
@@ -66,13 +86,7 @@ jQuery( document ).ready( function ( $ ) {
 						return true;
 					});
 
-			jQuery('.wdp_bulk_table_content').on('get_table', function (e, $obj_id) {
-				if (typeof $obj_id === 'undefined' || !$obj_id) {
-					get_table(variable_id);
-				} else {
-					get_table($obj_id);
-				}
-			});
+			init_custom_event();
 		}
 
 	}

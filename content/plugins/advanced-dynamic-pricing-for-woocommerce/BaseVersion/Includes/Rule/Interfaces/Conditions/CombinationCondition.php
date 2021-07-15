@@ -2,31 +2,32 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Interfaces\Conditions;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface CombinationCondition {
-	const COMBINE_TYPE_KEY = 'combine_type';
-	const COMBINE_LIST_KEY = 'combine_list';
+interface CombinationCondition
+{
+    const COMBINE_TYPE_KEY = 'combine_type';
+    const COMBINE_LIST_KEY = 'combine_list';
 
-	/**
-	 * @param string $combine_type
-	 */
-	public function setCombineType( $combine_type );
+    /**
+     * @param string|null $combineType
+     */
+    public function setCombineType($combineType);
 
-	/**
-	 * @return string
-	 */
-	public function getCombineType();
+    /**
+     * @return string|null
+     */
+    public function getCombineType();
 
-	/**
-	 * @param array $combine_list
-	 */
-	public function setCombineList( $combine_list );
+    /**
+     * @param array|null $combineList
+     */
+    public function setCombineList($combineList);
 
-	/**
-	 * @return array
-	 */
-	public function getCombineList();
+    /**
+     * @return array|null
+     */
+    public function getCombineList();
 }

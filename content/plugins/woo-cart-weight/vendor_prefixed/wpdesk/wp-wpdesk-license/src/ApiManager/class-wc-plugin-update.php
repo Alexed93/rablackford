@@ -199,9 +199,9 @@ if (!\class_exists('WCWeightVendor\\WPDesk_Update_API_Check')) {
             if (\is_wp_error($request) || \wp_remote_retrieve_response_code($request) != 200) {
                 if (\class_exists('WCWeightVendor\\WPDesk_Logger_Factory')) {
                     if (\is_wp_error($request)) {
-                        \WCWeightVendor\WPDesk_Logger_Factory::log_wp_error($request, \debug_backtrace());
+                        \WCWeightVendor\WPDesk_Logger_Factory::log_wp_error($request, \debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS));
                     } else {
-                        \WCWeightVendor\WPDesk_Logger_Factory::log_message_backtrace('Response is invalid. Response: ' . \json_encode($request), \WCWeightVendor\WPDesk_Logger::ERROR, \debug_backtrace());
+                        \WCWeightVendor\WPDesk_Logger_Factory::log_message_backtrace('Response is invalid. Response: ' . \json_encode($request), \WCWeightVendor\WPDesk_Logger::ERROR, \debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS));
                     }
                 }
                 return \false;
@@ -234,7 +234,7 @@ if (!\class_exists('WCWeightVendor\\WPDesk_Update_API_Check')) {
                 return $response;
             } else {
                 if (\class_exists('WCWeightVendor\\WPDesk_Logger_Factory')) {
-                    \WCWeightVendor\WPDesk_Logger_Factory::log_message_backtrace('Response is not an object', \WCWeightVendor\WPDesk_Logger::DEBUG, \debug_backtrace());
+                    \WCWeightVendor\WPDesk_Logger_Factory::log_message_backtrace('Response is not an object', \WCWeightVendor\WPDesk_Logger::DEBUG, \debug_backtrace(\DEBUG_BACKTRACE_PROVIDE_OBJECT | \DEBUG_BACKTRACE_IGNORE_ARGS));
                 } else {
                     \error_log("Unserialize error. Please send this report to support@wpdesk.net. Request: {$request}. Raw Response: {$raw_response}");
                 }

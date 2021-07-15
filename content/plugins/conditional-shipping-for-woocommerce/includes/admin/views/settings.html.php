@@ -9,42 +9,93 @@ if ( ! defined( 'ABSPATH' ) ) {
 	<a href="<?php echo admin_url( 'admin.php?page=wc-settings&tab=shipping&section=woo_conditional_shipping&ruleset_id=new' ); ?>" class="page-title-action"><?php esc_html_e( 'Add ruleset', 'woo-conditional-shipping' ); ?></a>
 </h2>
 
-<p>
-  <?php _e( 'Conditions are used to modify shipping method availability. Each ruleset contains conditions and actions which are applied to shipping method(s).', 'woo-conditional-shipping' ); ?>
-</p>
-<table class="woo-conditional-shipping-rulesets widefat">
-	<thead>
-		<tr>
-			<th class="woo-conditional-shipping-ruleset-status"></th>
-			<th class="woo-conditional-shipping-ruleset-name"><?php esc_html_e( 'Ruleset', 'woo-conditional-shipping' ); ?></th>
+<table class="form-table">
+	<tbody>
+		<tr valign="top" class="">
+			<th scope="row" class="titledesc">
+				<label>
+					<?php esc_html_e( 'Rulesets', 'woo-conditional-shipping' ); ?>
+				</label>
+			</th>
+			<td class="forminp">
+				<table class="woo-conditional-shipping-rulesets widefat">
+					<thead>
+						<tr>
+							<th class="woo-conditional-shipping-ruleset-status"></th>
+							<th class="woo-conditional-shipping-ruleset-name"><?php esc_html_e( 'Ruleset', 'woo-conditional-shipping' ); ?></th>
+						</tr>
+					</thead>
+					<tbody class="woo-conditional-shipping-ruleset-rows">
+						<?php foreach ( $rulesets as $ruleset ) { ?>
+							<tr>
+								<td class="woo-conditional-shipping-ruleset-status">
+									<?php $class = $ruleset->get_enabled() ? 'enabled' : 'disabled'; ?>
+									<span class="woocommerce-input-toggle woocommerce-input-toggle--<?php echo $class; ?>" data-id="<?php echo $ruleset->get_id(); ?>"></span>
+								</td>
+								<td class="woo-conditional-shipping-ruleset-name">
+									<a href="<?php echo $ruleset->get_admin_edit_url(); ?>">
+										<?php echo $ruleset->get_title(); ?>
+									</a>
+									<div class="row-actions">
+										<a href="<?php echo $ruleset->get_admin_edit_url(); ?>"><?php _e( 'Edit', 'woo-conditional-shipping' ); ?></a> | <a href="<?php echo $ruleset->get_admin_delete_url(); ?>" class="woo-conditional-shipping-ruleset-delete"><?php _e( 'Delete', 'woo-conditional-shipping' ); ?></a>
+									</div>
+								</td>
+							</tr>
+						<?php } ?>
+						<?php if ( empty( $rulesets ) ) { ?>
+							<tr>
+								<td colspan="2" class="woo-conditional-shipping-ruleset-name">
+									<?php _e( 'No rulesets defined yet.', 'woo-conditional-shipping' ); ?>
+								</td>
+							</tr>
+						<?php } ?>
+					</tbody>
+				</table>
+			</td>
 		</tr>
-	</thead>
-	<tbody class="woo-conditional-shipping-ruleset-rows">
-		<?php foreach ( $rulesets as $ruleset ) { ?>
-			<tr>
-				<td class="woo-conditional-shipping-ruleset-status">
-					<?php $class = $ruleset->get_enabled() ? 'enabled' : 'disabled'; ?>
-					<span class="woocommerce-input-toggle woocommerce-input-toggle--<?php echo $class; ?>" data-id="<?php echo $ruleset->get_id(); ?>"></span>
-				</td>
-				<td class="woo-conditional-shipping-ruleset-name">
-					<a href="<?php echo $ruleset->get_admin_edit_url(); ?>">
-						<?php echo $ruleset->get_title(); ?>
-					</a>
-					<div class="row-actions">
-						<a href="<?php echo $ruleset->get_admin_edit_url(); ?>"><?php _e( 'Edit', 'woo-conditional-shipping' ); ?></a> | <a href="<?php echo $ruleset->get_admin_delete_url(); ?>" class="woo-conditional-shipping-ruleset-delete"><?php _e( 'Delete', 'woo-conditional-shipping' ); ?></a>
-					</div>
-				</td>
-			</tr>
-		<?php } ?>
-		<?php if ( empty( $rulesets ) ) { ?>
-			<tr>
-				<td colspan="2" class="woo-conditional-shipping-ruleset-name">
-					<?php _e( 'No rulesets defined yet.', 'woo-conditional-shipping' ); ?>
-				</td>
-			</tr>
-		<?php } ?>
-  </tbody>
+
+		<tr valign="top" class="">
+			<th scope="row" class="titledesc">
+				<label>
+					<?php esc_html_e( 'Disable all', 'woo-conditional-shipping' ); ?>
+				</label>
+			</th>
+			<td class="forminp">
+				<label for="wcs_disable_all">
+					<input type="checkbox" name="wcs_disable_all" id="wcs_disable_all" value="1" <?php checked( get_option( 'wcs_disable_all', false ) ); ?> />
+					<?php _e( 'Disable all rulesets', 'woo-conditional-shipping' ); ?>
+				</label>
+
+				<p class="description"><?php _e( 'Helpful for finding out if Conditional Shipping or another plugin is affecting shipping methods for troubleshooting.', 'woo-conditional-shipping' ); ?></p>
+			</td>
+		</tr>
+
+		<tr valign="top" class="">
+			<th scope="row" class="titledesc">
+				<label>
+					<?php esc_html_e( 'Debug mode', 'woo-conditional-shipping' ); ?>
+				</label>
+			</th>
+			<td class="forminp">
+				<label for="wcs_debug_mode">
+					<input type="checkbox" name="wcs_debug_mode" id="wcs_debug_mode" value="1" <?php checked( get_option( 'wcs_debug_mode', false ) ); ?> />
+					<?php _e( 'Debug mode', 'woo-conditional-shipping' ); ?>
+				</label>
+
+				<p class="description"><?php _e( 'Debug mode shows passed conditions and which actions were run in the checkout.', 'woo-conditional-shipping' ); ?></p>
+			</td>
+		</tr>
+	</tbody>
 </table>
+
+<p class="submit">
+	<button type="submit" name="submit" id="submit" class="button button-primary button-large" value="<?php esc_attr_e( 'Save changes', 'woo-conditional-shipping' ); ?>"><?php esc_html_e( 'Save changes', 'woo-conditional-shipping' ); ?></button>
+
+	<input type="hidden" value="1" name="save" />
+	<input type="hidden" value="1" name="wcs_settings" />
+
+	<?php wp_nonce_field( 'woocommerce-settings' ); ?>
+</p>
 
 <?php if ( ! empty( $health['enables'] ) || ! empty( $health['disables'] ) ) { ?>
 	<div class="woo-conditional-shipping-health-check">
@@ -106,7 +157,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div>
 							<ul>
 								<li>
-									<?php printf( __( 'Enable <code>%s</code> in <a href="%s" target="_blank">the shipping zone</a>' ),
+									<?php printf( __( 'Enable <code>%s</code> in <a href="%s" target="_blank">the shipping zone</a>', 'woo-conditional-shipping' ),
 										woo_conditional_shipping_get_method_title( $data['instance_id'] ),
 										woo_conditional_shipping_get_zone_url( $data['zone_id'] )
 									); ?>

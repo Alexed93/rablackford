@@ -6,224 +6,243 @@ use ADP\BaseVersion\Includes\Context;
 use ADP\BaseVersion\Includes\Rule\Structures\RangeDiscount;
 use Exception;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class PackageRangeAdjustments {
-	const TYPE_BULK = 'bulk';
-	const TYPE_TIER = 'tier';
+class PackageRangeAdjustments
+{
+    const TYPE_BULK = 'bulk';
+    const TYPE_TIER = 'tier';
 
-	const AVAILABLE_TYPES = array(
-		self::TYPE_BULK,
-		self::TYPE_TIER,
-	);
+    const AVAILABLE_TYPES = array(
+        self::TYPE_BULK,
+        self::TYPE_TIER,
+    );
 
-	/**
-	 * @var string
-	 */
-	protected $type;
+    /**
+     * @var string
+     */
+    protected $type;
 
-	const GROUP_BY_DEFAULT = 'not';
-	const GROUP_BY_PRODUCT = 'product';
-	const GROUP_BY_VARIATION = 'variation';
-	const GROUP_BY_CART_POSITIONS = 'cart_pos';
-	const GROUP_BY_SETS = 'sets';
+    const GROUP_BY_DEFAULT = 'not';
+    const GROUP_BY_PRODUCT = 'product';
+    const GROUP_BY_VARIATION = 'variation';
+    const GROUP_BY_CART_POSITIONS = 'cart_pos';
+    const GROUP_BY_SETS = 'sets';
 
-	const BULK_AVAILABLE_GROUP_BY = array(
-		self::GROUP_BY_PRODUCT,
-		self::GROUP_BY_VARIATION,
-		self::GROUP_BY_CART_POSITIONS,
-		self::GROUP_BY_SETS,
-	);
+    const BULK_AVAILABLE_GROUP_BY = array(
+        self::GROUP_BY_PRODUCT,
+        self::GROUP_BY_VARIATION,
+        self::GROUP_BY_CART_POSITIONS,
+        self::GROUP_BY_SETS,
+    );
 
-	// degenerated aggregations
-	const GROUP_BY_ALL_ITEMS_IN_CART = 'total_qty_in_cart';
-	const GROUP_BY_PRODUCT_CATEGORIES = 'product_categories';
-	const GROUP_BY_PRODUCT_SELECTED_CATEGORIES = 'product_selected_categories';
-	const GROUP_BY_PRODUCT_SELECTED_PRODUCTS = 'selected_products';
+    // degenerated aggregations
+    const GROUP_BY_ALL_ITEMS_IN_CART = 'total_qty_in_cart';
+    const GROUP_BY_PRODUCT_CATEGORIES = 'product_categories';
+    const GROUP_BY_PRODUCT_SELECTED_CATEGORIES = 'product_selected_categories';
+    const GROUP_BY_PRODUCT_SELECTED_PRODUCTS = 'selected_products';
+    const GROUP_BY_META_DATA = 'meta_data';
 
-	const TIER_AVAILABLE_GROUP_BY = array(
-		self::GROUP_BY_SETS,
-	);
+    const TIER_AVAILABLE_GROUP_BY = array(
+        self::GROUP_BY_SETS,
+    );
 
-	/**
-	 * @var string
-	 */
-	protected $groupBy;
+    /**
+     * @var string
+     */
+    protected $groupBy;
 
-	/**
-	 * Coupon or Fee
-	 *
-	 * @var bool
-	 */
-	protected $replaceAsCartAdjustment;
+    /**
+     * Coupon or Fee
+     *
+     * @var bool
+     */
+    protected $replaceAsCartAdjustment;
 
-	/**
-	 * @var RangeDiscount[]
-	 */
-	protected $ranges;
+    /**
+     * @var RangeDiscount[]
+     */
+    protected $ranges;
 
-	/**
-	 * @var string
-	 */
-	protected $replaceCartAdjustmentCode;
+    /**
+     * @var string
+     */
+    protected $replaceCartAdjustmentCode;
 
-	/**
-	 * @var string
-	 */
-	protected $promotionalMessage;
+    /**
+     * @var string
+     */
+    protected $promotionalMessage;
 
-	/**
-	 * @var int[]
-	 */
-	protected $selectedProductIds;
+    /**
+     * @var int[]
+     */
+    protected $selectedProductIds;
 
-	/**
-	 * @var int[]
-	 */
-	protected $selectedCategoryIds;
+    /**
+     * @var int[]
+     */
+    protected $selectedCategoryIds;
 
-	/**
-	 * @param Context $context
-	 * @param string  $type
-	 * @param string  $groupBy
-	 */
-	public function __construct( $context, $type, $groupBy ) {
-		if ( ! in_array( $type, self::AVAILABLE_TYPES ) ) {
-			$context->handle_error( new Exception( sprintf( "Item range adjustment type '%s' not supported",
-				$type ) ) );
-		}
-
-        if ( ( $type === self::TYPE_BULK AND ! in_array( $groupBy, self::BULK_AVAILABLE_GROUP_BY ) ) OR
-        ( $type === self::TYPE_TIER AND ! in_array( $groupBy, self::TIER_AVAILABLE_GROUP_BY ) ) ) {
-			$context->handle_error( new Exception( sprintf( "Item range adjustment qty based '%s' not supported",
-				$groupBy ) ) );
+    /**
+     * @param Context $context
+     * @param string $type
+     * @param string $groupBy
+     */
+    public function __construct($context, $type, $groupBy)
+    {
+        if ( ! in_array($type, self::AVAILABLE_TYPES)) {
+            $context->handleError(new Exception(sprintf("Item range adjustment type '%s' not supported",
+                $type)));
         }
 
-		$this->type                      = $type;
-		$this->groupBy                   = $groupBy;
-		$this->replaceAsCartAdjustment   = false;
-		$this->replaceCartAdjustmentCode = null;
-		$this->selectedProductIds        = array();
-		$this->selectedCategoryIds       = array();
-	}
+        if (($type === self::TYPE_BULK and ! in_array($groupBy, self::BULK_AVAILABLE_GROUP_BY)) or
+            ($type === self::TYPE_TIER and ! in_array($groupBy, self::TIER_AVAILABLE_GROUP_BY))) {
+            $context->handleError(new Exception(sprintf("Item range adjustment qty based '%s' not supported",
+                $groupBy)));
+        }
 
-	/**
-	 * @param RangeDiscount $range
-	 */
-	public function addRange( $range ) {
-		if ( $range instanceof RangeDiscount ) {
-			$this->ranges[] = $range;
-		}
-	}
+        $this->type                      = $type;
+        $this->groupBy                   = $groupBy;
+        $this->replaceAsCartAdjustment   = false;
+        $this->replaceCartAdjustmentCode = null;
+        $this->selectedProductIds        = array();
+        $this->selectedCategoryIds       = array();
+    }
 
-	/**
-	 * @param RangeDiscount[] $ranges
-	 */
-	public function setRanges( $ranges ) {
-		$this->ranges = array();
+    /**
+     * @param RangeDiscount $range
+     */
+    public function addRange($range)
+    {
+        if ($range instanceof RangeDiscount) {
+            $this->ranges[] = $range;
+        }
+    }
 
-		foreach ( $ranges as $range ) {
-			$this->addRange( $range );
-		}
-	}
+    /**
+     * @param array<int, RangeDiscount> $ranges
+     */
+    public function setRanges($ranges)
+    {
+        $this->ranges = array();
 
-	/**
-	 * @return RangeDiscount[]
-	 */
-	public function getRanges() {
-		return $this->ranges;
-	}
+        foreach ($ranges as $range) {
+            $this->addRange($range);
+        }
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getType() {
-		return $this->type;
-	}
+    /**
+     * @return array<int,RangeDiscount>
+     */
+    public function getRanges()
+    {
+        return $this->ranges;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getGroupBy() {
-		return $this->groupBy;
-	}
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	/**
-	 * @param bool $replace
-	 */
-	public function setReplaceAsCartAdjustment( $replace ) {
-		$this->replaceAsCartAdjustment = boolval( $replace );
-	}
+    /**
+     * @return string
+     */
+    public function getGroupBy()
+    {
+        return $this->groupBy;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isReplaceWithCartAdjustment() {
-		return $this->replaceCartAdjustmentCode && $this->replaceAsCartAdjustment;
-	}
+    /**
+     * @param bool $replace
+     */
+    public function setReplaceAsCartAdjustment($replace)
+    {
+        $this->replaceAsCartAdjustment = boolval($replace);
+    }
 
-	/**
-	 * @param string $code
-	 */
-	public function setReplaceCartAdjustmentCode( $code ) {
-		$this->replaceCartAdjustmentCode = (string) $code;
-	}
+    /**
+     * @return bool
+     */
+    public function isReplaceWithCartAdjustment()
+    {
+        return $this->replaceCartAdjustmentCode && $this->replaceAsCartAdjustment;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getReplaceCartAdjustmentCode() {
-		return $this->replaceCartAdjustmentCode;
-	}
+    /**
+     * @param string $code
+     */
+    public function setReplaceCartAdjustmentCode($code)
+    {
+        $this->replaceCartAdjustmentCode = (string)$code;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isValid() {
-		return count( $this->ranges ) > 0;
-	}
+    /**
+     * @return string
+     */
+    public function getReplaceCartAdjustmentCode()
+    {
+        return $this->replaceCartAdjustmentCode;
+    }
 
-	/**
-	 * @param string $promotionalMessage
-	 */
-	public function setPromotionalMessage( $promotionalMessage ) {
-		$this->promotionalMessage = $promotionalMessage;
-	}
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return count($this->ranges) > 0;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getPromotionalMessage() {
-		return $this->promotionalMessage;
-	}
+    /**
+     * @param string $promotionalMessage
+     */
+    public function setPromotionalMessage($promotionalMessage)
+    {
+        $this->promotionalMessage = $promotionalMessage;
+    }
 
-	/**
-	 * @param int[] $selectedProductIds
-	 */
-	public function setSelectedProductIds( $selectedProductIds ) {
-		$this->selectedProductIds = $selectedProductIds;
-	}
+    /**
+     * @return string
+     */
+    public function getPromotionalMessage()
+    {
+        return $this->promotionalMessage;
+    }
 
-	/**
-	 * @return int[]
-	 */
-	public function getSelectedProductIds() {
-		return $this->selectedProductIds;
-	}
+    /**
+     * @param array<int,int> $selectedProductIds
+     */
+    public function setSelectedProductIds($selectedProductIds)
+    {
+        $this->selectedProductIds = $selectedProductIds;
+    }
 
-	/**
-	 * @param int[] $selectedCategoryIds
-	 */
-	public function setSelectedCategoryIds( $selectedCategoryIds ) {
-		$this->selectedCategoryIds = $selectedCategoryIds;
-	}
+    /**
+     * @return array<int,int>
+     */
+    public function getSelectedProductIds()
+    {
+        return $this->selectedProductIds;
+    }
 
-	/**
-	 * @return int[]
-	 */
-	public function getSelectedCategoryIds() {
-		return $this->selectedCategoryIds;
-	}
+    /**
+     * @param array<int,int> $selectedCategoryIds
+     */
+    public function setSelectedCategoryIds($selectedCategoryIds)
+    {
+        $this->selectedCategoryIds = $selectedCategoryIds;
+    }
+
+    /**
+     * @return array<int,int>
+     */
+    public function getSelectedCategoryIds()
+    {
+        return $this->selectedCategoryIds;
+    }
 }

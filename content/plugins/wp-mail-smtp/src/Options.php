@@ -2,6 +2,7 @@
 
 namespace WPMailSMTP;
 
+use WPMailSMTP\Helpers\Crypto;
 use WPMailSMTP\UsageTracking\UsageTracking;
 
 /**
@@ -68,6 +69,7 @@ class Options {
 		],
 		'sendgrid'    => [
 			'api_key',
+			'domain',
 		],
 		'smtpcom'     => [
 			'api_key',
@@ -75,6 +77,7 @@ class Options {
 		],
 		'sendinblue'  => [
 			'api_key',
+			'domain',
 		],
 		'pepipostapi' => [
 			'api_key',
@@ -244,13 +247,15 @@ class Options {
 	 * Options::init()->get( 'smtp', 'host' ) - will return only SMTP 'host' option.
 	 *
 	 * @since 1.0.0
+	 * @since 2.5.0 Added $strip_slashes method parameter.
 	 *
-	 * @param string $group
-	 * @param string $key
+	 * @param string $group         The option group.
+	 * @param string $key           The option key.
+	 * @param bool   $strip_slashes If the slashes should be stripped from string values.
 	 *
 	 * @return mixed|null Null if value doesn't exist anywhere: in constants, in DB, in a map. So it's completely custom or a typo.
 	 */
-	public function get( $group, $key ) {
+	public function get( $group, $key, $strip_slashes = true ) {
 
 		// Just to feel safe.
 		$group = sanitize_key( $group );
@@ -266,7 +271,7 @@ class Options {
 			if ( isset( $this->_options[ $group ] ) ) {
 				// Get the options key of a group.
 				if ( isset( $this->_options[ $group ][ $key ] ) ) {
-					$value = $this->_options[ $group ][ $key ];
+					$value = $this->get_existing_option_value( $group, $key );
 				} else {
 					$value = $this->postprocess_key_defaults( $group, $key );
 				}
@@ -284,12 +289,35 @@ class Options {
 			}
 		}
 
-		// Strip slashes only from values saved in DB. Constants should be processed as is.
-		if ( is_string( $value ) && ! $this->is_const_defined( $group, $key ) ) {
+		// Conditionally strip slashes only from values saved in DB. Constants should be processed as is.
+		if ( $strip_slashes && is_string( $value ) && ! $this->is_const_defined( $group, $key ) ) {
 			$value = stripslashes( $value );
 		}
 
 		return apply_filters( 'wp_mail_smtp_options_get', $value, $group, $key );
+	}
+
+	/**
+	 * Get the existing cached option value.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param string $group The options group.
+	 * @param string $key   The options key.
+	 *
+	 * @return mixed
+	 */
+	private function get_existing_option_value( $group, $key ) {
+
+		if ( $group === 'smtp' && $key === 'pass' ) {
+			try {
+				return Crypto::decrypt( $this->_options[ $group ][ $key ] );
+			} catch ( \Exception $e ) {
+				return $this->_options[ $group ][ $key ];
+			}
+		}
+
+		return $this->_options[ $group ][ $key ];
 	}
 
 	/**
@@ -525,6 +553,10 @@ class Options {
 						/** @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDGRID_API_KEY : $value;
 						break;
+					case 'domain':
+						/** @noinspection PhpUndefinedConstantInspection */
+						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDGRID_DOMAIN : $value;
+						break;
 				}
 
 				break;
@@ -548,6 +580,10 @@ class Options {
 					case 'api_key':
 						/** @noinspection PhpUndefinedConstantInspection */
 						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDINBLUE_API_KEY : $value;
+						break;
+					case 'domain':
+						/** @noinspection PhpUndefinedConstantInspection */
+						$return = $this->is_const_defined( $group, $key ) ? WPMS_SENDINBLUE_DOMAIN : $value;
 						break;
 				}
 
@@ -759,6 +795,9 @@ class Options {
 					case 'api_key':
 						$return = defined( 'WPMS_SENDGRID_API_KEY' ) && WPMS_SENDGRID_API_KEY;
 						break;
+					case 'domain':
+						$return = defined( 'WPMS_SENDGRID_DOMAIN' ) && WPMS_SENDGRID_DOMAIN;
+						break;
 				}
 
 				break;
@@ -779,6 +818,9 @@ class Options {
 				switch ( $key ) {
 					case 'api_key':
 						$return = defined( 'WPMS_SENDINBLUE_API_KEY' ) && WPMS_SENDINBLUE_API_KEY;
+						break;
+					case 'domain':
+						$return = defined( 'WPMS_SENDINBLUE_DOMAIN' ) && WPMS_SENDINBLUE_DOMAIN;
 						break;
 				}
 
@@ -823,14 +865,51 @@ class Options {
 	 * @since 1.3.0 Added $once argument to save options only if they don't exist already.
 	 * @since 1.4.0 Added Mailgun:region.
 	 * @since 1.5.0 Added Outlook/AmazonSES, Email Log. Stop saving const values into DB.
+	 * @since 2.5.0 Added $overwrite_existing method parameter.
 	 *
-	 * @param array $options Plugin options to save.
-	 * @param bool  $once    Whether to update existing options or to add these options only once.
+	 * @param array $options            Plugin options to save.
+	 * @param bool  $once               Whether to update existing options or to add these options only once.
+	 * @param bool  $overwrite_existing Whether to overwrite existing settings or merge these passed options with existing ones.
 	 */
-	public function set( $options, $once = false ) {
-		/*
-		 * Process generic options.
-		 */
+	public function set( $options, $once = false, $overwrite_existing = true ) {
+
+		// Merge existing settings with new values.
+		if ( ! $overwrite_existing ) {
+			$options = self::array_merge_recursive( $this->get_all_raw(), $options );
+		}
+
+		$options = $this->process_generic_options( $options );
+		$options = $this->process_mailer_specific_options( $options );
+		$options = apply_filters( 'wp_mail_smtp_options_set', $options );
+
+		// Whether to update existing options or to add these options only once if they don't exist yet.
+		if ( $once ) {
+			add_option( self::META_KEY, $options, '', 'no' ); // Do not autoload these options.
+		} else {
+			if ( is_multisite() && WP::use_global_plugin_settings() ) {
+				update_blog_option( get_main_site_id(), self::META_KEY, $options );
+			} else {
+				update_option( self::META_KEY, $options, 'no' );
+			}
+		}
+
+		// Now we need to re-cache values.
+		$this->populate_options();
+
+		do_action( 'wp_mail_smtp_options_set_after', $options );
+	}
+
+	/**
+	 * Process the generic plugin options.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param array $options The options array.
+	 *
+	 * @return array
+	 */
+	private function process_generic_options( $options ) { // phpcs:ignore
+
 		foreach ( (array) $options as $group => $keys ) {
 			foreach ( $keys as $option_name => $option_value ) {
 				switch ( $group ) {
@@ -862,6 +941,7 @@ class Options {
 							case 'do_not_send':
 							case 'am_notifications_hidden':
 							case 'email_delivery_errors_hidden':
+							case 'dashboard_widget_hidden':
 							case 'uninstall':
 							case UsageTracking::SETTINGS_SLUG:
 								$options[ $group ][ $option_name ] = (bool) $option_value;
@@ -871,9 +951,20 @@ class Options {
 			}
 		}
 
-		/*
-		 * Process mailers-specific options.
-		 */
+		return $options;
+	}
+
+	/**
+	 * Process mailers-specific plugin options.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @param array $options The options array.
+	 *
+	 * @return array
+	 */
+	private function process_mailer_specific_options( $options ) { // phpcs:ignore
+
 		if (
 			! empty( $options['mail']['mailer'] ) &&
 			isset( $options[ $options['mail']['mailer'] ] ) &&
@@ -902,11 +993,18 @@ class Options {
 
 					case 'pass': // smtp.
 						// Do not process as they may contain certain special characters, but allow to be overwritten using constants.
-						$options[ $mailer ][ $option_name ] = $this->is_const_defined( $mailer, $option_name ) ? '' : trim( (string) $option_value );
+						$option_value                       = trim( (string) $option_value );
+						$options[ $mailer ][ $option_name ] = $this->is_const_defined( $mailer, $option_name ) ? '' : $option_value;
+
+						if ( $mailer === 'smtp' && ! $this->is_const_defined( 'smtp', 'pass' ) ) {
+							try {
+								$options[ $mailer ][ $option_name ] = Crypto::encrypt( $option_value );
+							} catch ( \Exception $e ) {} // phpcs:ignore
+						}
 						break;
 
 					case 'api_key': // mailgun/sendgrid/sendinblue/pepipostapi/smtpcom.
-					case 'domain': // mailgun/zoho.
+					case 'domain': // mailgun/zoho/sendgrid/sendinblue.
 					case 'client_id': // gmail/outlook/amazonses/zoho.
 					case 'client_secret': // gmail/outlook/amazonses/zoho.
 					case 'auth_code': // gmail/outlook.
@@ -923,19 +1021,7 @@ class Options {
 			}
 		}
 
-		$options = apply_filters( 'wp_mail_smtp_options_set', $options );
-
-		// Whether to update existing options or to add these options only once if they don't exist yet.
-		if ( $once ) {
-			add_option( self::META_KEY, $options, '', 'no' ); // Do not autoload these options.
-		} else {
-			update_option( self::META_KEY, $options, 'no' );
-		}
-
-		// Now we need to re-cache values.
-		$this->populate_options();
-
-		do_action( 'wp_mail_smtp_options_set_after', $options );
+		return $options;
 	}
 
 	/**
@@ -1035,5 +1121,64 @@ class Options {
 	 */
 	public function is_mailer_smtp() {
 		return apply_filters( 'wp_mail_smtp_options_is_mailer_smtp', in_array( $this->get( 'mail', 'mailer' ), array( 'pepipost', 'smtp' ), true ) );
+	}
+
+	/**
+	 * Get all the options, but without stripping the slashes.
+	 *
+	 * @since 2.5.0
+	 *
+	 * @return array
+	 */
+	public function get_all_raw() {
+
+		$options = $this->_options;
+
+		foreach ( $options as $group => $g_value ) {
+			foreach ( $g_value as $key => $value ) {
+				$options[ $group ][ $key ] = $this->get( $group, $key, false );
+			}
+		}
+
+		return $options;
+	}
+
+	/**
+	 * Parse boolean value from string.
+	 *
+	 * @since 2.8.0
+	 *
+	 * @param string|boolean $value String or boolean value.
+	 *
+	 * @return boolean
+	 */
+	public function parse_boolean( $value ) {
+
+		// Return early if it's boolean.
+		if ( is_bool( $value ) ) {
+			return $value;
+		}
+
+		$value = trim( $value );
+
+		return $value === 'true';
+	}
+
+	/**
+	 * Get a message of a constant that was set inside wp-config.php file.
+	 *
+	 * @since 2.8.0
+	 *
+	 * @param string $constant Constant name.
+	 *
+	 * @return string
+	 */
+	public function get_const_set_message( $constant ) {
+
+		return sprintf( /* translators: %1$s - constant that was used; %2$s - file where it was used. */
+			esc_html__( 'The value of this field was set using a constant %1$s most likely inside %2$s of your WordPress installation.', 'wp-mail-smtp' ),
+			'<code>' . esc_html( $constant ) . '</code>',
+			'<code>wp-config.php</code>'
+		);
 	}
 }

@@ -9,12 +9,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 class Woo_Conditional_Shipping_Ruleset {
   private $post_id;
+  private $debug;
 
   /**
    * Constructor
    */
   public function __construct( $post_id = false ) {
     $this->post_id = $post_id;
+
+    $this->debug = Woo_Conditional_Shipping_Debug::instance();
   }
 
   /**
@@ -159,22 +162,34 @@ class Woo_Conditional_Shipping_Ruleset {
       $package['contents'] = WC()->cart->get_cart();
     }
 
+    $filters = woo_conditional_shipping_filters();
+
+    $passed = true;
     foreach ( $this->get_conditions() as $index => $condition ) {
       if ( isset( $condition['type'] ) && ! empty( $condition['type'] ) ) {
-        $function = "filter_{$condition['type']}";
+        $type = $condition['type'];
 
-        if ( class_exists( 'Woo_Conditional_Shipping_Filters_Pro' ) && method_exists( 'Woo_Conditional_Shipping_Filters_Pro', $function ) ) {
-          $callable = array( 'Woo_Conditional_Shipping_Filters_Pro', "filter_{$condition['type']}" );
+        $function = "filter_{$type}";
+
+        if ( isset( $filters[$type] ) && isset( $filters[$type]['callback'] ) ) {
+          $callable = $filters[$type]['callback'];
+        } else if ( class_exists( 'Woo_Conditional_Shipping_Filters_Pro' ) && method_exists( 'Woo_Conditional_Shipping_Filters_Pro', $function ) ) {
+          $callable = array( 'Woo_Conditional_Shipping_Filters_Pro', $function );
         } else {
-          $callable = array( 'Woo_Conditional_Shipping_Filters', "filter_{$condition['type']}" );
+          $callable = array( 'Woo_Conditional_Shipping_Filters', $function );
         }
 
-        if ( call_user_func( $callable, $condition, $package ) ) {
-          return false;
+        $result = call_user_func( $callable, $condition, $package );
+        if ( $result ) {
+          $passed = false;
         }
+
+        $this->debug->add_condition( $this->get_id(), $index, $condition, $result );
       }
     }
 
-    return true;
+    $this->debug->add_result( $this->get_id(), $passed );
+
+    return $passed;
   }
 }

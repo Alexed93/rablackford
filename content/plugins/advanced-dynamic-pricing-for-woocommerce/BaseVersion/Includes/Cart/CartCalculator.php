@@ -9,131 +9,182 @@ use ADP\BaseVersion\Includes\External\CacheHelper;
 use ADP\BaseVersion\Includes\Reporter\Interfaces\Listener;
 use ADP\BaseVersion\Includes\Rule\Interfaces\RuleProcessor;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class CartCalculator {
-	/**
-	 * @var RulesCollection
-	 */
-	protected $ruleCollection;
-	/**
-	 * @var Cart
-	 */
-	protected $cart;
+class CartCalculator
+{
+    /**
+     * @var RulesCollection
+     */
+    protected $ruleCollection;
+    /**
+     * @var Cart
+     */
+    protected $cart;
 
-	/**
-	 * @var Listener
-	 */
-	public $listener;
+    /**
+     * @var Listener
+     */
+    public $listener;
 
-	/**
-	 * @var Context
-	 */
-	protected $context;
+    /**
+     * @var Context
+     */
+    protected $context;
 
-	/**
-	 * @param Context         $context
-	 * @param RulesCollection $ruleCollection
-	 * @param Listener        $listener
-	 */
-	public function __construct( $context, $ruleCollection, $listener = null ) {
-		$this->context        = $context;
-		$this->ruleCollection = $ruleCollection;
-		$this->listener       = $listener;
-	}
+    /**
+     * @param Context $context
+     * @param RulesCollection $ruleCollection
+     * @param Listener|null $listener
+     */
+    public function __construct($context, $ruleCollection, $listener = null)
+    {
+        $this->context        = $context;
+        $this->ruleCollection = $ruleCollection;
+        $this->listener       = $listener;
+    }
 
-	/**
-	 * @param Context  $context
-	 * @param Listener $listener
-	 *
-	 * @return self
-	 */
-	public static function make( $context, $listener = null ) {
-		return new static( $context, CacheHelper::loadActiveRules( $context ), $listener );
-	}
+    /**
+     * @param Context $context
+     * @param Listener|null $listener
+     *
+     * @return self
+     */
+    public static function make($context, $listener = null)
+    {
+        return new static($context, CacheHelper::loadActiveRules($context), $listener);
+    }
 
-	public function getRulesCollection() {
-		return $this->ruleCollection;
-	}
+    public function getRulesCollection()
+    {
+        return $this->ruleCollection;
+    }
 
-	/**
-	 * @param Cart $cart
-	 *
-	 * @return bool
-	 */
-	public function processCart( &$cart ) {
-		if ( $cart->is_empty() ) {
-			return false;
-		}
+    /**
+     * @param Cart $cart
+     *
+     * @return bool
+     */
+    public function processCart(&$cart)
+    {
+        if ($cart->isEmpty()) {
+            return false;
+        }
 
-		if ( $this->listener ) {
-			$this->listener->calcProcessStarted();
-		}
+        if ($this->listener) {
+            $this->listener->calcProcessStarted();
+        }
 
-		$applied_rules = 0;
+        $appliedRules = 0;
 
-		foreach ( $this->ruleCollection->getRules() as $rule ) {
-			$proc = $rule->buildProcessor( $this->context );
-			if ( $proc->applyToCart( $cart ) ) {
-				$applied_rules ++;
-			}
+        foreach ($this->ruleCollection->getRules() as $rule) {
+            $proc = $rule->buildProcessor($this->context);
+            if ($proc->applyToCart($cart)) {
+                $appliedRules++;
+            }
 
-			$this->announceRuleCalculated( $proc );
-		}
+            $this->announceRuleCalculated($proc);
+        }
 
-		$result = boolval( $applied_rules );
+        $result = boolval($appliedRules);
 
-		if ( $result ) {
-			if ( 'compare_discounted_and_sale' === $this->context->get_option( 'discount_for_onsale' ) ) {
-				$newItems = array();
-				foreach ( $cart->getItems() as $item ) {
-					$productPrice = $item->getOriginalPrice();
-					foreach ( $item->getDiscounts() as $ruleId => $amounts ) {
-						$productPrice -= array_sum( $amounts );
-					}
-					if ( $this->context->get_option( 'is_calculate_based_on_wc_precision' ) ) {
-						$productPrice = round( $productPrice, wc_get_price_decimals() + 2 );
-					}
+        if ($result) {
+            if ('compare_discounted_and_sale' === $this->context->getOption('discount_for_onsale')) {
+                $newItems = array();
+                foreach ($cart->getItems() as $item) {
+                    $productPrice = $item->getOriginalPrice();
+                    foreach ($item->getDiscounts() as $ruleId => $amounts) {
+                        $productPrice -= array_sum($amounts);
+                    }
+                    if ($this->context->getOption('is_calculate_based_on_wc_precision')) {
+                        $productPrice = round($productPrice, wc_get_price_decimals());
+                    }
 
-					$product     = $item->getWcItem()->getProduct();
-					$wcSalePrice = $product->get_sale_price( 'edit' ) !== '' ? floatval( $product->get_sale_price( 'edit' ) ) : null;
+                    $product     = $item->getWcItem()->getProduct();
+                    $wcSalePrice = null;
 
-					if ( ! is_null( $wcSalePrice ) && $wcSalePrice < $productPrice ) {
-						$newItem = new CartItem( $item->getWcItem(), $wcSalePrice, $item->getQty(), $item->getPos() );
+                    /** Always remember about scheduled WC sales */
+                    if ($product->is_on_sale('edit') && $product->get_sale_price('edit') !== '') {
+                        $wcSalePrice = floatval($product->get_sale_price('edit'));
+                    }
 
-						foreach ( $item->getAttrs() as $attr ) {
-							$newItem->addAttr( $attr );
-						}
+                    if ( ! is_null($wcSalePrice) && $wcSalePrice < $productPrice) {
+                        $newItem = new CartItem($item->getWcItem(), $wcSalePrice, $item->getQty(), $item->getPos());
 
-						foreach ( $item->getMarks() as $mark ) {
-							$newItem->addMark( $mark );
-						}
+                        foreach ($item->getAttrs() as $attr) {
+                            $newItem->addAttr($attr);
+                        }
 
-						$item = $newItem;
-					}
+                        foreach ($item->getMarks() as $mark) {
+                            $newItem->addMark($mark);
+                        }
 
-					$newItems[] = $item;
-				}
+                        $minDiscountRangePrice = $item->getMinDiscountRangePrice();
+                        if ($minDiscountRangePrice !== null ) {
+                            $minDiscountRangePrice = $minDiscountRangePrice < $wcSalePrice ? $minDiscountRangePrice : $wcSalePrice;
+                            $newItem->setMinDiscountRangePrice($minDiscountRangePrice);
+                        }
 
-				$cart->setItems( $newItems );
-			}
-		}
+                        $item = $newItem;
+                    }
 
-		if ( $this->listener ) {
-			$this->listener->processResult( $result );
-		}
+                    $newItems[] = $item;
+                }
 
-		return $result;
-	}
+                $cart->setItems($newItems);
+            } elseif ('discount_regular' === $this->context->getOption('discount_for_onsale')) {
+                $newItems = array();
+                foreach ($cart->getItems() as $item) {
+                    $product     = $item->getWcItem()->getProduct();
+                    $wcSalePrice = null;
 
-	/**
-	 * @param RuleProcessor $proc
-	 */
-	protected function announceRuleCalculated( $proc ) {
-		if ( $this->listener ) {
-			$this->listener->ruleCalculated( $proc );
-		}
-	}
+                    /** Always remember about scheduled WC sales */
+                    if ($product->is_on_sale('edit') && $product->get_sale_price('edit') !== '') {
+                        $wcSalePrice = floatval($product->get_sale_price('edit'));
+                    }
+
+                    if ( ! is_null($wcSalePrice) && count($item->getHistory()) == 0) {
+                        $newItem = new CartItem($item->getWcItem(), $wcSalePrice, $item->getQty(), $item->getPos());
+
+                        foreach ($item->getAttrs() as $attr) {
+                            $newItem->addAttr($attr);
+                        }
+
+                        foreach ($item->getMarks() as $mark) {
+                            $newItem->addMark($mark);
+                        }
+
+                        $minDiscountRangePrice = $item->getMinDiscountRangePrice();
+                        if ($minDiscountRangePrice !== null ) {
+                            $newItem->setMinDiscountRangePrice($minDiscountRangePrice);
+                        }
+
+                        $item = $newItem;
+                    }
+
+                    $newItems[] = $item;
+                }
+
+                $cart->setItems($newItems);
+            }
+        }
+
+        if ($this->listener) {
+            $this->listener->processResult($result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param RuleProcessor $proc
+     */
+    protected function announceRuleCalculated($proc)
+    {
+        if ($this->listener) {
+            $this->listener->ruleCalculated($proc);
+        }
+    }
 }

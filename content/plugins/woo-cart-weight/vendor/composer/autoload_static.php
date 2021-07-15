@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f
+class ComposerStaticInit468769e6e1d0d8f14e1230b27cf3afc8
 {
     public static $prefixLengthsPsr4 = array (
         'W' => 
@@ -145,6 +145,7 @@ class ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f
         'WCWeightVendor\\WPDesk\\Composer\\Codeception\\Commands\\BaseCommand' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-codeception/src/WPDesk/Composer/Commands/BaseCommand.php',
         'WCWeightVendor\\WPDesk\\Composer\\Codeception\\Commands\\CreateCodeceptionTests' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-codeception/src/WPDesk/Composer/Commands/CreateCodeceptionTests.php',
         'WCWeightVendor\\WPDesk\\Composer\\Codeception\\Commands\\RunCodeceptionTests' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-codeception/src/WPDesk/Composer/Commands/RunCodeceptionTests.php',
+        'WCWeightVendor\\WPDesk\\Composer\\Codeception\\Commands\\RunLocalCodeceptionTests' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-codeception/src/WPDesk/Composer/Commands/RunLocalCodeceptionTests.php',
         'WCWeightVendor\\WPDesk\\Composer\\Codeception\\Commands\\SedTrait' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-codeception/src/WPDesk/Composer/Commands/SedTrait.php',
         'WCWeightVendor\\WPDesk\\Composer\\Codeception\\Plugin' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-codeception/src/WPDesk/Composer/Plugin.php',
         'WCWeightVendor\\WPDesk\\Helper\\Debug\\LibraryDebug' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/Debug/LibraryDebug.php',
@@ -160,6 +161,10 @@ class ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f
         'WCWeightVendor\\WPDesk\\Helper\\Page\\SettingsPage' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/Page/SettingsPage.php',
         'WCWeightVendor\\WPDesk\\Helper\\PrefixedHelperAsLibrary' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/PrefixedHelperAsLibrary.php',
         'WCWeightVendor\\WPDesk\\Helper\\UpgradeSoonNotice' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-helper/src/UpgradeSoonNotice.php',
+        'WCWeightVendor\\WPDesk\\License\\Changelog\\Filter\\ByVersion' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Changelog/Filter/ByVersion.php',
+        'WCWeightVendor\\WPDesk\\License\\Changelog\\Formatter' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Changelog/Formatter.php',
+        'WCWeightVendor\\WPDesk\\License\\Changelog\\Parser' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Changelog/Parser.php',
+        'WCWeightVendor\\WPDesk\\License\\Changelog\\Parser\\Line' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Changelog/Parser/Line.php',
         'WCWeightVendor\\WPDesk\\License\\InstalledPlugins' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/InstalledPlugins.php',
         'WCWeightVendor\\WPDesk\\License\\Page\\Action' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Page/Action.php',
         'WCWeightVendor\\WPDesk\\License\\Page\\LicensePage' => __DIR__ . '/../..' . '/vendor_prefixed/wpdesk/wp-wpdesk-license/src/Page/LicensePage.php',
@@ -289,9 +294,9 @@ class ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit58387b49545b9d07d4c406f694ee8f9f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit468769e6e1d0d8f14e1230b27cf3afc8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit468769e6e1d0d8f14e1230b27cf3afc8::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit468769e6e1d0d8f14e1230b27cf3afc8::$classMap;
 
         }, null, ClassLoader::class);
     }

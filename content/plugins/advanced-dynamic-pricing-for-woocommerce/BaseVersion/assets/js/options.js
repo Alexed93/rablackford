@@ -20,13 +20,15 @@ jQuery( document ).ready( function ( $ ) {
 		}
 	}, 0 );
 
-	// control visibility for options which depends on load_in_backend option
 	setTimeout(function () {
-		$('#load_in_backend').change(function () {
+		$('#update_price_with_qty').change(function() {
 			if (this.checked) {
-				$('.load-in-backed-checked').show()
+				$('#show_spinner_when_update_price').closest('tr').show()
+				$('#replace_variable_price').closest('tr').show()
 			} else {
-				$('.load-in-backed-checked').hide()
+				$('#replace_variable_price').prop('checked', false);
+				$('#replace_variable_price').closest('tr').hide()
+        $('#show_spinner_when_update_price').closest('tr').hide()
 			}
 		}).trigger('change');
 	}, 0);

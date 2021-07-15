@@ -5,54 +5,64 @@ namespace ADP\BaseVersion\Includes\External\AdminPage\Tabs;
 use ADP\BaseVersion\Includes\Context;
 use ADP\BaseVersion\Includes\External\AdminPage\Interfaces\AdminTabInterface;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class Help implements AdminTabInterface {
-	/**
-	 * @var string
-	 */
-	protected $title;
+class Help implements AdminTabInterface
+{
+    /**
+     * @var string
+     */
+    protected $title;
 
-	/**
-	 * @var Context
-	 */
-	protected $context;
+    /**
+     * @var Context
+     */
+    protected $context;
 
-	public function __construct( $context ) {
-		$this->context = $context;
-		$this->title   = self::get_title();
-	}
+    public function __construct($context)
+    {
+        $this->context = $context;
+        $this->title   = self::getTitle();
+    }
 
-	public function handle_submit_action() {
-		// do nothing
-	}
+    public function handleSubmitAction()
+    {
+        // do nothing
+    }
 
-	public function get_view_variables() {
-		return array();
-	}
+    public function getViewVariables()
+    {
+        return array();
+    }
 
-	public static function get_relative_view_path() {
-		return 'admin_page/tabs/help.php';
-	}
+    public static function getRelativeViewPath()
+    {
+        return 'admin_page/tabs/help.php';
+    }
 
-	public static function get_header_display_priority() {
-		return 80;
-	}
+    public static function getHeaderDisplayPriority()
+    {
+        return 80;
+    }
 
-	public static function get_key() {
-		return 'help';
-	}
+    public static function getKey()
+    {
+        return 'help';
+    }
 
-	public static function get_title() {
-		return __( 'Help', 'advanced-dynamic-pricing-for-woocommerce' );
-	}
+    public static function getTitle()
+    {
+        return __('Help', 'advanced-dynamic-pricing-for-woocommerce');
+    }
 
-	public function enqueue_scripts() {
-	}
+    public function enqueueScripts()
+    {
+    }
 
-	public function register_ajax() {
+    public function registerAjax()
+    {
 
-	}
+    }
 }

@@ -264,6 +264,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 					</select>
 				</div>
 
+				<div class="value_input wcs_state_value_input">
+					<select class="wc-enhanced-select" name="wcs_conditions[{{data.index}}][states][]" class="select" multiple>
+						<?php foreach ( woo_conditional_shipping_state_options() as $country_id => $states ) { ?>
+							<optgroup label="<?php echo esc_attr( $states['country'] ); ?>">
+								<?php foreach ( $states['states'] as $state_id => $state ) { ?>
+									<option
+										value="<?php echo "{$country_id}:{$state_id}"; ?>"
+										<# if ( data.states && jQuery.inArray( '<?php echo "{$country_id}:{$state_id}"; ?>', data.states ) !== -1 ) { #>
+											selected
+										<# } #>
+									>
+										<?php echo $state; ?>
+									</option>
+								<?php } ?>
+							</optgroup>
+						<?php } ?>
+					</select>
+				</div>
+
 				<div class="value_input wcs_product_attrs_input">
 					<select class="wc-enhanced-select" name="wcs_conditions[{{data.index}}][product_attrs][]" class="select" multiple>
 						<?php foreach ( woo_conditional_product_attr_options() as $taxonomy_id => $attrs ) { ?>
@@ -325,6 +344,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php } ?>
 					</select>
 				</div>
+
+				<?php do_action( 'woo_conditional_shipping_ruleset_value_inputs', $ruleset ); ?>
 			</fieldset>
 		</td>
 	</tr>

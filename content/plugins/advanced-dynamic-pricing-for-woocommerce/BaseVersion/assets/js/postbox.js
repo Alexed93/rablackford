@@ -52,6 +52,8 @@ var wpc_postboxes;
 
 			if (ariaExpandedValue) {
 				wpc_postboxes._on_expand($el.closest('.postbox'));
+			} else {
+				wpc_postboxes._on_close($el.closest('.postbox'));
 			}
 
 			if ( $el.hasClass( 'handlediv' ) ) {
@@ -174,6 +176,8 @@ var wpc_postboxes;
 				if (expandedValue) {
 					var $expand_el = $el.parent('.postbox');
 					wpc_postboxes._on_expand($expand_el);
+				} else {
+					wpc_postboxes._on_close($expand_el);
 				}
 
 				$el.attr( 'aria-expanded', expandedValue );
@@ -275,7 +279,8 @@ var wpc_postboxes;
 		},
 
 		_on_reorder: function() {},
-		_on_expand: function($el) {}
+		_on_expand: function($el) {},
+		_on_close: function($el) {},
 	};
 
 }(jQuery));

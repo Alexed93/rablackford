@@ -4,50 +4,53 @@ namespace ADP\BaseVersion\Includes\External\AdminPage\Interfaces;
 
 use ADP\BaseVersion\Includes\Context;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface AdminTabInterface {
-	/**
-	 * AdminTabInterface constructor.
-	 *
-	 * @param Context $context
-	 */
-	public function __construct( $context );
+interface AdminTabInterface
+{
+    /**
+     * AdminTabInterface constructor.
+     *
+     * @param Context $context
+     */
+    public function __construct($context);
 
-	public function handle_submit_action();
-	public function register_ajax();
-	public function enqueue_scripts();
+    public function handleSubmitAction();
 
-	/**
-	 * @return array
-	 */
-	public function get_view_variables();
+    public function registerAjax();
 
-	/**
-	 * Display priority in the header
-	 *
-	 * @return integer
-	 */
-	public static function get_header_display_priority();
+    public function enqueueScripts();
 
-	/**
-	 * @return string
-	 */
-	public static function get_relative_view_path();
+    /**
+     * @return array
+     */
+    public function getViewVariables();
 
-	/**
-	 * Unique tab key
-	 *
-	 * @return string
-	 */
-	public static function get_key();
+    /**
+     * Display priority in the header
+     *
+     * @return int
+     */
+    public static function getHeaderDisplayPriority();
 
-	/**
-	 * Localized title
-	 *
-	 * @return string
-	 */
-	public static function get_title();
+    /**
+     * @return string
+     */
+    public static function getRelativeViewPath();
+
+    /**
+     * Unique tab key
+     *
+     * @return string
+     */
+    public static function getKey();
+
+    /**
+     * Localized title
+     *
+     * @return string
+     */
+    public static function getTitle();
 }

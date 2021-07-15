@@ -9,38 +9,41 @@ use ADP\BaseVersion\Includes\External\LoadStrategies\Interfaces\LoadStrategy;
 use ADP\BaseVersion\Includes\External\Updater\Updater;
 use ADP\Factory;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class AdminCommon implements LoadStrategy {
-	/**
-	 * @var Context
-	 */
-	protected $context;
+class AdminCommon implements LoadStrategy
+{
+    /**
+     * @var Context
+     */
+    protected $context;
 
-	/**
-	 * @param Context $context
-	 */
-	public function __construct( $context ) {
-		$this->context = $context;
-	}
+    /**
+     * @param Context $context
+     */
+    public function __construct($context)
+    {
+        $this->context = $context;
+    }
 
-	public function start() {
-		Updater::update();
+    public function start()
+    {
+        Updater::update();
 
-		/**
-		 * @var AdminPage    $admin_page
-		 */
-		$admin_page           = Factory::get( 'External_AdminPage_AdminPage', $this->context );
-		$admin_page->install_register_page_hook();
-		if ( $this->context->is_plugin_admin_page() ) {
-			$admin_page->init_page();
-		}
+        /**
+         * @var AdminPage $adminPage
+         */
+        $adminPage = Factory::get('External_AdminPage_AdminPage', $this->context);
+        $adminPage->installRegisterPageHook();
+        if ($this->context->isPluginAdminPage()) {
+            $adminPage->initPage();
+        }
 
-		new Settings( $this->context );
+        new Settings($this->context);
 
-		/** @see Functions::install() */
-		Factory::callStaticMethod( "Functions", 'install', $this->context );
-	}
+        /** @see Functions::install() */
+        Factory::callStaticMethod("Functions", 'install', $this->context);
+    }
 }

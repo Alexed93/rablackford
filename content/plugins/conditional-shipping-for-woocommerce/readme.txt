@@ -2,9 +2,9 @@
 Contributors: wooelements
 Tags: woocommerce shipping, conditional shipping
 Requires at least: 4.5
-Tested up to: 5.5
+Tested up to: 5.7
 Requires PHP: 5.4
-Stable tag: 2.1.1
+Stable tag: 2.2.2
 License: GPLv2
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -26,7 +26,8 @@ With Conditional Shipping you can set maximum weight (30 kg) for Economy and min
 * Restrict WooCommerce shipping methods based on conditions
 * Works with existing shipping methods
 * [Support for dynamic shipping rates](https://wooelements.com/guide/conditional-shipping-pro-guide/#elementor-toc__heading-anchor-4) such as USPS and DHL
-* WooCommerce 3.x and 4.x compatible
+* Debug mode for easy troubleshooting
+* WooCommerce 3.x, 4.x and 5.x compatible
 
 = Available Conditions =
 
@@ -76,6 +77,20 @@ Conditional Shipping is installed just like any other WordPress plugin.
 Once the plugin is activated, you should see "Conditions" for shipping methods created with shipping zones.
 
 == Changelog ==
+
+= 2.2.1 & 2.2.2 =
+
+* Added missing debug and css files
+
+= 2.2.0 =
+
+* Added debug mode (*WooCommerce > Settings > Shipping > Conditions > Debug mode*)
+* Added "Disable all" setting for disabling all rulesets at once (*WooCommerce > Settings > Shipping > Conditions > Disable all*)
+
+= 2.1.2 =
+
+* Minor fixes and improvements
+* Updated WooCommerce compatibility info up to 5.2.x
 
 = 2.1.1 =
 

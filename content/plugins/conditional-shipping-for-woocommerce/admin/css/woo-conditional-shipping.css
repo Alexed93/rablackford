@@ -145,6 +145,11 @@ table.woo-conditional-shipping-conditions tr.wcs-type-items .wcs_subset_filter_i
   display: inline-block;
 }
 
+table.woo-conditional-shipping-actions tr.wcs-type-weight .wcs_subset_filter_input,
+table.woo-conditional-shipping-conditions tr.wcs-type-weight .wcs_subset_filter_input {
+  display: inline-block;
+}
+
 table.woo-conditional-shipping-actions .wcs_postcode_value_input .description,
 table.woo-conditional-shipping-conditions .wcs_postcode_value_input .description {
   font-size: .9em;
@@ -191,6 +196,13 @@ table.woo-conditional-shipping-conditions tr.wcs-type-billing_country .wcs_count
   display: block;
 }
 
+table.woo-conditional-shipping-actions tr.wcs-type-shipping_state .wcs_state_value_input,
+table.woo-conditional-shipping-actions tr.wcs-type-billing_state .wcs_state_value_input,
+table.woo-conditional-shipping-conditions tr.wcs-type-shipping_state .wcs_state_value_input,
+table.woo-conditional-shipping-conditions tr.wcs-type-billing_state .wcs_state_value_input {
+  display: block;
+}
+
 table.woo-conditional-shipping-actions tr.wcs-type-weekdays .wcs_weekdays_value_input,
 table.woo-conditional-shipping-conditions tr.wcs-type-weekdays .wcs_weekdays_value_input {
   display: block;
@@ -232,6 +244,10 @@ table.woo-conditional-shipping-conditions tr.wcs-action-type-shipping_notice td.
 table.woo-conditional-shipping-actions tr.wcs-action-type-shipping_notice .wcs_notice_input,
 table.woo-conditional-shipping-conditions tr.wcs-action-type-shipping_notice .wcs_notice_input {
   display: block;
+}
+
+table.woo-conditional-shipping-rulesets {
+  margin-bottom: 30px;
 }
 
 table.woo-conditional-shipping-rulesets td, table.woo-conditional-shipping-rulesets th {

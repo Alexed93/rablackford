@@ -2,26 +2,32 @@
 
 namespace ADP\Settings\Interfaces;
 
-interface OriginOptionInterface {
-	/**
-	 * @return mixed
-	 */
-	public function get();
+interface OriginOptionInterface
+{
+    /**
+     * @return mixed
+     */
+    public function get();
 
-	/**
-	 * @param $value
-	 *
-	 * @return bool
-	 */
-	public function set( $value );
+    /**
+     * @param $value
+     *
+     * @return bool
+     */
+    public function set($value);
 
-	/**
-	 * @return string
-	 */
-	public function getId();
+    /**
+     * @return string
+     */
+    public function getId();
 
-	/**
-	 * @return string
-	 */
-	public function getTitle();
+    /**
+     * @return string
+     */
+    public function getTitle();
+
+    /**
+     * @return bool
+     */
+    public function isValueInstalled();
 }

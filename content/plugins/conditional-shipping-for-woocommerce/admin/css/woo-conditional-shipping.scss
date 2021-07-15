@@ -82,6 +82,12 @@ table.woo-conditional-shipping-conditions {
 		}
 	}
 
+	tr.wcs-type-weight {
+		.wcs_subset_filter_input {
+			display: inline-block;
+		}
+	}
+
 	.wcs_postcode_value_input {
 		.description {
 			font-size: .9em;
@@ -101,6 +107,9 @@ table.woo-conditional-shipping-conditions {
 
 	tr.wcs-type-shipping_country .wcs_country_value_input,
 	tr.wcs-type-billing_country .wcs_country_value_input { display: block; }
+
+	tr.wcs-type-shipping_state .wcs_state_value_input,
+	tr.wcs-type-billing_state .wcs_state_value_input { display: block; }
 
 	tr.wcs-type-weekdays .wcs_weekdays_value_input { display: block; }
 	tr.wcs-type-time .wcs_time_value_input { display: block; }
@@ -140,6 +149,8 @@ table.woo-conditional-shipping-conditions {
 }
 
 table.woo-conditional-shipping-rulesets {
+	margin-bottom: 30px;
+
 	td, th {
 		vertical-align: top;
 		line-height: 24px;

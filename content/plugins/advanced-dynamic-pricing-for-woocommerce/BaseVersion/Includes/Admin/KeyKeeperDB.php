@@ -2,7 +2,8 @@
 
 namespace ADP\BaseVersion\Includes\Admin;
 
-interface KeyKeeperDB {
+interface KeyKeeperDB
+{
     const TITLE = 'title';
     const TYPE = 'type';
     const EXCLUSIVE = 'exclusive';

@@ -30,16 +30,19 @@ class Plugin {
 	 * Run the SpinupWP plugin.
 	 */
 	public function run() {
-		$admin_bar     = new AdminBar;
+		$admin_bar     = new AdminBar( $this->url );
 		$admin_notices = new AdminNotices( $this->url );
 		$cli           = new Cli;
 
 		$cli->register_command( 'spinupwp', Commands::class );
 		$this->cache = new Cache( $admin_bar, $cli );
 
+		$compatibility = new Compatibility( $this->cache );
+
 		$this->cache->init();
 		$admin_bar->init();
 		$admin_notices->init();
+		$compatibility->init();
 
 		if ( getenv( 'SPINUPWP_SITE' ) ) {
 			register_activation_hook( $this->path, array( Plugin::class, 'install' ) );

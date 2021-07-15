@@ -2,87 +2,96 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Conditions;
 
+use ADP\BaseVersion\Includes\Cart\Structures\Cart;
 use ADP\BaseVersion\Includes\Rule\ConditionsLoader;
 use ADP\BaseVersion\Includes\Rule\Interfaces\Conditions\DateTimeComparisonCondition;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class Date extends AbstractCondition implements DateTimeComparisonCondition {
-	const FROM = 'from';
-	const TO = 'to';
-	const SPECIFIC_DATE = 'specific_date';
+class Date extends AbstractCondition implements DateTimeComparisonCondition
+{
+    const FROM = 'from';
+    const TO = 'to';
+    const SPECIFIC_DATE = 'specific_date';
 
-	const AVAILABLE_COMP_METHODS = array(
-		self::FROM,
-		self::TO,
-		self::SPECIFIC_DATE,
-	);
-
-	/**
-	 * @var string
-	 */
-	protected $comparison_date;
-	/**
-	 * @var string
-	 */
-	protected $comparison_method;
-
-	public function check( $cart ) {
-		$date = $cart->get_context()->datetime( 'd-m-Y' );
-		$date = strtotime( $date );
-
-		$comparison_date   = strtotime( $this->comparison_date );
-		$comparison_method = $this->comparison_method;
-
-		return $this->compare_time_unix_format( $date, $comparison_date, $comparison_method );
-	}
-	
-	public static function getType() {
-		return 'date';
-	}
-
-	public static function getLabel() {
-		return __( 'Date', 'advanced-dynamic-pricing-for-woocommerce' );
-	}
-
-	public static function getTemplatePath() {
-		return WC_ADP_PLUGIN_VIEWS_PATH . 'conditions/datetime/date.php';
-	}
-
-	public static function getGroup() {
-		return ConditionsLoader::GROUP_DATE_TIME;
-	}
-
-	/**
-	 * @param string $comparison_datetime
-	 */
-	public function setComparisonDateTime( $comparison_datetime ) {
-		gettype($comparison_datetime) === 'string' ? $this->comparison_date = $comparison_datetime : $this->comparison_date = null;
-	}
+    const AVAILABLE_COMP_METHODS = array(
+        self::FROM,
+        self::TO,
+        self::SPECIFIC_DATE,
+    );
 
     /**
-     * @param string $comparison_method
+     * @var string
      */
-    public function setDateTimeComparisonMethod ( $comparison_method ) {
-		in_array($comparison_method, self::AVAILABLE_COMP_METHODS) ? $this->comparison_method = $comparison_method : $this->comparison_method = null;
-	}
+    protected $comparisonDate;
 
-	public function getComparisonDateTime()
-	{
-		return $this->comparison_date;
-	}
+    /**
+     * @var string
+     */
+    protected $comparisonMethod;
 
-	public function getDateTimeComparisonMethod()
-	{
-		return $this->comparison_method;
-	}
+    public function check($cart)
+    {
+        // it is not actually UTC.The time has already shifted by WP. UTC is for convenience.
+        $date = (new \DateTime("now", new \DateTimeZone("UTC")))->setTimestamp($cart->getContext()->time());
+        $date->setTime(0, 0, 0);
 
-	/**
-	 * @return bool
-	 */
-	public function isValid() {
-		return !is_null( $this->comparison_method ) AND !is_null( $this->comparison_date );
-	}
+        $comparisonDate   = \DateTime::createFromFormat("Y-m-d", $this->comparisonDate,
+            new \DateTimeZone("UTC"));
+        $comparisonDate->setTime(0, 0, 0);
+        $comparisonMethod = $this->comparisonMethod;
+
+        return $this->compareTimeUnixFormat($date->getTimestamp(), $comparisonDate->getTimestamp(), $comparisonMethod);
+    }
+
+    public static function getType()
+    {
+        return 'date';
+    }
+
+    public static function getLabel()
+    {
+        return __('Date', 'advanced-dynamic-pricing-for-woocommerce');
+    }
+
+    public static function getTemplatePath()
+    {
+        return WC_ADP_PLUGIN_VIEWS_PATH . 'conditions/datetime/date.php';
+    }
+
+    public static function getGroup()
+    {
+        return ConditionsLoader::GROUP_DATE_TIME;
+    }
+
+    public function setComparisonDateTime($comparisonDatetime)
+    {
+        gettype($comparisonDatetime) === 'string' ? $this->comparisonDate = $comparisonDatetime : $this->comparisonDate = null;
+    }
+
+    public function setDateTimeComparisonMethod($comparisonMethod)
+    {
+        in_array($comparisonMethod,
+            self::AVAILABLE_COMP_METHODS) ? $this->comparisonMethod = $comparisonMethod : $this->comparisonMethod = null;
+    }
+
+    public function getComparisonDateTime()
+    {
+        return $this->comparisonDate;
+    }
+
+    public function getDateTimeComparisonMethod()
+    {
+        return $this->comparisonMethod;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return ! is_null($this->comparisonMethod) and ! is_null($this->comparisonDate);
+    }
 }

@@ -7,7 +7,7 @@
  * It is also available through the world-wide-web at this URL:
  * http://www.gnu.org/licenses/gpl-3.0.txt
  *
- * @package YITH Woocommerce Request A Quote
+ * @package YITH WooCommerce Request A Quote
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -66,7 +66,7 @@ return array(
 			'default'   => 'no',
 		),
 
-		'page_list_layout_template' => array(
+		'page_list_layout_template'    => array(
 			'name'      => esc_html__( 'Page Layout', 'yith-woocommerce-request-a-quote' ),
 			'desc'      => esc_html__( 'Choose the layout for the quote page.', 'yith-woocommerce-request-a-quote' ),
 			'id'        => 'ywraq_page_list_layout_template',

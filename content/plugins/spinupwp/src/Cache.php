@@ -39,18 +39,20 @@ class Cache {
 		$this->set_cache_path();
 
 		if ( $this->is_object_cache_enabled() && $this->is_page_cache_enabled() ) {
-			$this->admin_bar->add_item( 'Purge All Caches', 'purge-all' );
+			$this->admin_bar->add_item( __( 'Purge All Caches', 'spinupwp' ), 'purge-all' );
 		}
 
 		if ( $this->is_object_cache_enabled() ) {
-			$this->admin_bar->add_item( 'Purge Object Cache', 'purge-object' );
+			$this->admin_bar->add_item( __( 'Purge Object Cache', 'spinupwp' ), 'purge-object' );
 		}
 
 		if ( $this->is_page_cache_enabled() ) {
-			$this->admin_bar->add_item( 'Purge Page Cache', 'purge-page' );
+			$this->admin_bar->add_item( __( 'Purge Page Cache', 'spinupwp' ), 'purge-page' );
 			$this->cli->register_command( 'spinupwp cache', CacheCommands::class );
 		}
 
+		add_action( 'spinupwp_purge_object_cache', array( $this, 'purge_object_cache' ) );
+		add_action( 'spinupwp_purge_page_cache', array( $this, 'purge_page_cache' ) );
 		add_action( 'admin_init', array( $this, 'handle_manual_purge_action' ) );
 		add_action( 'transition_post_status', array( $this, 'purge_post_on_update' ), 10, 3 );
 		add_action( 'delete_post', array( $this, 'purge_post_on_delete' ), 10, 1 );
@@ -219,7 +221,7 @@ class Cache {
 	 *
 	 * @return bool
 	 */
-	private function is_object_cache_enabled() {
+	public function is_object_cache_enabled() {
 		return wp_using_ext_object_cache();
 	}
 
@@ -228,7 +230,7 @@ class Cache {
 	 *
 	 * @return bool
 	 */
-	private function is_page_cache_enabled() {
+	public function is_page_cache_enabled() {
 		return defined( 'SPINUPWP_CACHE_PATH' ) || getenv( 'SPINUPWP_CACHE_PATH' );
 	}
 
@@ -237,7 +239,7 @@ class Cache {
 	 *
 	 * @return bool
 	 */
-	private function purge_object_cache() {
+	public function purge_object_cache() {
 		return wp_cache_flush();
 	}
 

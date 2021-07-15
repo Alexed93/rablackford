@@ -2,82 +2,90 @@
 
 namespace ADP;
 
-class Factory {
-	const PROJECT_NAMESPACE = __NAMESPACE__;
-	const BASE_VERSION_NAMESPACE = self::PROJECT_NAMESPACE . "\\BaseVersion";
-	const PRO_VERSION_NAMESPACE = self::PROJECT_NAMESPACE . "\\ProVersion";
+class Factory
+{
+    const PROJECT_NAMESPACE = __NAMESPACE__;
+    const BASE_VERSION_NAMESPACE = self::PROJECT_NAMESPACE . "\\BaseVersion";
+    const PRO_VERSION_NAMESPACE = self::PROJECT_NAMESPACE . "\\ProVersion";
 
-	protected static function convertAlias( $name ) {
-		return "Includes\\" . str_replace( "_", "\\", $name );
-	}
+    protected static function convertAlias($name)
+    {
+        return "Includes\\" . str_replace("_", "\\", $name);
+    }
 
-	/**
-	 * @param string $name
-	 *
-	 * @return string
-	 */
-	public static function getClassName( $name ) {
-		$className = self::BASE_VERSION_NAMESPACE . "\\" . self::convertAlias( $name );
-		$proClassName = self::PRO_VERSION_NAMESPACE . "\\" . self::convertAlias( $name );
+    /**
+     * @param string $name
+     *
+     * @return string
+     */
+    public static function getClassName($name)
+    {
+        $className    = self::BASE_VERSION_NAMESPACE . "\\" . self::convertAlias($name);
+        $proClassName = self::PRO_VERSION_NAMESPACE . "\\" . self::convertAlias($name);
 
-		if ( class_exists( $proClassName ) ) {
-			$className = $proClassName;
-		}
+        if (class_exists($proClassName)) {
+            $className = $proClassName;
+        }
 
-		return $className;
-	}
+        return $className;
+    }
 
-	public static function callStaticMethod( $name, $method, ...$arguments ) {
-		$className = self::getClassName( $name );
+    public static function callStaticMethod($name, $method, ...$arguments)
+    {
+        $className = self::getClassName($name);
 
-		return call_user_func_array( array( $className, $method ), $arguments );
-	}
+        return call_user_func_array(array($className, $method), $arguments);
+    }
 
-	public static function get( $name, ...$arguments ) {
-		$className = self::getClassName( $name );
+    public static function get($name, ...$arguments)
+    {
+        $className = self::getClassName($name);
 
-		/**
-		 * Support Singletons
-		 * Hope we do not need it in the future
-		 */
-		if ( method_exists( $className, 'get_instance' ) ) {
-			return $className::get_instance();
-		}
+        /**
+         * Support Singletons
+         * Hope we do not need it in the future
+         */
+        if (method_exists($className, 'get_instance')) {
+            return $className::get_instance();
+        }
 
-		try {
-			$class = new \ReflectionClass( $className );
-		} catch ( \ReflectionException $e ) {
-			echo $e->getMessage();
-			return null;
-		}
+        try {
+            $class = new \ReflectionClass($className);
+        } catch (\ReflectionException $e) {
+            echo $e->getMessage();
 
-		return $class->newInstanceArgs( $arguments );
-	}
+            return null;
+        }
 
-	public static function getClassNamesInNameSpace( $namespace ) {
-		$classNames = array();
-		$path       = AutoLoader::convertNameSpaceIntoPath( $namespace );
+        return $class->newInstanceArgs($arguments);
+    }
 
-		foreach ( glob( $path . "/*" ) as $filename ) {
-			$baseClassName       = str_replace( ".php", "", basename( $filename ) );
-			$className = $namespace . "\\" . $baseClassName;
+    public static function getClassNamesInNameSpace($namespace)
+    {
+        $classNames = array();
+        $path       = AutoLoader::convertNameSpaceIntoPath($namespace);
 
-			if ( class_exists( $className ) ) {
-				$reflection = new \ReflectionClass( $className );
+        foreach (glob($path . "/*") as $filename) {
+            $baseClassName = str_replace(".php", "", basename($filename));
+            $className     = $namespace . "\\" . $baseClassName;
 
-				if ( ! $reflection->isAbstract() ) {
-					$classNames[] = $className;
-				}
-			}
-		}
+            if (class_exists($className)) {
+                $reflection = new \ReflectionClass($className);
 
-		return $classNames;
-	}
+                if ( ! $reflection->isAbstract()) {
+                    $classNames[] = $className;
+                }
+            }
+        }
 
-	public static function getClassNames( $name ) {
-		return array_merge(
-			self::getClassNamesInNameSpace( self::BASE_VERSION_NAMESPACE . "\\" . self::convertAlias( $name ) ),
-			self::getClassNamesInNameSpace( self::PRO_VERSION_NAMESPACE . "\\" . self::convertAlias( $name ) )
-		);
-	}
+        return $classNames;
+    }
+
+    public static function getClassNames($name)
+    {
+        return array_merge(
+            self::getClassNamesInNameSpace(self::BASE_VERSION_NAMESPACE . "\\" . self::convertAlias($name)),
+            self::getClassNamesInNameSpace(self::PRO_VERSION_NAMESPACE . "\\" . self::convertAlias($name))
+        );
+    }
 }

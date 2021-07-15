@@ -1,6 +1,6 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 ?>
 <div class="wdp-column wdp-condition-subfield wdp-condition-field-method">
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <select multiple
             data-list="user_roles"
             data-field="preloaded"
-            data-placeholder="Select values"
+            data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
             name="rule[conditions][{c}][options][1][]">
     </select>
 </div>

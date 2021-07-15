@@ -1,13 +1,13 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
 ?>
 
 <div id="wdp_reporter_tab_cart_empty_template">
     <h3>
-		<?php echo __( 'Cart is empty', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
+        <?php echo __('Cart is empty', 'advanced-dynamic-pricing-for-woocommerce'); ?>
     </h3>
 </div>
 
@@ -28,11 +28,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="wdp_reporter_tab_cart_items_template">
     <div class="item-row item-header">
         <div class="row-cell index"><?php echo __('#', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell item-title large"><?php echo __('Title', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell item-qty small"><?php echo __('Quantity', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell item-price small"><?php echo __('Initial price', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell item-price small"><?php echo __('Price', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell item-history large"><?php echo __('History', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell item-title large"><?php echo __('Title',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell item-qty small"><?php echo __('Quantity',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell item-price small"><?php echo __('Initial price',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell item-price small"><?php echo __('Price',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell item-history large"><?php echo __('History',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
     </div>
 
     {items}
@@ -42,7 +47,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="item-row" data-cart-item-hash="{hash}">
         <div class="row-cell index">{index}</div>
         <div class="row-cell item-title large title">{title}</div>
-        <div class="row-cell item-qty small" >{quantity}</div>
+        <div class="row-cell item-qty small">{quantity}</div>
         <div class="row-cell item-price small">{original_price}</div>
         <div class="row-cell item-price small">{price}</div>
         <div class="row-cell item-history large">{history}</div>
@@ -53,9 +58,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div id="wdp_reporter_tab_cart_coupons_template">
     <div class="item-coupon-row item-header">
         <div class="row-cell index"><?php echo __('#', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell coupon-code large"><?php echo __('Coupon code', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell coupon-amount small"><?php echo __('Coupon amount', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell coupon-rules large"><?php echo __('Affected rules', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell coupon-code large"><?php echo __('Coupon code',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell coupon-amount small"><?php echo __('Coupon amount',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell coupon-rules large"><?php echo __('Affected rules',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
     </div>
 
     {coupons}
@@ -75,8 +83,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div class="item-fee-row item-header">
         <div class="row-cell index"><?php echo __('#', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
         <div class="row-cell fee-name large"><?php echo __('Name', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell fee-amount small"><?php echo __('Fee amount', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell fee-rules large"><?php echo __('Affected rules', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell fee-amount small"><?php echo __('Fee amount',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell fee-rules large"><?php echo __('Affected rules',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
     </div>
 
     {fees}
@@ -104,7 +114,8 @@ if ( ! defined( 'ABSPATH' ) ) {
         <div class="row-cell large"><?php echo __('Label', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
         <div class="row-cell small"><?php echo __('Initial cost', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
         <div class="row-cell small"><?php echo __('Cost', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
-        <div class="row-cell large"><?php echo __('Affected rules', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="row-cell large"><?php echo __('Affected rules',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
     </div>
 
     {shipping_rates}
@@ -122,7 +133,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="wdp_reporter_tab_items_single_free_shipping_rate_template">
     <div class="history-gifted rule-tooltip" data-rule-id="{rule_id}">
-		<?php echo __( 'Free shipping!', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
+        <?php echo __('Free shipping!', 'advanced-dynamic-pricing-for-woocommerce'); ?>
     </div>
 </div>
 

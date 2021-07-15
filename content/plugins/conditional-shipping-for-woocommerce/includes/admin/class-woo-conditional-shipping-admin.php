@@ -17,6 +17,7 @@ class Woo_Conditional_Shipping_Admin {
 		add_action( 'woocommerce_settings_shipping', array( $this, 'output' ) );
 		
 		add_action( 'woocommerce_settings_save_shipping', array( $this, 'save_ruleset' ), 10, 0 );
+		add_action( 'woocommerce_settings_save_shipping', array( $this, 'save_settings' ), 10, 0 );
 
     // Add admin JS
     add_action( 'admin_enqueue_scripts', array( $this, 'admin_enqueue_scripts' ) );
@@ -108,6 +109,21 @@ class Woo_Conditional_Shipping_Admin {
         
         include 'views/settings.html.php';
       }
+    }
+  }
+
+  /**
+   * Save general settings
+   */
+  public function save_settings() {
+    global $current_section;
+    
+    if ( 'woo_conditional_shipping' === $current_section && isset( $_POST['wcs_settings'] ) ) {
+      update_option( 'wcs_debug_mode', ( isset( $_POST['wcs_debug_mode'] ) && $_POST['wcs_debug_mode'] ) );
+      update_option( 'wcs_disable_all', ( isset( $_POST['wcs_disable_all'] ) && $_POST['wcs_disable_all'] ) );
+
+      // Increments the transient version to invalidate cache.
+      WC_Cache_Helper::get_transient_version( 'shipping', true );
     }
   }
 

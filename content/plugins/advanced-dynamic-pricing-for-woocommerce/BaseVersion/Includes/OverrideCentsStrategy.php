@@ -2,60 +2,119 @@
 
 namespace ADP\BaseVersion\Includes;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+use ADP\BaseVersion\Includes\Cart\Structures\CartItem;
+
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class OverrideCentsStrategy {
-	/**
-	 * @var Context
-	 */
-	protected $context;
+class OverrideCentsStrategy
+{
+    /**
+     * @var Context
+     */
+    protected $context;
 
-	public function __construct( $context ) {
-		$this->context = $context;
-	}
+    public function __construct($context)
+    {
+        $this->context = $context;
+    }
 
-	public function maybeOverrideCents( $price ) {
-		if ( $custom_price = apply_filters("wdp_custom_override_cents", false, $price, $this->context ) ) {
-			return $custom_price;
-		}
+    /**
+     * @param float $price
+     * @param CartItem $item
+     *
+     * @return float
+     */
+    public function maybeOverrideCentsForItem($price, $item)
+    {
+        $product = $item->getWcItem()->getProduct();
 
-		if ( ! $this->context->get_option( 'is_override_cents' ) ) {
-			return $price;
-		}
+        if ($customPrice = apply_filters("wdp_custom_override_cents", false, $price, $this->context, $product,
+            $item)) {
+            return $customPrice;
+        }
 
-		$prices_ends_with = $this->context->get_option( 'prices_ends_with' );
+        if ( ! $this->context->getOption('is_override_cents')) {
+            return $price;
+        }
 
-		$price_fraction     = $price - intval( $price );
-		$new_price_fraction = $prices_ends_with / 100;
+        $pricesEndsWith = $this->context->getOption('prices_ends_with');
 
-		$round_new_price_fraction = round( $new_price_fraction );
+        $priceFraction    = $price - intval($price);
+        $newPriceFraction = $pricesEndsWith / 100;
 
-		if ( 0 == intval( $price ) and 0 < $new_price_fraction ) {
-			$price = $new_price_fraction;
+        $roundNewPriceFraction = round($newPriceFraction);
 
-			return $price;
-		}
+        if (0 == intval($price) and 0 < $newPriceFraction) {
+            $price = $newPriceFraction;
 
-		if ( $round_new_price_fraction ) {
+            return $price;
+        }
 
-			if ( $price_fraction <= $new_price_fraction - round( 1 / 2, 2 ) ) {
-				$price = intval( $price ) - 1 + $new_price_fraction;
-			} else {
-				$price = intval( $price ) + $new_price_fraction;
-			}
+        if ($roundNewPriceFraction) {
 
-		} else {
+            if ($priceFraction <= $newPriceFraction - round(1 / 2, 2)) {
+                $price = intval($price) - 1 + $newPriceFraction;
+            } else {
+                $price = intval($price) + $newPriceFraction;
+            }
 
-			if ( $price_fraction >= $new_price_fraction + round( 1 / 2, 2 ) ) {
-				$price = intval( $price ) + 1 + $new_price_fraction;
-			} else {
-				$price = intval( $price ) + $new_price_fraction;
-			}
+        } else {
 
-		}
+            if ($priceFraction >= $newPriceFraction + round(1 / 2, 2)) {
+                $price = intval($price) + 1 + $newPriceFraction;
+            } else {
+                $price = intval($price) + $newPriceFraction;
+            }
 
-		return $price;
-	}
+        }
+
+        return $price;
+    }
+
+    /**
+     * @param float $price
+     *
+     * @return float
+     */
+    public function maybeOverrideCents($price)
+    {
+        if ( ! $this->context->getOption('is_override_cents')) {
+            return $price;
+        }
+
+        $pricesEndsWith = $this->context->getOption('prices_ends_with');
+
+        $priceFraction    = $price - intval($price);
+        $newPriceFraction = $pricesEndsWith / 100;
+
+        $roundNewPriceFraction = round($newPriceFraction);
+
+        if (0 == intval($price) and 0 < $newPriceFraction) {
+            $price = $newPriceFraction;
+
+            return $price;
+        }
+
+        if ($roundNewPriceFraction) {
+
+            if ($priceFraction <= $newPriceFraction - round(1 / 2, 2)) {
+                $price = intval($price) - 1 + $newPriceFraction;
+            } else {
+                $price = intval($price) + $newPriceFraction;
+            }
+
+        } else {
+
+            if ($priceFraction >= $newPriceFraction + round(1 / 2, 2)) {
+                $price = intval($price) + 1 + $newPriceFraction;
+            } else {
+                $price = intval($price) + $newPriceFraction;
+            }
+
+        }
+
+        return $price;
+    }
 }

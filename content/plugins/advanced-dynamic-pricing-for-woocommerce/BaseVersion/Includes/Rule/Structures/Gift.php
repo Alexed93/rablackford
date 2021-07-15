@@ -2,111 +2,126 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Structures;
 
-use ADP\BaseVersion\Includes\Context;
-use ADP\BaseVersion\Includes\External\CacheHelper;
-use Exception;
-use WC_Product;
+use ADP\BaseVersion\Includes\Enums\Exceptions\UnexpectedValueException;
+use ADP\BaseVersion\Includes\Enums\GiftModeEnum;
+use ADP\BaseVersion\Includes\Structures\GiftChoice;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class Gift {
-	const TYPE_PRODUCT = 'product';
-	const TYPE_CLONE_ADJUSTED = 'clone';
-	const AVAILABLE_TYPES = array(
-		self::TYPE_PRODUCT,
-		self::TYPE_CLONE_ADJUSTED,
-	);
+class Gift
+{
+    /**
+     * @var array<int, GiftChoice>
+     */
+    protected $choices;
 
-	/**
-	 * @var string
-	 */
-	protected $type;
+    /**
+     * @var float
+     */
+    protected $qty;
 
-	/**
-	 * @var array
-	 */
-	protected $values;
+    /**
+     * @var GiftModeEnum
+     */
+    protected $mode;
 
-	/**
-	 * @var float
-	 */
-	protected $qty;
+    public function __construct()
+    {
+        $this->choices = array();
+        $this->qty     = floatval(0);
+        $this->mode    = new GiftModeEnum();
+    }
 
-	/**
-	 * @param Context $context
-	 * @param string  $type
-	 */
-	public function __construct( $context, $type ) {
-		if ( ! in_array( $type, self::AVAILABLE_TYPES ) ) {
-			$context->handle_error( new Exception( sprintf( "Gift type '%s' not supported", $type ) ) );
-		}
+    /**
+     * @param array<int,GiftChoice> $choices
+     *
+     * @return self
+     */
+    public function setChoices($choices)
+    {
+        $this->choices = array_filter(
+            $choices,
+            function ($choice) {
+                return $choice instanceof GiftChoice && $choice->isValid();
+            }
+        );
 
-		$this->type   = $type;
-		$this->values = array();
-		$this->qty    = floatval( 0 );
-	}
+        return $this;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getType() {
-		return $this->type;
-	}
+    /**
+     * @return array<int,GiftChoice>
+     */
+    public function getChoices()
+    {
+        return $this->choices;
+    }
 
-	/**
-	 * @param array $values
-	 *
-	 * @return Gift
-	 */
-	public function setValues( $values ) {
-		if ( is_array( $values ) ) {
-			$filteredValues = array();
-			foreach ( $values as $value ) {
-				if ( $this->type === self::TYPE_PRODUCT ) {
-					$product = CacheHelper::getWcProduct( $value );
-					//  sorry, we do not gift variable products
-					if ( $product instanceof WC_Product && ! $product->is_type( 'variable' ) ) {
-						$filteredValues[] = $value;
-					}
-				} else {
-					$filteredValues[] = $value;
-				}
-			}
+    /**
+     * @param float $qty
+     *
+     * @return self
+     */
+    public function setQty($qty)
+    {
+        if (is_numeric($qty)) {
+            $qty = floatval($qty);
+            if ($qty >= 0) {
+                $this->qty = floatval($qty);
+            }
+        }
 
-			$this->values = $filteredValues;
-		}
+        return $this;
+    }
 
-		return $this;
-	}
+    /**
+     * @return float
+     */
+    public function getQty()
+    {
+        return $this->qty;
+    }
 
-	/**
-	 * @return array
-	 */
-	public function getValues() {
-		return $this->values;
-	}
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        if ( ! isset($this->choices, $this->qty)) {
+            return false;
+        }
 
-	/**
-	 * @param float $qty
-	 *
-	 * @return Gift
-	 */
-	public function setQty( $qty ) {
-		$this->qty = floatval( $qty );
+        return $this->qty > floatval(0);
+    }
 
-		return $this;
-	}
+    /**
+     * @return bool
+     */
+    public function isAllowToSelect()
+    {
+        return $this->mode->equals(GiftModeEnum::ALLOW_TO_CHOOSE())
+               || $this->mode->equals(GiftModeEnum::ALLOW_TO_CHOOSE_FROM_PRODUCT_CAT())
+               || $this->mode->equals(GiftModeEnum::REQUIRE_TO_CHOOSE())
+               || $this->mode->equals(GiftModeEnum::REQUIRE_TO_CHOOSE_FROM_PRODUCT_CAT());
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getQty() {
-		return $this->qty;
-	}
+    /**
+     * @param GiftModeEnum $mode
+     */
+    public function setMode($mode)
+    {
+        if ($mode instanceof GiftModeEnum) {
+            $this->mode = $mode;
+        }
+    }
 
-	public function isValid() {
-		return isset( $this->type, $this->values, $this->qty ) && ( count( $this->values ) > 0 || $this->type === $this::TYPE_CLONE_ADJUSTED ) && $this->qty > 0;
-	}
+    /**
+     * @return GiftModeEnum
+     */
+    public function getMode()
+    {
+        return $this->mode;
+    }
 }

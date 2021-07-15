@@ -6,109 +6,121 @@ use ADP\BaseVersion\Includes\Common\Helpers;
 use ADP\BaseVersion\Includes\Rule\Structures\Filter;
 use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class FiltersFormatter {
-	protected $text_domain = 'advanced-dynamic-pricing-for-woocommerce';
+class FiltersFormatter
+{
+    public function __construct()
+    {
+    }
 
-	public function __construct() {}
+    /**
+     * @param Filter $filter
+     *
+     * @return string
+     */
+    public function formatFilter($filter)
+    {
+        $filterType    = $filter->getType();
+        $filter_method = $filter->getMethod();
 
-	/**
-	 * @param Filter $filter
-	 *
-	 * @return string
-	 */
-	public function formatFilter( $filter ) {
-		$filter_type   = $filter->getType();
-		$filter_method = $filter->getMethod();
+        if ($filter::TYPE_ANY === $filterType) {
+            return sprintf('<a href="%s">%s</a>', get_permalink(wc_get_page_id('shop')),
+                __('Any product', 'advanced-dynamic-pricing-for-woocommerce'));
+        }
 
-		$filter_qty_label = '1';
+        $templates = array_merge(array(
+            'products' => array(
+                'in_list'     => __('Product from the list: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product not from the list: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-		if ( $filter::TYPE_ANY === $filter_type ) {
-			return sprintf( '<a href="%s">%s</a>', get_permalink( wc_get_page_id( 'shop' ) ),
-				sprintf( __( '%s of any product(s)', $this->text_domain ), $filter_qty_label ) );
-		}
+            'product_sku' => array(
+                'in_list'     => __('Product with SKUs from the list: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product with SKUs not from the list: %s',
+                    'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-		$templates = array_merge( array(
-			'products' => array(
-				'in_list'     => __( '%s product(s) from list: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) not from list: %s', $this->text_domain ),
-			),
+            'product_sellers' => array(
+                'in_list'     => __('Product from sellers: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product not from sellers: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-			'product_sku' => array(
-				'in_list'     => __( '%s product(s) with SKUs from list: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) with SKUs not from list: %s', $this->text_domain ),
-			),
+            'product_categories' => array(
+                'in_list'     => __('%s product(s) from categories: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('%s product(s) not from categories: %s',
+                    'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-			'product_categories' => array(
-				'in_list'     => __( '%s product(s) from categories: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) not from categories: %s', $this->text_domain ),
-			),
+            'product_category_slug' => array(
+                'in_list'     => __('Product from categories with slug: %s',
+                    'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product not from categories with slug: %s',
+                    'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-			'product_category_slug' => array(
-				'in_list'     => __( '%s product(s) from categories with slug: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) not from categories with slug: %s', $this->text_domain ),
-			),
+            'product_tags' => array(
+                'in_list'     => __('Product with tags from list: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product with tags not from list: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-			'product_tags' => array(
-				'in_list'     => __( '%s product(s) with tags from list: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) with tags not from list: %s', $this->text_domain ),
-			),
+            'product_attributes' => array(
+                'in_list'     => __('Product with attributes from list: %s',
+                    'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product with attributes not from list: %s',
+                    'advanced-dynamic-pricing-for-woocommerce'),
+            ),
 
-			'product_attributes' => array(
-				'in_list'     => __( '%s product(s) with attributes from list: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) with attributes not from list: %s', $this->text_domain ),
-			),
+            'product_custom_fields' => array(
+                'in_list'     => __('Product with custom fields: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+                'not_in_list' => __('Product without custom fields: %s', 'advanced-dynamic-pricing-for-woocommerce'),
+            ),
+        ), array_combine(array_keys(Helpers::getCustomProductTaxonomies()),
+            array_map(function ($tmpFilterType) {
+                return array(
+                    'in_list'     => __('Product with ' . $tmpFilterType . ' from list: %s',
+                        'advanced-dynamic-pricing-for-woocommerce'),
+                    'not_in_list' => __('Product with ' . $tmpFilterType . ' not from list: %s',
+                        'advanced-dynamic-pricing-for-woocommerce'),
+                );
+            }, array_keys(Helpers::getCustomProductTaxonomies()))));
 
-			'product_custom_fields' => array(
-				'in_list'     => __( '%s product(s) with custom fields: %s', $this->text_domain ),
-				'not_in_list' => __( '%s product(s) without custom fields: %s', $this->text_domain ),
-			),
-		), array_combine( array_keys( Helpers::get_custom_product_taxonomies() ),
-			array_map( function ( $tmp_filter_type ) {
-				return array(
-					'in_list'     => __( '%s product(s) with ' . $tmp_filter_type . ' from list: %s',
-						$this->text_domain ),
-					'not_in_list' => __( '%s product(s) with ' . $tmp_filter_type . ' not from list: %s',
-						$this->text_domain ),
-				);
-			}, array_keys( Helpers::get_custom_product_taxonomies() ) ) ) );
+        if ( ! isset($templates[$filterType][$filter_method])) {
+            return "";
+        }
 
-		if ( ! isset( $templates[ $filter_type ][ $filter_method ] ) ) {
-			return "";
-		}
+        $humanizedValues = array();
+        foreach ($filter->getValue() as $id) {
+            $name = Helpers::getTitleByType($id, $filterType);
+            $link = Helpers::getPermalinkByType($id, $filterType);
 
-		$humanized_values = array();
-		foreach ( $filter->getValue() as $id ) {
-			$name = Helpers::get_title_by_type( $id, $filter_type );
-			$link = Helpers::get_permalink_by_type( $id, $filter_type );
+            if ( ! empty($link)) {
+                $humanized_value = "<a href='{$link}'>{$name}</a>";
+            } else {
+                $humanized_value = "'{$name}'";
+            }
 
-			if ( ! empty( $link ) ) {
-				$humanized_value = "<a href='{$link}'>{$name}</a>";
-			} else {
-				$humanized_value = "'{$name}'";
-			}
+            $humanizedValues[$id] = $humanized_value;
+        }
 
-			$humanized_values[ $id ] = $humanized_value;
-		}
+        return sprintf($templates[$filterType][$filter_method], implode(", ", $humanizedValues));
+    }
 
-		return sprintf( $templates[ $filter_type ][ $filter_method ], $filter_qty_label, implode( ", ", $humanized_values ) );
-	}
+    /**
+     * @param SingleItemRule $rule
+     *
+     * @return array
+     */
+    public function formatRule(SingleItemRule $rule)
+    {
+        $humanizedFilters = array();
 
-	/**
-	 * @param SingleItemRule $rule
-	 *
-	 * @return array
-	 */
-	public function formatRule( $rule ) {
-		$humanized_filters = array();
+        foreach ($rule->getFilters() as $filter) {
+            $humanizedFilters[] = $this->formatFilter($filter);
+        }
 
-		foreach ( $rule->getFilters() as $filter ) {
-			$humanized_filters[] = $this->formatFilter( $filter );
-		}
-
-		return $humanized_filters;
-	}
+        return $humanizedFilters;
+    }
 }

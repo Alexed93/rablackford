@@ -1,6 +1,6 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
 ?>
@@ -16,12 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="wdp_reporter_tab_items_single_item_gifted_history_template">
     <div class="history-gifted rule-tooltip {is_replaced}" data-rule-id="{rule_id}">
-		<?php echo __( 'Gifted!', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
+        <?php echo __('Gifted!', 'advanced-dynamic-pricing-for-woocommerce'); ?>
     </div>
 </div>
 
 <div id="wdp_reporter_tab_items_single_item_empty_history_template">
     <div class="item-history-row">
-		<?php echo __( 'No changes!', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
+        <?php echo __('No changes!', 'advanced-dynamic-pricing-for-woocommerce'); ?>
     </div>
 </div>

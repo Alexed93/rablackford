@@ -2,33 +2,35 @@
 
 namespace ADP\BaseVersion\Includes\Traits;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-trait TimeComparison {
-	/**
-	 * @param int    $time
-	 * @param int    $comparison_time
-	 * @param string $comparison_method
-	 *
-	 * @return bool
-	 */
-	public function check_time( $time, $comparison_time, $comparison_method ) {
-		$result = false;
+trait TimeComparison
+{
+    /**
+     * @param int $time
+     * @param int $comparisonTime
+     * @param string $comparisonMethod
+     *
+     * @return bool
+     */
+    public function checkTime($time, $comparisonTime, $comparisonMethod)
+    {
+        $result = false;
 
-		if ( $comparison_method === ComparisonMethods::LATER ) {
-			$result = $time > $comparison_time;
-		} elseif ( $comparison_method === ComparisonMethods::EARLIER ) {
-			$result = $time < $comparison_time;
-		} elseif ( $comparison_method === ComparisonMethods::FROM ) {
-			$result = $time >= $comparison_time;
-		} elseif ( $comparison_method === ComparisonMethods::TO ) {
-			$result = $time <= $comparison_time;
-		} elseif ( $comparison_method === ComparisonMethods::SPECIFIC_DATE ) {
-			$result = $time == $comparison_time;
-		}
+        if ($comparisonMethod === ComparisonMethods::LATER) {
+            $result = $time > $comparisonTime;
+        } elseif ($comparisonMethod === ComparisonMethods::EARLIER) {
+            $result = $time < $comparisonTime;
+        } elseif ($comparisonMethod === ComparisonMethods::FROM) {
+            $result = $time >= $comparisonTime;
+        } elseif ($comparisonMethod === ComparisonMethods::TO) {
+            $result = $time <= $comparisonTime;
+        } elseif ($comparisonMethod === ComparisonMethods::SPECIFIC_DATE) {
+            $result = $time == $comparisonTime;
+        }
 
-		return $result;
-	}
+        return $result;
+    }
 }

@@ -2,9 +2,11 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Structures;
 
+use ADP\BaseVersion\Includes\Context;
 use Exception;
 
-class SetDiscount extends Discount {
+class SetDiscount extends Discount
+{
     const TYPE_SET_AMOUNT = 'set_fixed_amount';
     const TYPE_SET_FIXED_VALUE = 'set_fixed_value';
 
@@ -14,13 +16,14 @@ class SetDiscount extends Discount {
         self::TYPE_SET_FIXED_VALUE,
     );
 
-    public function __construct( $context, $type, $value ) {
-        if ( ! in_array( $type, self::AVAILABLE_SET_TYPES ) ) {
-			$context->handle_error( new Exception( sprintf( "Discount type '%s' not supported", $type ) ) );
-		}
+    public function __construct($context, $type, $value)
+    {
+        if ( ! in_array($type, self::AVAILABLE_SET_TYPES)) {
+            $context->handleError(new Exception(sprintf("Discount type '%s' not supported", $type)));
+        }
 
-		$this->type         = $type;
-		$this->value        = floatval( $value );
-		$this->currencyCode = $context->get_currency_code();
+        $this->type         = $type;
+        $this->value        = floatval($value);
+        $this->currencyCode = $context->getCurrencyCode();
     }
 }

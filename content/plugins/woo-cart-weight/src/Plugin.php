@@ -86,6 +86,8 @@ class Plugin extends AbstractPlugin implements HookableCollection {
 
 	/**
 	 * Init renderer.
+	 *
+	 * @return void
 	 */
 	private function init_renderer() {
 		$resolver = new ChainResolver();
@@ -96,12 +98,16 @@ class Plugin extends AbstractPlugin implements HookableCollection {
 
 	/**
 	 * Load dependencies.
+	 *
+	 * @return void
 	 */
 	public function load_dependencies() {
 	}
 
 	/**
 	 * Fires hooks
+	 *
+	 * @return void
 	 */
 	public function hooks() {
 		parent::hooks();
@@ -111,6 +117,8 @@ class Plugin extends AbstractPlugin implements HookableCollection {
 
 	/**
 	 * Init renderers.
+	 *
+	 * @return void
 	 */
 	public function init_renderers() {
 		$cart = WC()->cart;
@@ -120,5 +128,4 @@ class Plugin extends AbstractPlugin implements HookableCollection {
 			( new WidgetWeightRenderer( $this->renderer, $cart ) )->hooks();
 		}
 	}
-
 }

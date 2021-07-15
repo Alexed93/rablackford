@@ -2,31 +2,32 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Interfaces\Conditions;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface RangeValueCondition {
-	const START_RANGE_KEY = 'start_range';
-	const END_RANGE_KEY = 'end_range';
+interface RangeValueCondition
+{
+    const START_RANGE_KEY = 'start_range';
+    const END_RANGE_KEY = 'end_range';
 
-	/**
-	 * @param integer $start_range
-	 */
-	public function setStartRange( $start_range );
+    /**
+     * @param int|null $startRange
+     */
+    public function setStartRange($startRange);
 
-	/**
-	 * @return integer
-	 */
-	public function getStartRange();
+    /**
+     * @return int|null
+     */
+    public function getStartRange();
 
-	/**
-	 * @param integer $end_range
-	 */
-	public function setEndRange( $end_range );
+    /**
+     * @param int|null $endRange
+     */
+    public function setEndRange($endRange);
 
-	/**
-	 * @return integer
-	 */
-	public function getEndRange();
+    /**
+     * @return int|null
+     */
+    public function getEndRange();
 }

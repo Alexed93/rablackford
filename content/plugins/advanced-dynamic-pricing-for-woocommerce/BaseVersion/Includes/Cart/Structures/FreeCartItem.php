@@ -2,175 +2,329 @@
 
 namespace ADP\BaseVersion\Includes\Cart\Structures;
 
+use ADP\BaseVersion\Includes\External\CacheHelper;
+use ADP\BaseVersion\Includes\External\Cmp\PhoneOrdersCmp;
 use Exception;
 use WC_Product;
+use WC_Product_Variable;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class FreeCartItem {
-	/**
-	 * @var WC_Product
-	 */
-	protected $product;
+class FreeCartItem
+{
+    /**
+     * @var WC_Product
+     */
+    protected $product;
 
-	/**
-	 * @var float
-	 */
-	protected $initialPrice;
+    /**
+     * @var float
+     */
+    protected $initialPrice;
 
-	/**
-	 * @var float
-	 */
-	protected $initialTax;
+    /**
+     * @var float
+     */
+    protected $initialTax;
 
-	/**
-	 * @var float
-	 */
-	public $qty;
+    /**
+     * @var float
+     */
+    public $qty;
 
-	/**
-	 * @var float
-	 */
-	protected $qtyAlreadyInWcCart;
+    /**
+     * @var float
+     */
+    protected $qtyAlreadyInWcCart;
 
-	/**
-	 * @var bool
-	 */
-	protected $replaceWithCoupon;
+    /**
+     * @var bool
+     */
+    protected $replaceWithCoupon;
 
-	/**
-	 * @var string
-	 */
-	protected $replaceCouponCode;
+    /**
+     * @var string
+     */
+    protected $replaceCouponCode;
 
-	protected $ruleId;
+    /**
+     * @var int
+     */
+    protected $ruleId;
 
-	public $originalWcCartItem = array();
+    /**
+     * @var array
+     */
+    public $originalWcCartItem = array();
 
-	/**
-	 * @var int
-	 */
-	protected $pos;
+    /**
+     * @var int
+     */
+    protected $pos;
 
-	/**
-	 * TODO detect who gift the product
-	 *
-	 * @param WC_Product $product
-	 * @param float       $qty
-	 * @param integer     $ruleId
-	 *
-	 * @throws Exception
-	 */
-	public function __construct( $product, $qty, $ruleId ) {
-		if ( ! ( $product instanceof WC_Product ) ) {
-			throw new Exception( sprintf( "Unsupported class of the product: %s", gettype( $product ) ) );
-		}
+    /**
+     * @var string
+     */
+    protected $associatedGiftHash;
 
-		$this->product         = $product;
-		$this->qty             = floatval( $qty );
-		$this->ruleId          = $ruleId;
-		$this->qtyAlreadyInWcCart = 0;
-		$this->replaceWithCoupon = false;
-		$this->replaceCouponCode = '';
+    /**
+     * @var array
+     */
+    protected $variation;
 
-		$this->initialPrice = floatval( $product->get_price( '' ) );
-		$this->initialTax   = floatval( 0 );
-	}
+    /**
+     * @var array
+     */
+    protected $cartItemData;
 
-	public function setReplaceWithCoupon($replace) {
-		$this->replaceWithCoupon = boolval($replace);
-	}
+    /**
+     * @var WC_Product_Variable|null
+     */
+    protected $parentProduct;
 
-	public function isReplaceWithCoupon() {
-		return $this->replaceWithCoupon;
-	}
+    /**
+     * @var bool
+     */
+    protected $selected;
 
-	public function setQtyAlreadyInWcCart($qty) {
-		$this->qtyAlreadyInWcCart = $qty;
-	}
+    /**
+     * @param WC_Product $product
+     * @param float $qty
+     * @param int $ruleId
+     * @param string $associatedGiftHash
+     *
+     * @throws Exception
+     */
+    public function __construct($product, $qty, $ruleId, $associatedGiftHash)
+    {
+        if ( ! ($product instanceof WC_Product)) {
+            throw new Exception(sprintf("Unsupported class of the product: %s", gettype($product)));
+        }
 
-	public function getRuleId() {
-		return $this->ruleId;
-	}
+        $this->product            = $product;
+        $this->qty                = floatval($qty);
+        $this->ruleId             = $ruleId;
+        $this->associatedGiftHash = $associatedGiftHash;
+        $this->qtyAlreadyInWcCart = 0;
+        $this->replaceWithCoupon  = false;
+        $this->replaceCouponCode  = '';
 
-	/**
-	 * @return bool
-	 */
-	public function getQtyAlreadyInWcCart() {
-		return $this->qtyAlreadyInWcCart;
-	}
+        $this->initialPrice = floatval($product->get_price(''));
+        $this->initialTax   = floatval(0);
 
-	/**
-	 * @return WC_Product
-	 */
-	public function getProduct() {
-		return $this->product;
-	}
+        if ($product->get_parent_id()) {
+            $this->parentProduct = CacheHelper::getWcProduct($product->get_parent_id());
+        }
 
-	/**
-	 * @param float $initialPrice
-	 * @param float $initialTax
-	 */
-	public function installInitialPrices( $initialPrice, $initialTax ) {
-		$this->initialPrice = floatval( $initialPrice );
-		$this->initialTax   = floatval( $initialTax );
-	}
+        if ($product instanceof \WC_Product_Variation) {
+            $this->setVariation($product->get_variation_attributes());
+        } else {
+            $this->variation = array();
+        }
 
-	public function getInitialPrice() {
-		return $this->initialPrice;
-	}
+        $this->cartItemData = array();
 
-	public function getInitialTax() {
-		return $this->initialTax;
-	}
+        $this->selected = false;
+    }
 
-	public function hash() {
-		$data = array(
-			$this->product->get_id(),
-			$this->product->get_parent_id(),
-			$this->ruleId,
-//			$this->initialPrice,
-			$this->replaceWithCoupon,
-			$this->replaceCouponCode,
-		);
+    public function setReplaceWithCoupon($replace)
+    {
+        $this->replaceWithCoupon = boolval($replace);
+    }
 
-		return md5( json_encode( $data ) );
-	}
+    public function isReplaceWithCoupon()
+    {
+        return $this->replaceWithCoupon;
+    }
 
-	/**
-	 * @param int $pos
-	 */
-	public function setPos( $pos ) {
-		$this->pos = $pos;
-	}
+    public function setQtyAlreadyInWcCart($qty)
+    {
+        $this->qtyAlreadyInWcCart = $qty;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getPos() {
-		return $this->pos;
-	}
+    public function getRuleId()
+    {
+        return $this->ruleId;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getQty() {
-		return $this->qty;
-	}
+    /**
+     * @return bool
+     */
+    public function getQtyAlreadyInWcCart()
+    {
+        return $this->qtyAlreadyInWcCart;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getReplaceCouponCode() {
-		return $this->replaceCouponCode;
-	}
+    /**
+     * @return WC_Product
+     */
+    public function getProduct(): WC_Product
+    {
+        return $this->product;
+    }
 
-	/**
-	 * @param string $replaceCouponCode
-	 */
-	public function setReplaceCouponCode( $replaceCouponCode ) {
-		$this->replaceCouponCode = $replaceCouponCode;
-	}
+    /**
+     * @param float $initialPrice
+     * @param float $initialTax
+     */
+    public function installInitialPrices($initialPrice, $initialTax)
+    {
+        $this->initialPrice = floatval($initialPrice);
+        $this->initialTax   = floatval($initialTax);
+    }
+
+    public function getInitialPrice()
+    {
+        return $this->initialPrice;
+    }
+
+    public function getInitialTax()
+    {
+        return $this->initialTax;
+    }
+
+    public function hash()
+    {
+        $cartItemData = $this->cartItemData;
+        unset($cartItemData[PhoneOrdersCmp::CART_ITEM_SKIP_KEY]);
+
+        $data = array(
+            $this->product->get_id(),
+            $this->product->get_parent_id(),
+            $this->ruleId,
+//            $this->initialPrice,
+            $this->replaceWithCoupon,
+            $this->replaceCouponCode,
+            $this->associatedGiftHash,
+            $this->variation,
+            $cartItemData,
+            $this->selected,
+        );
+
+        return md5(json_encode($data));
+    }
+
+    /**
+     * @param int $pos
+     */
+    public function setPos($pos)
+    {
+        $this->pos = $pos;
+    }
+
+    /**
+     * @return int
+     */
+    public function getPos()
+    {
+        return $this->pos;
+    }
+
+    /**
+     * @return float
+     */
+    public function getQty()
+    {
+        return $this->qty;
+    }
+
+    /**
+     * @param float $qty
+     */
+    public function setQty($qty)
+    {
+        if (is_numeric($qty)) {
+            $this->qty = floatval($qty);
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function getReplaceCouponCode()
+    {
+        return $this->replaceCouponCode;
+    }
+
+    /**
+     * @param string $replaceCouponCode
+     */
+    public function setReplaceCouponCode($replaceCouponCode)
+    {
+        $this->replaceCouponCode = $replaceCouponCode;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAssociatedGiftHash()
+    {
+        return $this->associatedGiftHash;
+    }
+
+    /**
+     * @param array<int, string> $variation
+     */
+    public function setVariation($variation)
+    {
+        if ( ! is_array($variation)) {
+            return;
+        }
+
+        if ( ! ($this->product instanceof \WC_Product_Variation) || ! ($this->parentProduct instanceof WC_Product_Variable)) {
+            return;
+        }
+        $parentAttributes = $this->parentProduct->get_variation_attributes();
+
+        foreach ($parentAttributes as $attributeName => $values) {
+            $attributeName = 'attribute_' . sanitize_title($attributeName);
+            if (empty($variation[$attributeName])) {
+                $variation[$attributeName] = reset($values);
+            }
+        }
+
+        $this->variation = $variation;
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    public function getVariation()
+    {
+        return $this->variation;
+    }
+
+    /**
+     * @param array $cartItemData
+     */
+    public function setCartItemData($cartItemData)
+    {
+        $this->cartItemData = $cartItemData;
+    }
+
+    /**
+     * @return array
+     */
+    public function getCartItemData()
+    {
+        return $this->cartItemData;
+    }
+
+    /**
+     * @param bool $selected
+     */
+    public function setSelected($selected)
+    {
+        $this->selected = boolval($selected);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSelected()
+    {
+        return $this->selected;
+    }
 }

@@ -2,31 +2,32 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Interfaces\Conditions;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface ListComparisonCondition {
-	const COMPARISON_LIST_KEY = 'comparison_list';
-	const COMPARISON_LIST_METHOD_KEY = 'comparison_list_method';
+interface ListComparisonCondition
+{
+    const COMPARISON_LIST_KEY = 'comparison_list';
+    const COMPARISON_LIST_METHOD_KEY = 'comparison_list_method';
 
-	/**
-	 * @param array $comparison_list
-	 */
-	public function setComparisonList( $comparison_list );
+    /**
+     * @param array|string $comparisonList
+     */
+    public function setComparisonList($comparisonList);
 
-	/**
-	 * @return array
-	 */
-	public function getComparisonList();
+    /**
+     * @return array|null
+     */
+    public function getComparisonList();
 
-	/**
-	 * @param string $comparison_method
-	 */
-	public function setListComparisonMethod( $comparison_method );
+    /**
+     * @param string|null $comparisonMethod
+     */
+    public function setListComparisonMethod($comparisonMethod);
 
-	/**
-	 * @return string
-	 */
-	public function getListComparisonMethod();
+    /**
+     * @return string|null
+     */
+    public function getListComparisonMethod();
 }

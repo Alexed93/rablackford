@@ -3,107 +3,118 @@
 namespace ADP\BaseVersion\Includes\Rule\Conditions;
 
 use ADP\BaseVersion\Includes\Cart\CartCustomerHelper;
+use ADP\BaseVersion\Includes\Cart\Structures\Cart;
 use ADP\BaseVersion\Includes\Rule\ConditionsLoader;
 use ADP\BaseVersion\Includes\Rule\Interfaces\Conditions\ValueComparisonCondition;
 use ADP\BaseVersion\Includes\Rule\Interfaces\Conditions\TimeRangeCondition;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class CustomerOrderCount extends AbstractCondition implements ValueComparisonCondition, TimeRangeCondition {
-	const LT = '<';
-	const LTE = '<=';
-	const MT = '>';
-	const MTE = '>=';
+class CustomerOrderCount extends AbstractCondition implements ValueComparisonCondition, TimeRangeCondition
+{
+    const LT = '<';
+    const LTE = '<=';
+    const MT = '>';
+    const MTE = '>=';
 
-	const AVAILABLE_COMP_METHODS = array(
-		self::LT,
-		self::LTE,
-		self::MT,
-		self::MTE,
-	);
+    const AVAILABLE_COMP_METHODS = array(
+        self::LT,
+        self::LTE,
+        self::MT,
+        self::MTE,
+    );
 
-	/**
-	 * @var string
-	 */
-	protected $comparison_method;
-	/**
-	 * @var integer
-	 */
-	protected $comparison_value;
-	/**
-	 * @var string
-	 */
-	protected $time_range;
+    /**
+     * @var string
+     */
+    protected $comparisonMethod;
 
-	public function check( $cart ) {
-		$time_range         = $this->time_range;
-		$comparison_method  = $this->comparison_method;
-		$comparison_value   = (int) $this->comparison_value;
-		$context            = $cart->get_context()->getGlobalContext();
-		$cartCustomerHelper = new CartCustomerHelper( $context, $cart->get_context()->getCustomer() );
-		$order_count        = $cartCustomerHelper->getOrderCountAfter( $time_range );
+    /**
+     * @var int
+     */
+    protected $comparisonValue;
 
-		return $this->compare_values( $order_count, $comparison_value, $comparison_method );
-	}
+    /**
+     * @var string
+     */
+    protected $timeRange;
 
-	public static function getType() {
-		return 'customer_order_count';
-	}
+    public function check($cart)
+    {
+        $timeRange          = $this->timeRange;
+        $comparisonMethod   = $this->comparisonMethod;
+        $comparisonValue    = (int)$this->comparisonValue;
+        $context            = $cart->getContext()->getGlobalContext();
+        $cartCustomerHelper = new CartCustomerHelper($context, $cart->getContext()->getCustomer());
+        $orderCount         = $cartCustomerHelper->getOrderCountAfter($timeRange);
 
-	public static function getLabel() {
-		return __( 'Order count', 'advanced-dynamic-pricing-for-woocommerce' );
-	}
+        return $this->compareValues($orderCount, $comparisonValue, $comparisonMethod);
+    }
 
-	public static function getTemplatePath() {
-		return WC_ADP_PLUGIN_VIEWS_PATH . 'conditions/customer/order-count.php';
-	}
+    public static function getType()
+    {
+        return 'customer_order_count';
+    }
 
-	public static function getGroup() {
-		return ConditionsLoader::GROUP_CUSTOMER;
-	}
+    public static function getLabel()
+    {
+        return __('Order count', 'advanced-dynamic-pricing-for-woocommerce');
+    }
 
-	/**
-	 * @param string $comparison_method
-	 */
-	public function setValueComparisonMethod( $comparison_method ) {
-		in_array($comparison_method, self::AVAILABLE_COMP_METHODS) ? $this->comparison_method = $comparison_method : $this->comparison_method = null;
-	}
+    public static function getTemplatePath()
+    {
+        return WC_ADP_PLUGIN_VIEWS_PATH . 'conditions/customer/order-count.php';
+    }
 
-	/**
-	 * @param integer $comparison_value
-	 */
-	public function setComparisonValue( $comparison_value ) {
-		$this->comparison_value =  (int)$comparison_value;
-	}
+    public static function getGroup()
+    {
+        return ConditionsLoader::GROUP_CUSTOMER;
+    }
 
-	public function getValueComparisonMethod()
-	{
-		return $this->comparison_method;
-	}
+    public function setValueComparisonMethod($comparisonMethod)
+    {
+        in_array($comparisonMethod,
+            self::AVAILABLE_COMP_METHODS) ? $this->comparisonMethod = $comparisonMethod : $this->comparisonMethod = null;
+    }
 
-	public function getComparisonValue()
-	{
-		return $this->comparison_value;
-	}
+    /**
+     * @param int $comparisonValue
+     */
+    public function setComparisonValue($comparisonValue)
+    {
+        $this->comparisonValue = (int)$comparisonValue;
+    }
 
-	/**
-	 * @param string $time_range
-	 */
-	public function setTimeRange ( $time_range ) {
-		gettype($time_range) === 'string' ? $this->time_range = $time_range : $this->time_range = null;
-	}
+    /**
+     * @return string|null
+     */
+    public function getValueComparisonMethod()
+    {
+        return $this->comparisonMethod;
+    }
 
-	public function getTimeRange()
-	{
-		return $this->time_range;
-	}
+    public function getComparisonValue()
+    {
+        return $this->comparisonValue;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isValid() {
-		return !is_null( $this->comparison_method ) AND !is_null( $this->comparison_value ) AND !is_null( $this->time_range );
-	}
+    public function setTimeRange($timeRange)
+    {
+        gettype($timeRange) === 'string' ? $this->timeRange = $timeRange : $this->timeRange = null;
+    }
+
+    public function getTimeRange()
+    {
+        return $this->timeRange;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return ! is_null($this->comparisonMethod) and ! is_null($this->comparisonValue) and ! is_null($this->timeRange);
+    }
 }

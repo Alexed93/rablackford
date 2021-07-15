@@ -1,5 +1,8 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
+
+use ADP\BaseVersion\Includes\Rule\Structures\PackageItem;
+
+if ( ! defined('ABSPATH')) {
     exit; // Exit if accessed directly
 }
 
@@ -28,11 +31,11 @@ if ( ! defined( 'ABSPATH' ) ) {
     endforeach;
     ?>
 
-	<?php
-	foreach ($cart_templates as $id => $cart_template):
-		echo '<div id="' . $id . '_cart_adjustment_template">' . $cart_template . '</div>';
-	endforeach;
-	?>
+    <?php
+    foreach ($cart_templates as $id => $cart_template):
+        echo '<div id="' . $id . '_cart_adjustment_template">' . $cart_template . '</div>';
+    endforeach;
+    ?>
 
     <div id="rule_template">
         <?php include 'rule.php'; ?>
@@ -47,11 +50,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="wdp-column wdp-condition-field-type">
                 <select name="rule[conditions][{c}][type]">
                     <?php foreach ($conditions_titles as $group_name => $group): ?>
-                    <optgroup label="<?php echo $group_name ?>">
-                        <?php foreach ($group as $condition_id => $condition_title): ?>
-                            <option value="<?php echo $condition_id ?>"><?php echo $condition_title ?></option>
-                        <?php endforeach; ?>
-                    </optgroup>
+                        <optgroup label="<?php echo $group_name ?>">
+                            <?php foreach ($group as $condition_id => $condition_title): ?>
+                                <option value="<?php echo $condition_id ?>"><?php echo $condition_title ?></option>
+                            <?php endforeach; ?>
+                        </optgroup>
                     <?php endforeach; ?>
                 </select>
             </div>
@@ -73,13 +76,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <div class="wdp-column wdp-limit-type">
                 <select name="rule[limits][{l}][type]">
-	                <?php foreach ($limits_titles as $group_name => $group): ?>
+                    <?php foreach ($limits_titles as $group_name => $group): ?>
                         <optgroup label="<?php echo $group_name ?>">
-			                <?php foreach ($group as $limit_id => $limit_title): ?>
+                            <?php foreach ($group as $limit_id => $limit_title): ?>
                                 <option value="<?php echo $limit_id ?>"><?php echo $limit_title ?></option>
-			                <?php endforeach; ?>
+                            <?php endforeach; ?>
                         </optgroup>
-	                <?php endforeach; ?>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="wdp-column wdp-column-subfields wdp-limit-field-sub"></div>
@@ -100,13 +103,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <div class="wdp-column wdp-cart-adjustment-type">
                 <select name="rule[cart_adjustments][{ca}][type]">
-					<?php foreach ($cart_titles as $group_name => $group): ?>
+                    <?php foreach ($cart_titles as $group_name => $group): ?>
                         <optgroup label="<?php echo $group_name ?>">
-							<?php foreach ($group as $cart_adj_id => $cart_adj_title): ?>
+                            <?php foreach ($group as $cart_adj_id => $cart_adj_title): ?>
                                 <option value="<?php echo $cart_adj_id ?>"><?php echo $cart_adj_title ?></option>
-							<?php endforeach; ?>
+                            <?php endforeach; ?>
                         </optgroup>
-					<?php endforeach; ?>
+                    <?php endforeach; ?>
                 </select>
             </div>
             <div class="wdp-column wdp-column-subfields wdp-cart-adjustment-field-sub"></div>
@@ -132,44 +135,52 @@ if ( ! defined( 'ABSPATH' ) ) {
                                 <input type="number" placeholder="1" min="1" name="rule[{t}][{f}][qty]" value="1">
                             </div>
 
-	                        <?php if ( $options->getOption( 'show_qty_range_in_product_filter' ) ): ?>
-		                        <div class="wdp-column range-sign">
-			                        <span> — </span>
-		                        </div>
+                            <?php if ($options->getOption('show_qty_range_in_product_filter')): ?>
+                                <div class="wdp-column range-sign">
+                                    <span> — </span>
+                                </div>
 
-		                        <div class="wdp-column wdp-condition-field-qty-end">
-			                        <input type="number" min="1" name="rule[{t}][{f}][qty_end]" value="1">
-		                        </div>
-	                        <?php endif; ?>
+                                <div class="wdp-column wdp-condition-field-qty-end">
+                                    <input type="number" min="1" name="rule[{t}][{f}][qty_end]" value="1">
+                                </div>
+                            <?php endif; ?>
 
-			    <?php
+                            <?php
 
-			    $product_filter_type_list = array(
-				    'any'                   => __( 'Any product', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'products'              => __( 'Products', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'product_prop'          => __( 'Product property', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'product_categories'    => __( 'Categories', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'product_category_slug' => __( 'Category slugs', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'product_attributes'    => __( 'Attributes', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'product_tags'          => __( 'Tags', 'advanced-dynamic-pricing-for-woocommerce' ),
-			    );
+                            $product_filter_type_list = array(
+                                'any'                       => __('Any product',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                                'products'                  => __('Products',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                                'product_categories'        => __('Categories',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                                'product_category_slug'     => __('Category slugs',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                                'product_attributes'        => __('Attributes',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                                'product_custom_attributes' => __('Custom attributes',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                                'product_tags'              => __('Tags', 'advanced-dynamic-pricing-for-woocommerce'),
+                            );
 
-			    foreach ( \ADP\BaseVersion\Includes\Common\Helpers::get_custom_product_taxonomies() as $tax ) {
-				    $product_filter_type_list[ $tax->name ] = $tax->labels->menu_name;
-			    }
+                            foreach (\ADP\BaseVersion\Includes\Common\Helpers::getCustomProductTaxonomies() as $tax) {
+                                $product_filter_type_list[$tax->name] = $tax->labels->menu_name;
+                            }
 
-			    $product_filter_type_list = array_merge( $product_filter_type_list, array(
-				    'product_sku'           => __( 'SKUs', 'advanced-dynamic-pricing-for-woocommerce' ),
-				    'product_custom_fields' => __( 'Custom fields', 'advanced-dynamic-pricing-for-woocommerce' ),
-			    ) );
+                            $product_filter_type_list = array_merge($product_filter_type_list, array(
+                                'product_sku'           => __('SKUs', 'advanced-dynamic-pricing-for-woocommerce'),
+                                'product_custom_fields' => __('Custom fields',
+                                    'advanced-dynamic-pricing-for-woocommerce'),
+                            ));
 
-			    $product_filter_type_list = apply_filters( 'wdp_select_product_filter_type_list', $product_filter_type_list );
-			    ?>
+                            $product_filter_type_list = apply_filters('wdp_select_product_filter_type_list',
+                                $product_filter_type_list);
+                            ?>
 
                             <div class="wdp-column wdp-filter-field-type">
                                 <select name="rule[{t}][{f}][type]" class="wdp-filter-type">
-				    <?php foreach ($product_filter_type_list as $value => $title): ?>
-					<option value="<?php echo $value ?>"><?php echo $title ?></option>
+                                    <?php foreach ($product_filter_type_list as $value => $title): ?>
+                                        <option value="<?php echo $value ?>"><?php echo $title ?></option>
                                     <?php endforeach; ?>
                                 </select>
                             </div>
@@ -180,16 +191,31 @@ if ( ! defined( 'ABSPATH' ) ) {
                         </div>
 
                         <div>
-							<div class="wdp-limitation" style="margin-top: 10px">
+                            <div class="wdp-limitation" style="margin-top: 10px">
                                 <select name="rule[{t}][{f}][limitation]">
-                                    <option value="none"><?php _e( 'None', 'advanced-dynamic-pricing-for-woocommerce' ); ?></option>
-                                    <option value="product"><?php _e( 'Same product only', 'advanced-dynamic-pricing-for-woocommerce' ); ?></option>
-                                    <option value="variation"><?php _e( 'Same variation only', 'advanced-dynamic-pricing-for-woocommerce' ); ?></option>
-                                    <option value="unique"><?php _e( 'Select only unique products', 'advanced-dynamic-pricing-for-woocommerce' ); ?></option>
+                                    <option value="<?php echo PackageItem::LIMITATION_NONE; ?>"><?php _e('None',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
+                                    <option
+                                        value="<?php echo PackageItem::LIMITATION_SAME_PRODUCT; ?>"><?php _e('Same product only',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
+                                    <option
+                                        value="<?php echo PackageItem::LIMITATION_UNIQUE_PRODUCT; ?>"><?php _e('Unique product only',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
+                                    <option
+                                        value="<?php echo PackageItem::LIMITATION_SAME_VARIATION; ?>"><?php _e('Same variation only',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
+                                    <option
+                                        value="<?php echo PackageItem::LIMITATION_UNIQUE_VARIATION; ?>"><?php _e('Unique variation only',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
+                                    <option
+                                        value="<?php echo PackageItem::LIMITATION_SAME_HASH; ?>"><?php _e('Only same hash',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
+                                    <option
+                                        value="<?php echo PackageItem::LIMITATION_UNIQUE_HASH; ?>"><?php _e('Only unique hash',
+                                            'advanced-dynamic-pricing-for-woocommerce'); ?></option>
                                 </select>
                             </div>
                         </div>
-
 
                     </div>
 
@@ -207,14 +233,16 @@ if ( ! defined( 'ABSPATH' ) ) {
                                         <div style="width: 100px"></div>
                                         <div class="wdp-column" style="flex: 1">
                                             <span class="wdp-product-exclude-title">
-                                                <?php _e( 'Exclude products', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
+                                                <?php _e('Exclude products',
+                                                    'advanced-dynamic-pricing-for-woocommerce'); ?>
                                             </span>
                                         </div>
                                         <div class="wdp-add-exclude-products wdp-column" style="flex: 3">
                                             <select multiple
                                                     data-list="products"
                                                     data-field="autocomplete"
-                                                    data-placeholder="Select values"
+                                                    data-placeholder="<?php _e("Select values",
+                                                        "advanced-dynamic-pricing-for-woocommerce") ?>"
                                                     name="rule[{t}][{f}][product_exclude][values][]">
                                             </select>
                                         </div>
@@ -225,10 +253,14 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     <div class="wdp-exclude-on-wc-sale-container wdp-column wdp-column-subfields">
                                         <div style="width: 100px"></div>
                                         <div class="wdp-column" style="flex: 1">
-                                            <input type="checkbox" class="wdp-exclude-on-wc-sale" name="rule[{t}][{f}][product_exclude][on_wc_sale]" value="1" >
-                                            <span class="wdp-exclude-on-wc-sale-title">
-                                                <?php _e( 'Exclude on sale products', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
-                                            </span>
+                                            <label>
+                                                <input type="checkbox" class="wdp-exclude-on-wc-sale"
+                                                       name="rule[{t}][{f}][product_exclude][on_wc_sale]" value="1">
+                                                <span class="wdp-exclude-on-wc-sale-title">
+													<?php _e('Exclude on sale products',
+                                                        'advanced-dynamic-pricing-for-woocommerce'); ?>
+												</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -237,10 +269,15 @@ if ( ! defined( 'ABSPATH' ) ) {
                                     <div class="wdp-exclude-already-affected-container wdp-column wdp-column-subfields">
                                         <div style="width: 100px"></div>
                                         <div class="wdp-column" style="flex: 1">
-                                            <input type="checkbox" class="wdp-exclude-already-affected" name="rule[{t}][{f}][product_exclude][already_affected]" value="1" >
-                                            <span>
-                                                <?php _e( 'Exclude products modified by other pricing rules', 'advanced-dynamic-pricing-for-woocommerce' ); ?>
-                                            </span>
+                                            <label>
+                                                <input type="checkbox" class="wdp-exclude-already-affected"
+                                                       name="rule[{t}][{f}][product_exclude][already_affected]"
+                                                       value="1">
+                                                <span>
+													<?php _e('Exclude products modified by other pricing rules',
+                                                        'advanced-dynamic-pricing-for-woocommerce'); ?>
+												</span>
+                                            </label>
                                         </div>
                                     </div>
                                 </div>
@@ -272,18 +309,20 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="filter_products_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
-                <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
             </select>
         </div>
 
         <div class="wdp-column wdp-condition-field-value">
             <div>
                 <select multiple
-                    data-list="products"
-                    data-field="autocomplete"
-                    data-placeholder="Select values"
-                    name="rule[{t}][{f}][value][]">
+                        data-list="products"
+                        data-field="autocomplete"
+                        data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
+                        name="rule[{t}][{f}][value][]">
                 </select>
             </div>
         </div>
@@ -295,7 +334,7 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <select multiple
                         data-list="giftable_products"
                         data-field="autocomplete"
-                        data-placeholder="Select values"
+                        data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
                         name="rule[{t}][{f}][value][]">
                 </select>
             </div>
@@ -305,18 +344,20 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="filter_product_tags_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
-                <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
             </select>
         </div>
 
         <div class="wdp-column wdp-condition-field-value">
             <div>
                 <select multiple
-                    data-list="product_tags"
-                    data-field="autocomplete"
-                    data-placeholder="Select values"
-                    name="rule[{t}][{f}][value][]">
+                        data-list="product_tags"
+                        data-field="autocomplete"
+                        data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
+                        name="rule[{t}][{f}][value][]">
                 </select>
             </div>
         </div>
@@ -325,18 +366,20 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="filter_product_categories_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
-                <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
             </select>
         </div>
 
         <div class="wdp-column wdp-condition-field-value">
             <div>
                 <select multiple
-                    data-list="product_categories"
-                    data-field="autocomplete"
-                    data-placeholder="Select values"
-                    name="rule[{t}][{f}][value][]">
+                        data-list="product_categories"
+                        data-field="autocomplete"
+                        data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
+                        name="rule[{t}][{f}][value][]">
                 </select>
             </div>
         </div>
@@ -345,8 +388,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="filter_product_category_slug_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
-                <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
             </select>
         </div>
 
@@ -355,19 +400,21 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <select multiple
                         data-list="product_category_slug"
                         data-field="autocomplete"
-                        data-placeholder="Select values"
+                        data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
                         name="rule[{t}][{f}][value][]">
                 </select>
             </div>
         </div>
     </div>
 
-	<?php foreach ( \ADP\BaseVersion\Includes\Common\Helpers::get_custom_product_taxonomies() as $tax ): ?>
+    <?php foreach (\ADP\BaseVersion\Includes\Common\Helpers::getCustomProductTaxonomies() as $tax): ?>
         <div id="filter_<?php echo $tax->name; ?>_template">
             <div class="wdp-column wdp-filter-field-method">
                 <select name="rule[{t}][{f}][method]">
-                    <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                    <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                    <option value="in_list" selected><?php _e('in list',
+                            'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                    <option value="not_in_list"><?php _e('not in list',
+                            'advanced-dynamic-pricing-for-woocommerce') ?></option>
                 </select>
             </div>
 
@@ -377,15 +424,35 @@ if ( ! defined( 'ABSPATH' ) ) {
                             data-list="product_taxonomies"
                             data-taxonomy="<?php echo $tax->name; ?>"
                             data-field="autocomplete"
-                            data-placeholder="Select values"
+                            data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
                             name="rule[{t}][{f}][value][]">
                     </select>
                 </div>
             </div>
         </div>
-	<?php endforeach;?>
+    <?php endforeach; ?>
 
     <div id="filter_product_attributes_template">
+        <div class="wdp-column wdp-filter-field-method">
+            <select name="rule[{t}][{f}][method]">
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+            </select>
+        </div>
+
+        <div class="wdp-column wdp-condition-field-value">
+            <select multiple
+                    data-list="product_attributes"
+                    data-field="autocomplete"
+                    data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
+                    name="rule[{t}][{f}][value][]">
+            </select>
+        </div>
+    </div>
+
+    <div id="filter_product_custom_attributes_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
                 <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
@@ -395,10 +462,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 
         <div class="wdp-column wdp-condition-field-value">
             <select multiple
-                data-list="product_attributes"
-                data-field="autocomplete"
-                data-placeholder="Select values"
-                name="rule[{t}][{f}][value][]">
+                    data-list="product_custom_attributes"
+                    data-field="autocomplete"
+                    data-placeholder="<?php _e( "Select values", "advanced-dynamic-pricing-for-woocommerce" ) ?>"
+                    name="rule[{t}][{f}][value][]">
             </select>
         </div>
     </div>
@@ -406,8 +473,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="filter_product_sku_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
-                <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
             </select>
         </div>
 
@@ -415,7 +484,7 @@ if ( ! defined( 'ABSPATH' ) ) {
             <select multiple
                     data-list="product_sku"
                     data-field="autocomplete"
-                    data-placeholder="Select values"
+                    data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
                     name="rule[{t}][{f}][value][]">
             </select>
         </div>
@@ -424,33 +493,21 @@ if ( ! defined( 'ABSPATH' ) ) {
     <div id="filter_product_custom_fields_template">
         <div class="wdp-column wdp-filter-field-method">
             <select name="rule[{t}][{f}][method]">
-                <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-                <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="in_list" selected><?php _e('in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                <option value="not_in_list"><?php _e('not in list',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></option>
             </select>
         </div>
 
         <div class="wdp-column wdp-condition-field-value">
             <select multiple
-                data-list="product_custom_fields"
-                data-field="autocomplete"
-                data-placeholder="Select values"
-                name="rule[{t}][{f}][value][]">
+                    data-list="product_custom_fields"
+                    data-field="autocomplete"
+                    data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
+                    name="rule[{t}][{f}][value][]">
             </select>
         </div>
-    </div>
-
-    <div id="filter_product_prop_template">
-        <input class="wdp-condition-field-name-prefix" type="hidden" value="product_collection[{t}][{f}]">
-
-        <div class="wdp-column wdp-filter-field-prop">
-            <select name="product_collection[{t}][{f}][prop]"></select>
-        </div>
-
-        <div class="wdp-column wdp-filter-field-method">
-            <select name="product_collection[{t}][{f}][method]"></select>
-        </div>
-
-        <div class="wdp-column wdp-condition-field-value"></div>
     </div>
 
     <div id="adjustment_split_row_template">
@@ -458,11 +515,11 @@ if ( ! defined( 'ABSPATH' ) ) {
             <div class="wdp-column">
                 <select name="rule[product_adjustments][split][{adj}][type]" class="adjustment-split-type">
                     <option value="discount__amount">
-						<?php _e( 'Fixed discount', 'advanced-dynamic-pricing-for-woocommerce' ) ?></option>
+                        <?php _e('Fixed discount', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
                     <option value="discount__percentage">
-						<?php _e( 'Percentage discount', 'advanced-dynamic-pricing-for-woocommerce' ) ?></option>
+                        <?php _e('Percentage discount', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
                     <option value="price__fixed">
-						<?php _e( 'Fixed price', 'advanced-dynamic-pricing-for-woocommerce' ) ?></option>
+                        <?php _e('Fixed price', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
                 </select>
             </div>
 
@@ -481,17 +538,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
             <div class="wdp-column">
                 <input name="rule[bulk_adjustments][ranges][{b}][from]"
-                    class="adjustment-from" type="number" placeholder="qty from" min="0" step="any">
+                       class="adjustment-from" type="number" placeholder="qty from" min="0" step="any">
             </div>
 
             <div class="wdp-column">
                 <input name="rule[bulk_adjustments][ranges][{b}][to]"
-                    class="adjustment-to" type="number" placeholder="qty to" min="0" step="any">
+                       class="adjustment-to" type="number" placeholder="qty to" min="0" step="any">
             </div>
 
             <div class="wdp-column">
                 <input name="rule[bulk_adjustments][ranges][{b}][value]"
-                    class="adjustment-value" type="number" placeholder="0.00" min="0">
+                       class="adjustment-value" type="number" placeholder="0.00" min="0">
             </div>
 
             <div class="wdp-btn-remove wdp-range-remove">
@@ -501,42 +558,48 @@ if ( ! defined( 'ABSPATH' ) ) {
     </div>
 
     <div id="adjustment_deal_template">
-		<div class="wdp-row wdp-filter-item" data-index="{f}">
-			<div class="wdp-column wdp-drag-icon">
-				<span class="dashicons dashicons-menu"></span>
-			</div>
-
-			<div class="wdp-column wdp-condition-field-qty">
-				<input type="number" placeholder="qty" min="1" name="rule[get_products][value][{f}][qty]" value="1">
-			</div>
-
-            <div class="wdp-column wdp-condition-field-use-filter-product" style="max-width: 200px">
-                <input type="checkbox" name="rule[get_products][value][{f}][use_product_from_filter]">
-                <label><?php _e('Use product from filter', 'advanced-dynamic-pricing-for-woocommerce'); ?></label>
+        <div class="wdp-row wdp-filter-item" data-index="{f}">
+            <div class="wdp-column wdp-drag-icon">
+                <span class="dashicons dashicons-menu"></span>
             </div>
 
-			<div class="wdp-column wdp-column-subfields wdp-condition-field-sub"></div>
+            <div class="wdp-column wdp-condition-field-qty">
+                <input type="number" placeholder="qty" min="1" name="rule[get_products][value][{f}][qty]" value="1">
+            </div>
 
-			<input type="hidden" name="rule[get_products][value][{f}][type]" value="giftable_products" class="wdp-filter-type">
+            <div class="wdp-column wdp-condition-field-gift-mode" style="max-width: 200px">
+                <select name="rule[get_products][value][{f}][gift_mode]">
+                    <option value="giftable_products"><?php _e("Give gift from the list (1st available)",
+                            'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                    <option value="use_product_from_filter"><?php _e("Use product from filter",
+                            'advanced-dynamic-pricing-for-woocommerce') ?></option>
+                </select>
+            </div>
 
-			<div class="wdp-column wdp-btn-remove wdp_filter_remove">
-				<div class="wdp-btn-remove-handle">
-					<span class="dashicons dashicons-no-alt"></span>
-				</div>
-			</div>
-		</div>
+            <input type="hidden" value="giftable_products" name="rule[get_products][value][{f}][type]">
+
+            <div class="wdp-column wdp-column-subfields wdp-condition-field-sub"></div>
+
+            <div class="wdp-column wdp-btn-remove wdp_filter_remove">
+                <div class="wdp-btn-remove-handle">
+                    <span class="dashicons dashicons-no-alt"></span>
+                </div>
+            </div>
+        </div>
     </div>
 
     <div id="filter_block_template">
         <div class="wdp-block wdp-filter-block">
             <label><?php _e('Products', 'advanced-dynamic-pricing-for-woocommerce'); ?></label>
             <div class="wdp-wrapper wdp_product_filter wdp-sortable">
-                <div class="wdp-product-filter-empty"><?php _e('No filters', 'advanced-dynamic-pricing-for-woocommerce') ?></div>
+                <div class="wdp-product-filter-empty"><?php _e('No filters',
+                        'advanced-dynamic-pricing-for-woocommerce') ?></div>
             </div>
         </div>
 
         <div class="wdp-add-condition">
-            <button type="button" class="button add-product-filter"><?php _e('Add Product Filter', 'advanced-dynamic-pricing-for-woocommerce'); ?></button>
+            <button type="button" class="button add-product-filter"><?php _e('Add Product Filter',
+                    'advanced-dynamic-pricing-for-woocommerce'); ?></button>
         </div>
     </div>
 
@@ -550,26 +613,28 @@ if ( ! defined( 'ABSPATH' ) ) {
                 <select multiple
                         data-list="user_roles"
                         data-field="preloaded"
-                        data-placeholder="Select values"
+                        data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
                         name="rule[role_discounts][rows][{indx}][roles][]"
                         class="role-discount wdp-role-discount-value"
                         data-field-name="roles">
                 </select>
             </div>
             <div class="wdp-column">
-                <select name="rule[role_discounts][rows][{indx}][discount_type]" class="role-discount-type wdp-role-discount-value" data-field-name="discount_type" >
+                <select name="rule[role_discounts][rows][{indx}][discount_type]"
+                        class="role-discount-type wdp-role-discount-value" data-field-name="discount_type">
                     <option value="discount__amount">
-						<?php _e( 'Fixed discount', 'advanced-dynamic-pricing-for-woocommerce' ) ?></option>
+                        <?php _e('Fixed discount', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
                     <option value="discount__percentage">
-						<?php _e( 'Percentage discount', 'advanced-dynamic-pricing-for-woocommerce' ) ?></option>
+                        <?php _e('Percentage discount', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
                     <option value="price__fixed">
-						<?php _e( 'Fixed unit price', 'advanced-dynamic-pricing-for-woocommerce' ) ?></option>
+                        <?php _e('Fixed unit price', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
                 </select>
             </div>
 
             <div class="wdp-column">
                 <input name="rule[role_discounts][rows][{indx}][discount_value]" data-field-name="discount_value"
-                       class="role-discount-value wdp-role-discount-value" type="number" placeholder="0.00" min="0" step="any">
+                       class="role-discount-value wdp-role-discount-value" type="number" placeholder="0.00" min="0"
+                       step="any">
             </div>
 
             <div class="wdp-column wdp-btn-remove wdp_role_discount_remove">

@@ -228,7 +228,14 @@ jQuery(document).ready(function ($) {
         new_rule.removeClass('not-initialized')
     }
 
-    wpc_postboxes._on_expand = finishLoadRule;
+	wpc_postboxes._on_expand = function (new_rule, data) {
+		new_rule.find('.rule-trigger-coupon-code input').prop('readonly', false);
+		finishLoadRule(new_rule, data);
+	};
+
+	wpc_postboxes._on_close = function (new_rule, data) {
+		new_rule.find('.rule-trigger-coupon-code input').prop('readonly', true);
+	};
 
     // load saved rules
     if (wdp_data.rules) {
@@ -307,9 +314,15 @@ jQuery(document).ready(function ($) {
 
     function preAddEventHandlersToRule(new_rule) {
         // on change rule title
+
         new_rule.find('.wdp-title').on('change input', function () {
             var $postbox = $(this).closest('.postbox');
             var value = $(this).val();
+            if ( value.length ) {
+                $postbox.find('.wdp-no-name').addClass('cross-not-visible');
+            } else {
+                $postbox.find('.wdp-no-name').removeClass('cross-not-visible');
+            }
             $postbox.find('[data-wdp-title]').text(value);
         });
 
@@ -438,16 +451,60 @@ jQuery(document).ready(function ($) {
 
                 } );
             }
-            setTimeout( function() {
-                //remove errors
-                var $all_filters = $('.wdp-product-filter-container .wdp-row.wdp-filter-item');
-                $.each( $all_filters, function( key, value ) {
-                    let $selectValuesField = $( value ).find( '.wdp-column.wdp-condition-field-value' );
-                    remove_user_input_errors( $selectValuesField, '.products-filter__error-wrapper' );
-                    let searchIn = $( value ).find( '.two-on-two-column.left-column' );
-                    remove_user_input_errors( searchIn, '.products-filter__error-wrapper' );
-                } );
-            }, 5000 );
+			let filtersByFreeProduct = $form.find('.wdp-get-products-block .wdp-filter-item');
+			if ( filtersByFreeProduct.length ) {
+				filtersByFreeProduct.each(function (index) {
+					//Check if values in filters are present
+					let $condition_block = $(this).find('.wdp-column.wdp-condition-field-value');
+					if ($condition_block.length) {
+						let $selectedOptions = $condition_block.find('.select2-selection__choice');
+						if (!$selectedOptions.length && !$condition_block.find(".select2-hidden-accessible").prop('disabled')) {
+							beforeSendValidation = false;
+							let $attachErrorTo = $(this).find('.select2.select2-container').first();
+							if (!$attachErrorTo.next('.products-filter__error-wrapper').length) {
+								let $elEmptyValue = $("<div class=\"products-filter__error-wrapper\"><span class=\"products-filter__onempty-error\"></span></div>");
+								$attachErrorTo.after($elEmptyValue);
+								$('.products-filter__onempty-error').text('You must select at least one value');
+							}
+						}
+					}
+				});
+			}
+
+      var rangesValuesFrom = jQuery.map($form.find('.adjustment-from'), function(e, i) {
+        return parseInt(jQuery(e).val());
+      });
+      var rangesValuesTo = jQuery.map($form.find('.adjustment-to'), function(e, i) {
+        return parseInt(jQuery(e).val());
+      });
+			if (jQuery.inArray(0, rangesValuesFrom) !== -1 || jQuery.inArray(0, rangesValuesTo) !== -1) {
+        beforeSendValidation = false;
+        if (!$form.find('.bulk-ranges__error-wrapper').length) {
+          let $zeroRangeValue = $("<div class=\"bulk-ranges__error-wrapper\"><span class=\"bulk-ranges__onzero-error\"></span></div>");
+          $form.find('.wdp-ranges').after($zeroRangeValue);
+          $('.bulk-ranges__onzero-error').text(wdp_data.labels.bulk_zero_value_err);
+        }
+        setTimeout(function() {
+          $form.find('.bulk-ranges__error-wrapper').remove();
+        }, 5000);
+			}
+			setTimeout( function() {
+				//remove errors
+				var $all_filters = $('.wdp-product-filter-container .wdp-row.wdp-filter-item');
+				$.each( $all_filters, function( key, value ) {
+					let $selectValuesField = $( value ).find( '.wdp-column.wdp-condition-field-value' );
+					remove_user_input_errors( $selectValuesField, '.products-filter__error-wrapper' );
+					let searchIn = $( value ).find( '.two-on-two-column.left-column' );
+					remove_user_input_errors( searchIn, '.products-filter__error-wrapper' );
+				} );
+
+				$.each( filtersByFreeProduct, function( key, value ) {
+					let $selectValuesField = $( value ).find( '.wdp-column.wdp-condition-field-value' );
+					remove_user_input_errors( $selectValuesField, '.products-filter__error-wrapper' );
+					let searchIn = $( value ).find( '.two-on-two-column.left-column' );
+					remove_user_input_errors( searchIn, '.products-filter__error-wrapper' );
+				} );
+			}, 5000 );
             if ( beforeSendValidation ) {
                 let new_params = $form.serialize();
                 new_params += "&" + wdp_data.security_query_arg + "=" + wdp_data.security;
@@ -496,6 +553,10 @@ jQuery(document).ready(function ($) {
 
             save_rule_callback();
         });
+
+		new_rule.find('.rule-trigger-coupon-code input').change(function () {
+			new_rule.addClass('dirty');
+		});
 
         new_rule.find('.wdp-field-enabled').click(function (event) {
             event.preventDefault();
@@ -556,6 +617,8 @@ jQuery(document).ready(function ($) {
 	        } else {
 		        new_rule.find( '.dont-apply-bulk-if-roles-matched-check' ).hide();
 	        }
+
+			add_range($(this));
         });
 
         // Add cart adjustment
@@ -634,10 +697,17 @@ jQuery(document).ready(function ($) {
             }
 
             new_rule.find('.rule-is-exclusive select').val(data.exclusive);
+			if (data.additional.trigger_coupon_code) {
+				new_rule.find('.rule-trigger-coupon-code input').val(data.additional.trigger_coupon_code);
+			}
             if(data.id) {
                 new_rule.find('.rule-id').val(data.id);
             }
             new_rule.find('label.rule-id').text(data.id);
+
+            if ( data.title ) {
+                new_rule.find('.wdp-no-name').addClass('cross-not-visible');
+            }
 
             new_rule.find('[data-wdp-title]').text(data.title);
             new_rule.find('.wdp-title').val(data.title);
@@ -818,17 +888,24 @@ jQuery(document).ready(function ($) {
 			var $product_filter_container = $(this).closest('.wdp-filter-block');
 			var filters_count = $product_filter_container.find('.wdp-filter-item').length;
 			if( $(this).val() == 1 && filters_count === 1 ) {
-				$product_filter_container.find('.wdp-limitation').hide();
+                $product_filter_container.find('.wdp-limitation').hide();
+                $product_filter_container.find('.wdp-select-filter-priority').hide();
 			}
 			else {
-				$product_filter_container.find('.wdp-limitation').show();
+                $product_filter_container.find('.wdp-limitation').show();
+                $product_filter_container.find('.wdp-select-filter-priority').show();
 			}
 		});
 
 		var filters_count = $container.find('.wdp-filter-item').length;
 		if(filters_count > 1) {
-			$container.find('.wdp-limitation').show();
-		}
+            $container.find('.wdp-limitation').show();
+        }
+        if(filters_count > 1) {
+            $('.wdp-select-filter-priority').show();
+		} else {
+            $('.wdp-select-filter-priority').hide();
+        }
 
         // load data for existing filter
         if (data) {
@@ -840,7 +917,10 @@ jQuery(document).ready(function ($) {
 				$product_filter.find('.wdp-condition-field-qty input').val(qty);
 				if(qty == 1 && filters_count === 1) {
 					$container.find('.wdp-limitation').hide();
-				}
+                }
+                if(qty > 1 && filters_count === 1) {
+                    $('.wdp-select-filter-priority').show()
+                }
 			}
 	        if (qty_end) $product_filter.find('.wdp-condition-field-qty-end input').val(qty_end);
 		}
@@ -855,12 +935,16 @@ jQuery(document).ready(function ($) {
             if (filters_count === 0) {
                 $container.hide();
                 $container.closest('.postbox').find('.wdp-btn-add-product-filter').show();
-                $container.closest('.postbox').find('.adjustment-mode-total').attr('checked', 'checked').change();
+                $container.trigger('change');
                 $container.closest('.postbox').find('.adjustment-mode-split').attr('disabled', 'disabled');
 			}
 			if (filters_count === 1) {
-				$product_filter_container.find('.wdp-condition-field-qty input').trigger('change');
-			}
+                $product_filter_container.find('.wdp-condition-field-qty input').trigger('change');
+            }
+
+            if (filters_count === 1 && $product_filter.find('.wdp-condition-field-qty input').val() === 1) {
+                $product_filter_container.find('.wdp-select-filter-priority').hide();
+            }
         });
 
         if (!wdp_data.options.enable_product_exclude) {
@@ -877,6 +961,7 @@ jQuery(document).ready(function ($) {
 
         $container.closest('.postbox').find('.adjustment-mode-split').attr('disabled', false);
         add_product_adjustment_split($container.closest('.wdp-filter-block'), product_filter_index);
+        updateElementsVisibilityDiscountSplit($container.closest('.postbox').find('.wdp-product-adjustments'), $container.closest('.postbox'));
     }
 
     function remove_user_input_errors( searchIn, errorEl ) {
@@ -899,6 +984,38 @@ jQuery(document).ready(function ($) {
             $product_filter.find('.wdp-condition-field-range').show();
         }
     }
+
+	function updateGiftableProductFilterFields(type, ruleIndex, filterIndex, container, data, option) {
+		container = container.closest('.wdp-filter-item');
+
+		// prepare template for filter type
+		let template = get_template('filter_' + type, {
+			r: ruleIndex,
+			f: filterIndex,
+			t: option || 'filters'
+		});
+
+		container.find('.wdp-condition-field-sub').html(template);
+
+		// load data for existing filter
+		if (data) {
+			if (data.method) {
+				container.find('.wdp-filter-field-method select').val(data.method);
+			}
+
+			if (data.value) {
+				var html = '';
+				$.each(data.value, function (i, id) {
+					var title = wdp_data.titles[type] && wdp_data.titles[type][id] ? wdp_data.titles[type][id] : id;
+					html += '<option selected value="' + id + '">' + title + '</option>';
+				});
+				container.find('.wdp-condition-field-value select').append(html);
+			}
+		}
+
+		make_select2_products(container.find('[data-field="autocomplete"]'));
+		make_select2_product_taxonomies(container.find('[data-field="autocomplete"][data-list="product_taxonomies"]'));
+	}
 
     function update_product_filter_fields($el, data, option) {
         var $container = $el.closest('.wdp-filter-item');
@@ -946,6 +1063,10 @@ jQuery(document).ready(function ($) {
                 if (data.product_exclude.already_affected) {
                     $container.find('.wdp-exclude-already-affected-container input').prop('checked', true);
                 }
+
+				if (data.product_exclude.backorder) {
+					$container.find('.wdp-exclude-backorder-container input').prop('checked', true);
+				}
             }
 
             if (data.limitation) {
@@ -1019,8 +1140,8 @@ jQuery(document).ready(function ($) {
             var fields = $container.find('.wdp-condition-subfield');
 
             fields.sort(function (a, b) {
-                var priority_a = jQuery(a).find('select, input').attr('name').match(/options]\[(\d+)]/i);
-                var priority_b = jQuery(b).find('select, input').attr('name').match(/options]\[(\d+)]/i);
+                var priority_a = jQuery(a).find('select, input, textarea').attr('name').match(/options]\[(\d+)]/i);
+                var priority_b = jQuery(b).find('select, input, textarea').attr('name').match(/options]\[(\d+)]/i);
                 priority_a = priority_a[priority_a.length - 1];
                 priority_b = priority_b[priority_b.length - 1];
 
@@ -1030,7 +1151,7 @@ jQuery(document).ready(function ($) {
             fields.each( function(index, field) {
                 var value_field;
 
-                value_field = $('select[multiple]', field);
+                value_field = $('select[data-list]', field);
                 if (value_field.length) {
                     var titles = [], get_title;
                     if (value_field.data('field') === 'autocomplete') {
@@ -1039,7 +1160,7 @@ jQuery(document).ready(function ($) {
                         } else {
 		                    titles = wdp_data.titles[value_field.data('list')];
                         }
-                        get_title = function(id) { return titles[id]; }
+                        get_title = function(id) { return typeof titles !== 'undefined' ? titles[id] : id; }
                     } else if (value_field.data('field') === 'preloaded') {
                         titles = wdp_data.lists[value_field.data('list')];
                         get_title = function(id) {
@@ -1064,8 +1185,18 @@ jQuery(document).ready(function ($) {
                 }
 
                 value_field = $('input', field);
-                if (value_field.length) {
-                    value_field.val(data.options[index]);
+              var value_field_checkbox = $('input[type="checkbox"]', field);
+              if (value_field_checkbox.length) {
+                if (data.options[index]) {
+                  value_field_checkbox.attr('checked', 'checked');
+                }
+              } else if (value_field.length) {
+                value_field.val(data.options[index]);
+              }
+
+                value_field = $('textarea', field);
+                if ( value_field.length ) {
+                    value_field.text( data.options[index] );
                 }
             });
         }
@@ -1081,11 +1212,17 @@ jQuery(document).ready(function ($) {
         $container.find('.wdp-condition-field-method-coupon select').change( function() {
             var disabled = [ 'at_least_one_any', 'none_at_all' ].indexOf( $( this ).val() ) >= 0;
             $container.find('.wdp-condition-field-value-coupon select').prop('disabled', disabled);
+            if ( disabled ) {
+                $container.find('.wdp-condition-field-value-coupon select').val([]).trigger('change');
+            }
         } );
 
         $container.find('.wdp-condition-field-method-coupon select').each( function() {
             var disabled = [ 'at_least_one_any', 'none_at_all' ].indexOf( $( this ).val() ) >= 0;
             $container.find('.wdp-condition-field-value-coupon select').prop('disabled', disabled);
+            if ( disabled ) {
+                $container.find('.wdp-condition-field-value-coupon select').val([]).trigger('change');
+            }
         } );
 
 	    $container.find( '.wdp-condition-field-method select' ).change( function () {
@@ -1096,7 +1233,17 @@ jQuery(document).ready(function ($) {
 	    $container.find( '.wdp-condition-field-method select' ).each( function () {
 		    var enable_last = 'in_range' === $( this ).val();
 		    $container.find( '.wdp-condition-field-value-last' ).toggle( enable_last );
-	    } );
+        } );
+
+        $container.find( '#combination-any' ).click( function() {
+            let select = $( this ).closest( '.wdp-column' ).find('.wdp-condition-field-value select');
+            if ( $( this ).is(":checked") ) {
+                select.val('').trigger('change');
+                select.prop('disabled', true);
+            } else {
+                select.prop('disabled', false);
+            }
+        } );
     }
 
     function add_limit($el, data) {
@@ -1217,24 +1364,60 @@ jQuery(document).ready(function ($) {
         });
 
         var $product_filter = $(template);
-        var $product_filter_selector = $product_filter.find('.wdp-filter-type');
+		let productFilterItem = $product_filter;
 
         $container.append($product_filter);
 
-        var $use_product_checkbox = $product_filter.find('.wdp-condition-field-use-filter-product input');
+        let giftTypeSelector = $product_filter.find('.wdp-condition-field-gift-mode select');
 
         if (data) {
             if (data['qty']) $product_filter.find('.wdp-condition-field-qty input').val(data['qty']);
 
-            if (data['use_product_from_filter']) {
-                $use_product_checkbox.prop('checked', data['use_product_from_filter'] === 'on');
-            }
+			if (data['gift_mode']) {
+				giftTypeSelector.val(data['gift_mode']);
+			}
         }
 
-        $use_product_checkbox.on('change', function(e) {
-            $product_filter.find('.wdp-condition-field-sub select').prop("disabled", this.checked);
-            $product_filter.find('.wdp-condition-field-sub select').val(null).trigger('change');
-        })
+        let giftTypeSelectorOnChange = function(value, addProductData) {
+			if ( value === "use_product_from_filter" ) {
+				addProductData = {
+					'value': {},
+				}
+				updateGiftableProductFilterFields(
+					"giftable_products",
+					get_current_rule_index(productFilterItem),
+					get_current_product_filter_index(productFilterItem),
+					productFilterItem,
+					addProductData,
+					'get_products][value'
+				);
+
+				$product_filter.find('.wdp-condition-field-sub select').prop("disabled", true);
+			} else if ( value === "allow_to_choose" || value === "giftable_products" || value === "require_to_choose" || value === "giftable_products_in_rotation" || value === "giftable_products_in_random" ) {
+				updateGiftableProductFilterFields(
+					"giftable_products",
+					get_current_rule_index(productFilterItem),
+					get_current_product_filter_index(productFilterItem),
+					productFilterItem,
+					addProductData,
+					'get_products][value'
+				);
+			} else if ( value === "allow_to_choose_from_product_cat" || value === "require_to_choose_from_product_cat" ) {
+				updateGiftableProductFilterFields(
+					"giftable_categories",
+					get_current_rule_index(productFilterItem),
+					get_current_product_filter_index(productFilterItem),
+					productFilterItem,
+					addProductData,
+					'get_products][value'
+				);
+			}
+		}
+
+		giftTypeSelector.on('change', function (e) {
+			giftTypeSelectorOnChange(this.value, {});
+		})
+		giftTypeSelectorOnChange(giftTypeSelector.val(), data);
 
         var $rule = $container.closest('.postbox');
 
@@ -1249,11 +1432,6 @@ jQuery(document).ready(function ($) {
             }
         });
 
-        update_product_filter_fields($product_filter_selector, data, 'get_products][value');
-
-        if (data && data['use_product_from_filter']) {
-            $product_filter.find('.wdp-condition-field-sub select').prop("disabled", data['use_product_from_filter'] === 'on');
-        }
     }
 
     function add_product_adjustment($container, data) {
@@ -1289,10 +1467,14 @@ jQuery(document).ready(function ($) {
             if (data['max_discount_sum']) {
                 $container.find('.product-adjustments-max-discount').val(data['max_discount_sum']);
             }
+            if (data['split_discount_by']) {
+              $container.find('.split-discount-by-' + data['split_discount_by']).attr('selected', 'selected');
+            }
         } else {
             type = 'total';
             $container.find('.adjustment-mode-total').attr('checked', 'checked');
             $container.find('.adjustment-total-type').find('option:first-child').prop('selected', 'selected');
+            $container.find('.adjustment-split-discount-type').find('option:first-child').prop('selected', 'selected');
 
             $container.find('.adjustment-split').each(function() {
                 fill_product_adjustment_split($(this));
@@ -1303,6 +1485,11 @@ jQuery(document).ready(function ($) {
             updateElementsVisisibilyInRowForElementValue($(this).val(), $(this).closest('.wdp-product-adjustments'));
         });
         updateElementsVisisibilyInRowForElementValue(type, $container);
+
+      $rule.change(function() {
+        updateElementsVisibilityDiscountSplit($(this).find('.wdp-product-adjustments'), $(this));
+      })
+      updateElementsVisibilityDiscountSplit($container, $rule);
     }
 
     function add_product_adjustment_split($container, adj_index, data) {
@@ -1433,8 +1620,37 @@ jQuery(document).ready(function ($) {
                 if (data.options[index] !== undefined) {
                     jQuery(this).val(data.options[index]);
                 }
+
+              var fields = $container.find('.wdp-cart-adjustment-value');
+              fields.each( function(index, field) {
+                var value_field;
+
+                value_field = $('select[data-list]', field);
+                if (value_field.length) {
+                  var titles = [], get_title;
+                  if (value_field.data('field') === 'preloaded') {
+                    titles = wdp_data.lists[value_field.data('list')];
+                    get_title = function(id) {
+                      for (var i = 0; i < titles.length; i++) {
+                        if (titles[i].id.toString() === id) return titles[i].text;
+                      }
+                      return id;
+                    }
+                  }
+
+                  if ( typeof data.options[index] === "string" ) {
+                    value_field.append('<option selected value="' + data.options[index] + '">' + get_title(data.options[index]) + '</option>');
+                  } else {
+                    $.each(data.options[index], function (i, val) {
+                      value_field.append('<option selected value="' + val + '">' + get_title(val) + '</option>');
+                    });
+                  }
+                }
+              });
             });
         }
+
+        make_select2_preloaded($container.find('[data-field="preloaded"]'));
     }
 
     function updateDealOption($row, type) {
@@ -1460,7 +1676,7 @@ jQuery(document).ready(function ($) {
     function update_get_products_options_visibility($rule) {
         var $type_val = $rule.find('.wdp-get-products-repeat select').val();
 
-        if ($type_val === 'based_on_subtotal') {
+        if ( $type_val === 'based_on_subtotal' || $type_val === 'based_on_subtotal_after_discount' ) {
             $rule.find('.wdp-get-products-repeat .repeat-subtotal').show();
         } else {
             $rule.find('.wdp-get-products-repeat .repeat-subtotal').hide();
@@ -1595,13 +1811,50 @@ jQuery(document).ready(function ($) {
 
             $el.select2({
                 width: '100%',
-                minimumInputLength: 1,
+				closeOnSelect: wdp_data.options.close_on_select,
+				minimumInputLength: 1,
                 placeholder: $el.data('placeholder'),
                 escapeMarkup: function (text) { return text; },
                 language: {
-                    noResults: function () {
-                        return wdp_data.labels.select2_no_results;
-                    }
+                    errorLoading: function () {
+						return wdp_data.labels.select2_error_loading;
+					},
+					inputTooLong: function (args) {
+						var overChars = args.input.length - args.maximum;
+
+						var message = wdp_data.labels.select2_input_too_long.replace('%d', overChars);
+
+						if (overChars != 1) {
+							message += 's';
+						}
+
+						return message;
+					},
+					inputTooShort: function (args) {
+						var remainingChars = args.minimum - args.input.length;
+
+						var message = wdp_data.labels.select2_input_too_short.replace('%d', remainingChars);
+
+						return message;
+						},
+						loadingMore: function () {
+						return 'Loading more results…';
+					},
+					maximumSelected: function (args) {
+						var message = wdp_data.labels.select2_maximum_selected.replace('%d', args.maximum);
+
+						if (args.maximum != 1) {
+							message += 's';
+						}
+
+						return message;
+					},
+					noResults: function () {
+						return wdp_data.labels.select2_no_results;
+					},
+					searching: function () {
+						return wdp_data.labels.select2_searching;
+					},
                 },
                 ajax: {
                     url: ajaxurl,
@@ -1609,13 +1862,14 @@ jQuery(document).ready(function ($) {
                     dataType: 'json',
                     delay: 250,
                     data: function (params) {
+						let $rule = $el.closest('.postbox');
                         let new_params = {
                             query: params.term,
                             action: 'wdp_ajax',
                             method: $el.data('list') || 'product',
                             selected: $el.val(),
+							current_rule: $rule.find('.rule-id').val()
                         };
-
                         new_params[wdp_data.security_query_arg] = wdp_data.security;
                         return new_params;
                     },
@@ -1658,7 +1912,9 @@ jQuery(document).ready(function ($) {
 
                     $(this).val(current).trigger('change');
                 } else {
+                  if ( typeof wdp_data.titles[type] !== 'undefined') {
                     wdp_data.titles[type][id] = title;
+                  }
                 }
             });
 
@@ -1672,13 +1928,50 @@ jQuery(document).ready(function ($) {
 
 			$el.select2({
 				width: '100%',
+				closeOnSelect: wdp_data.options.close_on_select,
 				minimumInputLength: 1,
 				placeholder: $el.data('placeholder'),
 				escapeMarkup: function (text) { return text; },
 				language: {
+					errorLoading: function () {
+						return wdp_data.labels.select2_error_loading;
+					},
+					inputTooLong: function (args) {
+						var overChars = args.input.length - args.maximum;
+
+						var message = wdp_data.labels.select2_input_too_long.replace('%d', overChars);
+
+						if (overChars != 1) {
+							message += 's';
+						}
+
+						return message;
+					},
+					inputTooShort: function (args) {
+						var remainingChars = args.minimum - args.input.length;
+
+						var message = wdp_data.labels.select2_input_too_short.replace('%d', remainingChars);
+
+						return message;
+						},
+						loadingMore: function () {
+						return 'Loading more results…';
+					},
+					maximumSelected: function (args) {
+						var message = wdp_data.labels.select2_maximum_selected.replace('%d', args.maximum);
+
+						if (args.maximum != 1) {
+							message += 's';
+						}
+
+						return message;
+					},
 					noResults: function () {
 						return wdp_data.labels.select2_no_results;
-					}
+					},
+					searching: function () {
+						return wdp_data.labels.select2_searching;
+					},
 				},
 				ajax: {
 					url: ajaxurl,
@@ -1721,15 +2014,55 @@ jQuery(document).ready(function ($) {
             var $el = $(el);
             var data = wdp_data.lists[ $el.data('list') ];
 
+            let close_on_select = $el.attr("multiple") !== undefined ? wdp_data.options.close_on_select : true
+            let minimumInputLength = $el.attr("multiple") !== undefined ? 1 : 0
+
             $el.select2({
                 width: '100%',
+				closeOnSelect: close_on_select,
                 escapeMarkup: function (text) { return text; },
-                minimumInputLength: 1,
+                minimumInputLength: minimumInputLength,
                 placeholder: $el.data('placeholder'),
                 language: {
-                    noResults: function () {
-                        return wdp_data.labels.select2_no_results;
-                    }
+                    errorLoading: function () {
+						return wdp_data.labels.select2_error_loading;
+					},
+					inputTooLong: function (args) {
+						var overChars = args.input.length - args.maximum;
+
+						var message = wdp_data.labels.select2_input_too_long.replace('%d', overChars);
+
+						if (overChars != 1) {
+							message += 's';
+						}
+
+						return message;
+					},
+					inputTooShort: function (args) {
+						var remainingChars = args.minimum - args.input.length;
+
+						var message = wdp_data.labels.select2_input_too_short.replace('%d', remainingChars);
+
+						return message;
+						},
+						loadingMore: function () {
+						return 'Loading more results…';
+					},
+					maximumSelected: function (args) {
+						var message = wdp_data.labels.select2_maximum_selected.replace('%d', args.maximum);
+
+						if (args.maximum != 1) {
+							message += 's';
+						}
+
+						return message;
+					},
+					noResults: function () {
+						return wdp_data.labels.select2_no_results;
+					},
+					searching: function () {
+						return wdp_data.labels.select2_searching;
+					},
                 },
                 data: data
             });
@@ -1812,6 +2145,15 @@ jQuery(document).ready(function ($) {
         }
         // $('#rules-container').toggleClass('hide-disabled', $(this).val() );
     });
+
+	$('.hide-rules-coupons-applied').change(function () {
+		var checked = $(this).prop('checked');
+		var result  = checked === true ? 1 : 0;
+		remove_get_parameter('disable_all_rules_coupon_applied');
+		remove_get_parameter('paged');
+
+		window.location.href += '&disable_all_rules_coupon_applied=' + result;
+	});
 
     $('.wdp-btn-rebuild-onsale-list').click(function () {
 
@@ -1935,4 +2277,28 @@ jQuery(document).ready(function ($) {
 
         return id
     }
+
+    function updateElementsVisibilityDiscountSplit($container, $rule) {
+      if ( isPackageRule($rule) ) {
+        $container.find(".split-discount-controls").show();
+      } else{
+        $container.find(".split-discount-controls").hide();
+      }
+    }
+
+  function isPackageRule($container) {
+    let $product_filter_container = $container.find('.wdp-filter-block');
+    let filters = $product_filter_container.find('.wdp-filter-item');
+
+    if (filters.length === 1) {
+      let filter = filters.first()
+      let qty = filter.find('.wdp-condition-field-qty input').val();
+
+      return parseInt(qty) > 1;
+    } else if (filters.length > 1) {
+      return true
+    }
+
+    return false;
+  }
 });

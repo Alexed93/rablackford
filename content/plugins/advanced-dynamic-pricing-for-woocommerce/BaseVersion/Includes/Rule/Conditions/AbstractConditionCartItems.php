@@ -2,161 +2,176 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Conditions;
 
+use ADP\BaseVersion\Includes\Cart\Structures\Cart;
 use ADP\BaseVersion\Includes\Rule\ProductFiltering;
 use ADP\Factory;
 use ADP\BaseVersion\Includes\Rule\Interfaces\Conditions\ListComparisonCondition;
 use ADP\BaseVersion\Includes\Rule\Interfaces\Conditions\RangeValueCondition;
 use ADP\BaseVersion\Includes\Translators\FilterTranslator;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-abstract class AbstractConditionCartItems extends AbstractCondition implements ListComparisonCondition, RangeValueCondition {
-	const IN_LIST = 'in_list';
-	const NOT_IN_LIST = 'not_in_list';
-	const NOT_CONTAINING = 'not_containing';
+abstract class AbstractConditionCartItems extends AbstractCondition implements ListComparisonCondition, RangeValueCondition
+{
+    const IN_LIST = 'in_list';
+    const NOT_IN_LIST = 'not_in_list';
+    const NOT_CONTAINING = 'not_containing';
 
-	const AVAILABLE_COMP_METHODS = array(
-		self::IN_LIST,
-		self::NOT_IN_LIST,
-		self::NOT_CONTAINING,
-	);
+    const AVAILABLE_COMP_METHODS = array(
+        self::IN_LIST,
+        self::NOT_IN_LIST,
+        self::NOT_CONTAINING,
+    );
 
-	protected $comparison_list;
-	protected $comparison_method;
-	protected $comparison_qty;
-	protected $comparison_qty_finish;
-	/**
-	 * @var array $comparison_list
-	 * @var string $comparison_method
-	 * @var integer $comparison_qty
-	 * @var integer $comparison_qty_finish
-	 */
+    /**
+     * @var array
+     */
+    protected $comparisonList;
 
-	protected $used_items;
-	protected $has_product_dependency = true;
-	protected $filter_type = '';
+    /**
+     * @var string
+     */
+    protected $comparisonMethod;
 
-	public function check( $cart ) {
-		$this->used_items = array();
+    /**
+     * @var int
+     */
+    protected $comparisonQty;
 
-		$comparison_qty               = (float) $this->comparison_qty;
-		$comparison_qty_finish_exists = isset( $this->comparison_qty_finish ) && $this->comparison_qty_finish != 0 ? "" !== $this->comparison_qty_finish : false;
-		$comparison_qty_finish        = $comparison_qty_finish_exists ? (float) $this->comparison_qty_finish : INF;
-		$comparison_method            = isset( $this->comparison_method ) ? $this->comparison_method : 'in_list';
-		$comparison_list              = isset( $this->comparison_list ) ? $this->comparison_list : array();
+    /**
+     * @var int
+     */
+    protected $comparisonQtyFinish;
 
-		if ( empty( $comparison_qty ) ) {
-			return true;
-		}
+    protected $usedItems;
+    protected $hasProductDependency = true;
+    protected $filterType = '';
 
-		$invert_filtering = false;
-		if ( $comparison_method === "not_containing" ) {
-			$invert_filtering  = true;
-			$comparison_method = 'in_list';
-		}
+    public function check($cart)
+    {
+        $this->usedItems = array();
 
-		$qty               = 0;
-		$product_filtering = Factory::get( "Rule_ProductFiltering", $cart->get_context()->getGlobalContext() );
-		/**
-		 * @var ProductFiltering $product_filtering 
-		 */
-		$product_filtering->prepare( $this->filter_type, $comparison_list, $comparison_method );
+        $comparisonQty             = (float)$this->comparisonQty;
+        $comparisonQtyFinishExists = isset($this->comparisonQtyFinish) && $this->comparisonQtyFinish != 0 ? "" !== $this->comparisonQtyFinish : false;
+        $comparisonQtyFinish       = $comparisonQtyFinishExists ? (float)$this->comparisonQtyFinish : INF;
+        $comparisonMethod          = isset($this->comparisonMethod) ? $this->comparisonMethod : 'in_list';
+        $comparisonList            = isset($this->comparisonList) ? $this->comparisonList : array();
 
-		foreach ( $cart->getItems() as $item_key => $item ) {
-			$wrapper = $item->getWcItem();
-			$checked   = $product_filtering->check_product_suitability( $wrapper->getProduct() );
+        if (empty($comparisonQty)) {
+            return true;
+        }
 
-			if ( $checked ) {
-				$qty += $item->getQty();
+        $invertFiltering = false;
+        if ($comparisonMethod === "not_containing") {
+            $invertFiltering  = true;
+            $comparisonMethod = 'in_list';
+        }
+
+        $qty              = 0;
+        $productFiltering = Factory::get("Rule_ProductFiltering", $cart->getContext()->getGlobalContext());
+        /**
+         * @var ProductFiltering $productFiltering
+         */
+        $productFiltering->prepare($this->filterType, $comparisonList, $comparisonMethod);
+
+        foreach ($cart->getItems() as $item_key => $item) {
+            $wrapper = $item->getWcItem();
+            $checked = $productFiltering->checkProductSuitability($wrapper->getProduct());
+
+            if ($checked) {
+                $qty += $item->getQty();
 //				$this->used_items[] = $item_key;
-			}
-		}
+            }
+        }
 
-		$result = $comparison_qty_finish_exists ? ( $comparison_qty <= $qty ) && ( $qty <= $comparison_qty_finish ) : $comparison_qty <= $qty;
+        $result = $comparisonQtyFinishExists ? ($comparisonQty <= $qty) && ($qty <= $comparisonQtyFinish) : $comparisonQty <= $qty;
 
-		return $invert_filtering ? ! $result : $result;
-	}
+        return $invertFiltering ? ! $result : $result;
+    }
 
-	public function get_involved_cart_items() {
-		return $this->used_items;
-	}
+    public function getInvolvedCartItems()
+    {
+        return $this->usedItems;
+    }
 
-	public function match( $cart ) {
-		return $this->check( $cart );
-	}
+    public function match($cart)
+    {
+        return $this->check($cart);
+    }
 
-	public function get_product_dependency() {
-		return array(
-			'qty'    => $this->comparison_qty,
-			'type'   => $this->filter_type,
-			'method' => $this->comparison_method,
-			'value'  => (array) $this->comparison_list,
-		);
-	}
+    public function getProductDependency()
+    {
+        return array(
+            'qty'    => $this->comparisonQty,
+            'type'   => $this->filterType,
+            'method' => $this->comparisonMethod,
+            'value'  => (array)$this->comparisonList,
+        );
+    }
 
-	public function translate( $language_code ) {
-		parent::translate( $language_code );
+    public function translate($languageCode)
+    {
+        parent::translate($languageCode);
 
-		$comparison_list = (array) $this->comparison_list;
+        $comparison_list = (array)$this->comparisonList;
 
-		$comparison_list = ( new FilterTranslator() )->translateByType( $this->filter_type, $comparison_list, $language_code );
+        $comparison_list = (new FilterTranslator())->translateByType($this->filterType, $comparison_list,
+            $languageCode);
 
-		$this->comparison_list = $comparison_list;
-	}
+        $this->comparisonList = $comparison_list;
+    }
 
-	/**
-	 * @param array $comparison_list
-	 */
-	public function setComparisonList( $comparison_list ) {
-		gettype($comparison_list) === 'array' ?	$this->comparison_list = $comparison_list :	$this->comparison_list = null;
-	}
+    /**
+     * @param array $comparisonList
+     */
+    public function setComparisonList($comparisonList)
+    {
+        gettype($comparisonList) === 'array' ? $this->comparisonList = $comparisonList : $this->comparisonList = null;
+    }
 
-	/**
-	 * @param string $comparison_method
-	 */
-	public function setListComparisonMethod( $comparison_method ) {
-		in_array($comparison_method, self::AVAILABLE_COMP_METHODS) ? $this->comparison_method = $comparison_method : $this->comparison_method = null;
-	}
+    public function setListComparisonMethod($comparisonMethod)
+    {
+        in_array($comparisonMethod,
+            self::AVAILABLE_COMP_METHODS) ? $this->comparisonMethod = $comparisonMethod : $this->comparisonMethod = null;
+    }
 
-	public function getComparisonList()
-	{
-		return $this->comparison_list;
-	}
+    public function getComparisonList()
+    {
+        return $this->comparisonList;
+    }
 
-	public function getListComparisonMethod() {
-		return $this->comparison_method;
-	}
+    public function getListComparisonMethod()
+    {
+        return $this->comparisonMethod;
+    }
 
-	/**
-	 * @param integer $start_range
-	 */
-	public function setStartRange( $start_range ) {
-		$this->comparison_qty = (int)$start_range;
-	}
+    public function setStartRange($startRange)
+    {
+        $this->comparisonQty = (int)$startRange;
+    }
 
-	public function getStartRange()
-	{
-		return $this->comparison_qty;
-	}
+    public function getStartRange()
+    {
+        return $this->comparisonQty;
+    }
 
-	/**
-	 * @param integer $end_range
-	 */
-    public function setEndRange( $end_range ) {
-		$this->comparison_qty_finish = (int)$end_range;
-	}
+    public function setEndRange($endRange)
+    {
+        $this->comparisonQtyFinish = (int)$endRange;
+    }
 
-	public function getEndRange()
-	{
-		return $this->comparison_qty_finish;
-	}
+    public function getEndRange()
+    {
+        return $this->comparisonQtyFinish;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isValid() {
-		return !is_null( $this->comparison_method ) AND !is_null( $this->comparison_list ) AND !is_null( $this->comparison_qty );
-	}
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return ! is_null($this->comparisonMethod) and ! is_null($this->comparisonList) and ! is_null($this->comparisonQty);
+    }
 }

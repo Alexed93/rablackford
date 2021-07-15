@@ -2,10 +2,10 @@
 Contributors: algolplus
 Donate link: https://paypal.me/ipprokaev/0usd
 Tags: woocommerce, discounts, deals, dynamic pricing, pricing deals, bulk discount, pricing rule
-Requires PHP: 5.4.0
+Requires PHP: 7.0
 Requires at least: 4.8
-Tested up to: 5.4
-Stable tag: 3.0.4
+Tested up to: 5.7
+Stable tag: 3.2.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -21,20 +21,20 @@ Configure fixed dollar amount adjustments, percentage adjustments, or set fixed 
 
 Also supports role-based prices & bulk pricing. **Bulk tables can be designed with Customizer.** You should setup bulk rule for category/product at first and enable "Show Bulk Table" at tab "Settings".
 
-= Some Examples  = 
+= Some Examples  =
 
 * Category-level discounts - discount products and provide free shipping
-* Buy 4(or more) items on Friday and get 20% off 
+* Buy 4(or more) items on Friday and get 20% off
 * Buy product X and get product Y for free - immediately added and visible in cart
 * Buy a package -  discount it (each item separately), and also get a free product
 * Apply bulk discount for selected items, available only to wholesale buyers
 * Give a 10% discount to all "Accessories"(Category) if a product X is present in the cart
 
-Check more examples [on our website](https://algolplus.com/plugins/woocommerce-pricing-rules-examples/).
+Check more examples [on our website](https://docs.algolplus.com/algol_pricing/sample-discount/).
 
 = One pricing rule can  =
 * Filter cart items by products, categories, tags or custom fields
-* Modify price for each product separately 
+* Modify price for each product separately
 * Or set total price for whole set
 * Apply cart discounts and fees
 * Add free products on fly
@@ -42,8 +42,8 @@ Check more examples [on our website](https://algolplus.com/plugins/woocommerce-p
 * Validate conditions for cart items, user roles or dates
 * Track limits (only "max usage" supported currently)
 
-= Interface settings = 
-* Show/hide original prices 
+= Interface settings =
+* Show/hide original prices
 * Show/hide badge "On Sale"
 * Show/hide bulk discount table on the product page
 * Set rule for  products which already on sale
@@ -65,8 +65,15 @@ Install and activate plugin, visit WooCommerce > Pricing Rules.
 
 == Frequently Asked Questions ==
 
+= The plugin slows down my site a lot. Sometimes the cart page just freezes. =
+It seems your websitе calls external API to do shipping calculations. Use following PHP code  to suppress it in our rules
+add_filter( "adp_feature_flag_disable_shipping_calculation_during_process", "__return_true" );
 = Free product can't be added to the cart. I see message "Sorry, this product cannot be purchased." =
 WooCommerce verifies product before adding to the cart. So this product must be published, in stock and has price defined.
+= How can I hide original prices? =
+It's a PRO feature. You should turn off option "Show striked prices" at tab Settings, for category and product pages.
+= I don't see "For sale" badge for variable products =
+It's a PRO feature. You should turn on option "Calculate 'On Sale' badge for variable products" at tab Settings, section Calculations.
 = Compatibility with my theme/plugin =
 Free and pro versions use same core, so you can test it using free version. [Please, visit the link to see detailed reply](https://algolplus.com/plugins/pricing-plugin-compatibility/)
 = How to allow customer to select free product =
@@ -86,13 +93,148 @@ You should be PHP programmer to do it. [Please, review sample addon and adapt it
 == Screenshots ==
 1. List of pricing rules
 2. Simple rule -  discount for category
-3. More complex rule 
+3. More complex rule
 4. Complex rule was applied to the cart
 5. The applied discounts can be viewed  inside the order
 6. Settings page
 
 
 == Changelog ==
+
+= 3.2.5 - 2021-06-28 =
+* Allow to filter products by custom attributes
+* Apply rules to orders created via REST api
+* Adjusted auto-generated texts for bulk tables
+* Updated compatibility with "WooCommerce Composite Products", by SomewhereWarm
+* Fixed bug - custom taxonomies conditions did not work
+* Fixed bug - reset selected shipping method for some cart conditions
+* Fixed bug - some products didn't show assigned rules on tab "Pricing rules" (when admin edits product)
+
+= 3.2.4 - 2021-05-24 =
+* Show adjusted prices in product schema (JSON-LD)
+* Added compatibility with "WooCommerce Deposits", by WooCommerce
+* Added compatibility with "Composite Products", by SomewhereWarm
+* Added compatibility with "Price Based on Country for WooCommerce", by Oscar Gare
+* Updated compatibility with WPML
+* Updated compatibility with "WOOCS – WooCommerce Currency Switcher", by realmag777
+* Updated compatibility with "WooCommerce Multi Currency – Currency Switcher", by VillaTheme
+* Updated compatibility with "WooCommerce Product Bundles", by SomewhereWarm
+* Updated compatibility with "Aelia Currency Switcher", by Aelia
+* Fixed bug - the bulk table wasn't displayed in the "quick view" popup
+* Fixed bug - wrong number of gifts were given by "based on subtotal"
+* Fixed bug - date/time conditions worked incorrectly for some date formats
+* Fixed bug - wrong text domain for messages in the footer of bulk table
+
+= 3.2.3 - 2021-04-26 =
+* Support tag {{regular_price_striked}} in template "Replace price with lowest bulk price"
+* Allow to use HTML in bulk message
+* Don't allow to use "0" as start value for bulk range
+* Renamed labels and options for "Onsale" products​ (>Settings>Calcuations)
+* Fixed bug - incorrect price at product page for rules "X items for $Y"
+* Fixed bug - shortcode [adp_products_on_sale] didn't work for custom taxonomies
+* Fixed bug - displayed the bulk table for the excluded variation
+* Fixed bug - compatibility issues with Phone Orders(pro version)
+* Fixed bug - importer ignored variations
+
+= 3.2.2 - 2021-03-25 =
+* Added tag {regular_price_striked} to templates on the tab >Settings>Product Price
+* Fixed bug - shortcodes [adp_products_on_sale] and [adp_products_bogo] didn't work
+* Fixed some minor bugs
+
+= 3.2.1 - 2021-03-22 =
+* Fixed bug - option "Unique variation only" doesn't work (in section "Product Filter")
+* Fixed bug - impossible to turn off option "Replace price with lowest bulk price" (if it was on in version 3.1.x)
+* Fixed bug - incorrectly converted template for option"Replace price with lowest bulk price"
+* Fixed bug - option "Replace price with lowest bulk price" was not applied if 1st range didn't start with "1"
+
+= 3.2.0 - 2021-03-17 =
+* Requires PHP 7.0 or greater
+* Fixed bug - shortcode {price_excluding_tax} was not discounted
+* Fixed bug - cart conditions ignored the sale price
+* Compatibility with plugin "WPCS – WordPress Currency Switcher", by realmag777
+* Compatibility with plugin "WooCommerce Multi Currency – Currency Switcher", by VillaTheme
+* Compatibility with plugin "WooCommerce Subscriptions", by WebToffee
+* Compatibility with plugin "PDF Product Vouchers", by SkyVerge
+
+= 3.1.5 - 2021-01-18 =
+* Fixed bug - cart adjustments didn't work correctly
+
+= 3.1.4 - 2021-01-18 =
+* Fixed bug - conflict with internal Wordpress postboxes.js library
+* Fixed bug - button "Get system report" didn't work if debugbar was inactive
+* Fixed bug - coupon/"Amount Saved"/totals was wrong if option "Add products to cart at normal cost" was active
+* Fixed bug - mode "Discount regular price" set incorrect price for "onsale" products in the cart (only)
+
+= 3.1.3 - 2020-12-28 =
+* Fixed critical bug - simple rules ignored limit "Can be applied"
+* Fixed bug - wrong internationalization for selecting gifts
+
+= 3.1.2 - 2020-12-22 =
+* Allow to restore deleted gifts from mini-cart
+* Fixed bug - can not use variable product as gift
+* Compatibility with plugin "Gift Cards", by SomewhereWarm
+* Сompatibility with plugin "Aelia Currency Switcher", by Aelia
+
+= 3.1.1 - 2020-12-15 =
+* Fixed critical bug - sometimes free products were not added to the cart
+
+= 3.1.0 - 2020-12-10 =
+* Allow to remove gifts (added by BOGO rules) from the cart
+* Modified options in section Сoupons (tab Settings)
+* Main SKU (in product filter) now matches to all variations
+* Fixed bug - buttons "Rebuld onsale/bogo list" ignored products when were excluded in Product Filters
+* Fixed bug - unneccessary BR tag in template for bulk table
+
+
+= 3.0.9 - 2020-11-11 =
+* The plugin supports multisite network
+* Fixed bug - bulk discount didn't work if ending values were empty (for ranges)
+* Fixed bug - option "Use first range as minimum quantity if bulk rule is active" didn't work for variation products
+* Fixed bug - coupon(automatically added) now split proportionally to cart items cost
+* Fixed bug - PHP error "Cannot instantiate interface" for coupons
+* Added filter "adp_discount_product_table"
+
+
+= 3.0.8 - 2020-10-28 =
+* Added grouping 'Qty based on cart position' for Tier mode (bulk rules)
+* Fixed bug - link "Remove" is visible for coupons added by our plugin
+* Fixed bug - the amount of the coupon (for the replacement of the free product) ignored the WC option "price includes tax"
+* Fixed bug - fake range "1-xxx" was added to bulk table
+* Fixed bug - option "Use first range as minimum quantity if bulk rule is active" didn't work
+* Fixed bug - the Customizer showed "Amount saved" twice
+* Fixed bug - imported rules had products with names "0"
+* Fixed bug - incompatibility issue with "WooCommerce Product Bundles" plugin
+
+= 3.0.7 - 2020-10-21 =
+* Fixed bug - can not add more same items if package rule was applied
+* Fixed bug - wrong amounts shown in bulk table if cart was non-empty
+* Fixed bug - bulk rules didn't work sometimes if first bulk range didn't start with "1"
+* Fixed bug - wrong coupon amount calculated (for the replacement of the modified products)
+* Fixed bug - coupon amount (for the replacement of the free product) ignores the WC option "price includes tax"
+* Fixed bug - incorrect rounding if option "Round up totals to match modified item prices" is off
+* Added some hooks to format bulk table
+
+= 3.0.6 - 2020-10-12 =
+* Bulk mode "Qty based on meta data" (to split variations with different attributes)
+* Added compatibility with WPML
+* Tweaked compatibility with WOOCS
+* The "Coupon name" field is shown "as is" (not in lower case)
+* Modified Customizer to show %% discounts in bulk table
+* Added parameters for shortcode [adp_product_bulk_rules_table]
+* Fixed bug - link "Remove" was visible for coupons added by our plugin
+* Fixed bug - wrong coupons search on tab "Rules"
+* Fixed bug - the plugin ignored schedule for sale prices (date range set inside the product)
+* Fixed bug - option "Max discount" was not applied to the product discounts sometimes
+* Fixed bug - missed 'role discount' and 'excluded products' during export at tab "Tools"
+* Fixed bug - missed “.wdp_bulk_table_content” container for simple products (bulk table)
+* Fixed bug - option "Hide coupon word" didn't work at checkout page
+* Fixed bug - option "Show message after adding free product" showed same messages on page reload
+* Fixed bug - Safari showed extra text in title (for each rule)
+* Fixed bug - some texts can not be translated
+* Fixed bug - can not delete the plugin if WooCommerce is not active
+
+= 3.0.5 2020-08-05 =
+* internal, not published
 
 = 3.0.4 - 2020-07-21 =
 * Added compatibility with WOOCS
@@ -136,7 +278,7 @@ You should be PHP programmer to do it. [Please, review sample addon and adapt it
 * Added missed hook "wdp_calculate_totals_hook_priority"
 * Rename the conditions "Subtotal/Subtotal amount (skip onsale products) *" to "Subtotal (exc. VAT)/Subtotal (skip onsale products and exc. VAT) *".
 Now the conditions listed use the subtotal without tax to comparison with the rule value.
- 
+
 = 3.0.1 - 2020-06-17 =
 * Fixed bug - compatibility with caching plugins, error "Cannot declare class WP_Object_Cache"
 * Fixed bug - compatibility with WPML, error "Call to a member function get_client_currency() on null"
@@ -146,7 +288,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * Fixed PHP warnings/notices
 
 = 3.0.0 - 2020-06-16 =
-* The plugin requires at least WooCommerce 3.6.0! 
+* The plugin requires at least WooCommerce 3.6.0!
 * Fixed bug - mode "Qty base on product categories in all cart" generated wrong bulk table
 * Fixed bug - compatibility issues with our Phone Orders plugin
 
@@ -168,7 +310,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * Security update - added nonce to all ajax requests
 * Fixed bug - the plugin didn't show striked price on product page
 * Fixed bug - the plugin didn't work for PHP 5.4
-* Updated uninstallation code 
+* Updated uninstallation code
 
 = 2.3.1 - 2020-01-29 =
 * UI updated for rule - add operator "Not containing" for cart conditions
@@ -176,7 +318,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * UI updated for rule - added checkbox "Same product" to section "Free Products"
 * Updated settings -  added sections "Product price", "Bulk table", "Coupons"
 * Added option "Calculate price based on" for bulk tables
-* Added system option "Apply pricing rules while doing API request" 
+* Added system option "Apply pricing rules while doing API request"
 * Added html template for product price
 * Fixed bug - value for "Amount Saved" was wrong if user marked checkbox "Don't modify prices and add discount to cart as fee/coupon"
 * Fixed bug - now if you use "role discounts and bulk discounts" inside one rule - IT CAN INCREASE PRICES
@@ -215,7 +357,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * Added button "Refresh" to debugbar (useful to check applied rules after ajax calls)
 * Tweak default settings
 * Fixed bug - plugin showed wrong price for variable products having 30+ variations
-* Fixed bug - plugin showed "0.00" if price was just empty 
+* Fixed bug - plugin showed "0.00" if price was just empty
 * Fixed bug - option "Suppress other pricing plugins" generates warnings for some hooks
 * Fixed bug - now plugin overrides cents only if price was changed
 * Fixed bug - attributes filtering doesn't work for some cases
@@ -224,7 +366,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * Fixed bug - option "Best between discount and sale price" uses sale price
 * Fixed bug - the shortcode incorrectly works for variable products
 * Fixed bug - non-standard ajax requests use empty cart for price calculations
-* Fixed minor bugs for debug bar 
+* Fixed minor bugs for debug bar
 
 = 2.2.0 - 2019-08-19 =
 * Debug bar for admins (enable it in >Settings>Debug)
@@ -238,7 +380,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * Support UTF8 coupons
 * Partially support WooCommerce Subscriptions (adjust only amount for period)
 * Improved performance for product filters
-* Fixed bug - showed warning for role discount if roles were not selected 
+* Fixed bug - showed warning for role discount if roles were not selected
 * Fixed bug - shortcodes printed some html even if product have no bulk ranges
 
 = 2.1.1 - 2019-07-16 =
@@ -250,7 +392,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 = 2.1.0 - 2019-07-02 =
 * The plugin requires at least WooCommerce 3.3.0 !
 * Added shortcode [adp_products_on_sale] (enable it in >Settings>Rules)
-* New product filter - "Any product" 
+* New product filter - "Any product"
 * Category filter  updated , parent category filter is applied even if only child category was selected in the product
 * UI updated for rule  - added checkbox "Don't modify prices and add discount to cart as fee/coupon"
 * New cart rules - repeatable fixed fee and discounts
@@ -264,10 +406,10 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * New calculation algorithm, the plugin works much faster
 * Tab "Tools" can export/import settings and rules
 * Rule UI change - Different product attributes can be selected in same filter
-* Rule UI change - Allow to exclude products in product filters (must be turned ON at tab Settings)	
+* Rule UI change - Allow to exclude products in product filters (must be turned ON at tab Settings)
 * Added pagination to list of rules
 * New rule option "Automatically disable rule if it runs longer than X seconds" (default - 5 seconds)
-* New customizer option "Show bulk table message as table header" 
+* New customizer option "Show bulk table message as table header"
 * New cart option "Label for saved amount" (previous label "Discount Amount" confused customers)
 * New cart option "Disable external coupons if any rule was applied"
 * New system option "Still allow to edit prices in Phone Orders"
@@ -322,7 +464,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * Speeded up calculations for cart having many units of same product, finally
 
 = 1.4.3 - 2018-07-26 =
-* Added new filter - product SKU 
+* Added new filter - product SKU
 * Added option to show "On Sale" badge if product price was modified by pricing rules
 * Speeded up calculations for cart having many units of same product
 * Fixed display bugs for variable products
@@ -343,7 +485,7 @@ Now the conditions listed use the subtotal without tax to comparison with the ru
 * New condition "Customer order count"
 * New setting "Override cents" (round discounted prices  to xxx.99)
 * Updated buttons in UI
-* Preserve external coupons in cart 
+* Preserve external coupons in cart
 * Show total discount amount in cart and checkout
 * Show applied discounts in order popup (WooCommerce 3.3.0 functionality)
 

@@ -7,91 +7,138 @@ use ADP\BaseVersion\Includes\Cart\Structures\CartContext;
 use ADP\BaseVersion\Includes\Cart\Structures\CartCustomer;
 use ADP\BaseVersion\Includes\Context;
 use ADP\BaseVersion\Includes\External\Cmp\SomewhereWarmBundlesCmp;
+use ADP\BaseVersion\Includes\External\Cmp\SomewhereWarmCompositesCmp;
 use ADP\BaseVersion\Includes\External\WC\WcCartItemFacade;
+use ADP\BaseVersion\Includes\External\WC\WcCouponFacade;
 use ADP\BaseVersion\Includes\External\WC\WcCustomerConverter;
+use ADP\BaseVersion\Includes\External\WC\WcCustomerSessionFacade;
+use ADP\BaseVersion\Includes\External\WC\WcTotalsFacade;
+use ADP\Factory;
 use WC_Cart;
 use WC_Coupon;
 use WC_Customer;
 use WC_Session;
 
-class CartBuilder {
-	/**
-	 * @var Context
-	 */
-	protected $context;
+class CartBuilder
+{
+    /**
+     * @var Context
+     */
+    protected $context;
 
-	/**
-	 * @var SomewhereWarmBundlesCmp
-	 */
-	protected $bundlesCmp;
+    /**
+     * @var SomewhereWarmBundlesCmp
+     */
+    protected $bundlesCmp;
 
-	/**
-	 * @param Context $context
-	 */
-	public function __construct( $context ) {
-		$this->context    = $context;
-		$this->bundlesCmp = new SomewhereWarmBundlesCmp( $context );
-	}
+    /**
+     * @var SomewhereWarmCompositesCmp
+     */
+    protected $compositeCmp;
 
-	/**
-	 * @param WC_Customer $wcCustomer
-	 * @param WC_Session  $wcSession
-	 *
-	 * @return Cart
-	 */
-	public function create( $wcCustomer, $wcSession ) {
-		$context   = $this->context;
-		$converter = new WcCustomerConverter( $context );
-		$customer  = $converter->convertFromWcCustomer( $wcCustomer, $wcSession );
+    /**
+     * @param Context $context
+     */
+    public function __construct($context)
+    {
+        $this->context      = $context;
+        $this->bundlesCmp   = new SomewhereWarmBundlesCmp($context);
+        $this->compositeCmp = new SomewhereWarmCompositesCmp($context);
+    }
 
-		return new Cart( new CartContext( $customer, $context ) );
-	}
+    /**
+     * @param WC_Customer|null $wcCustomer
+     * @param \WC_Session_Handler|null $wcSession
+     *
+     * @return Cart
+     */
+    public function create($wcCustomer, $wcSession)
+    {
+        $context = $this->context;
+        /** @var WcCustomerConverter $converter */
+        $converter = Factory::get("External_WC_WcCustomerConverter", $context);
+        $customer  = $converter->convertFromWcCustomer($wcCustomer, $wcSession);
+        $userMeta = get_user_meta($customer->getId());
+        $customer->setMetaData($userMeta ? $userMeta : array());
 
-	/**
-	 *
-	 * @param Cart    $cart
-	 * @param WC_Cart $wcCart
-	 */
-	public function populateCart( $cart, $wcCart ) {
-		$pos = 0;
+        $cartContext = new CartContext($customer, $context);
+        /** @var WcCustomerSessionFacade $wcSessionFacade */
+        $wcSessionFacade = Factory::get("External_WC_WcCustomerSessionFacade", $wcSession);
+        $cartContext->withSession($wcSessionFacade);
 
-		foreach ( $wcCart->cart_contents as $cartKey => $wcCartItem ) {
-			$wrapper = new WcCartItemFacade( $this->context, $wcCartItem );
+        /** @var Cart $cart */
+        $cart = Factory::get('Cart_Structures_Cart', $cartContext);
 
-			if ( $wrapper->isClone() ) {
-				continue;
-			}
+        return $cart;
+    }
 
-			$item = $wrapper->createItem();
-			if ( $item ) {
-				$item->setPos( $pos );
+    /**
+     *
+     * @param Cart $cart
+     * @param WC_Cart $wcCart
+     */
+    public function populateCart($cart, $wcCart)
+    {
+        $pos = 0;
 
-				if ( $this->bundlesCmp->isBundled( $wrapper ) ) {
-					$item->addAttr( $item::ATTR_IMMUTABLE );
-				}
+        foreach ($wcCart->cart_contents as $cartKey => $wcCartItem) {
+            $wrapper = new WcCartItemFacade($this->context, $wcCartItem, $cartKey);
 
-				$cart->addToCart( $item );
-			}
+            if ($wrapper->isClone()) {
+                continue;
+            }
 
-			$pos ++;
-		}
+            $item = $wrapper->createItem();
+            if ($item) {
+                $item->setPos($pos);
 
-		/** Save applied coupons. It needs for detect free (gifts) products during current calculation and notify about them. */
-		$this->addOriginCoupons( $cart, $wcCart );
-	}
+                if ($this->bundlesCmp->isBundled($wrapper)) {
+                    $item->addAttr($item::ATTR_IMMUTABLE);
+                }
 
-	/**
-	 * @param Cart    $cart
-	 * @param WC_Cart $wcCart
-	 */
-	public function addOriginCoupons( $cart, $wcCart ) {
-		if ( ! ( $wcCart instanceof WC_Cart ) ) {
-			return;
-		}
+                if ($this->compositeCmp->isCompositeItem($wrapper)) {
+                    if ($this->compositeCmp->isAllowToProcessPricedIndividuallyItems()) {
+                        if ($this->compositeCmp->isCompositeItemNotPricedIndividually($wrapper, $wcCart)) {
+                            $item->addAttr($item::ATTR_IMMUTABLE);
+                        }
+                    } else {
+                        $item->addAttr($item::ATTR_IMMUTABLE);
+                    }
+                }
 
-		foreach ( $wcCart->get_coupons() as $coupon ) {
-			/** @var $coupon WC_Coupon */
-			$cart->addOriginCoupon( $coupon->get_code( 'edit' ) );
-		}
-	}
+                $cart->addToCart($item);
+            }
+
+            $pos++;
+        }
+
+        /** Save applied coupons. It needs for detect free (gifts) products during current calculation and notify about them. */
+        $this->addOriginCoupons($cart, $wcCart);
+    }
+
+    /**
+     * @param Cart $cart
+     * @param WC_Cart $wcCart
+     */
+    public function addOriginCoupons($cart, $wcCart)
+    {
+        if ( ! ($wcCart instanceof WC_Cart)) {
+            return;
+        }
+
+        $adpCoupons = (new WcTotalsFacade($this->context, $wcCart))->getAdpCoupons();
+
+        foreach ($wcCart->get_coupons() as $coupon) {
+            /** @var $coupon WC_Coupon */
+            $code = $coupon->get_code('edit');
+
+            if ($coupon->is_valid()) {
+                if ($coupon->get_discount_type('edit') === WcCouponFacade::TYPE_ADP_RULE_TRIGGER) {
+                    $cart->addRuleTriggerCoupon($code);
+                } elseif ( ! $coupon->get_meta('adp', true) && ! in_array($code, $adpCoupons)) {
+                    $cart->addOriginCoupon($coupon->get_code('edit'));
+                }
+            }
+        }
+    }
 }

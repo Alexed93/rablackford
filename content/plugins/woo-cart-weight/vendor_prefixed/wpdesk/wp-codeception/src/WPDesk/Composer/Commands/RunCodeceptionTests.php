@@ -41,7 +41,7 @@ class RunCodeceptionTests extends \WCWeightVendor\WPDesk\Composer\Codeception\Co
             \mkdir($cache_dir, 0777, \true);
         }
         \putenv('TMP_CACHE_DIR=' . $cache_dir);
-        $codecept_param = ' --html --verbose ';
+        $codecept_param = ' --html --verbose -f ';
         $additionalParameters = ' -e CODECEPT_PARAM="' . $codecept_param . '" ';
         if (!empty($singleTest) && 'all' !== $singleTest) {
             $additionalParameters .= ' -e CODECEPT_PARAM="' . $codecept_param . ' acceptance ' . $singleTest . '" ';

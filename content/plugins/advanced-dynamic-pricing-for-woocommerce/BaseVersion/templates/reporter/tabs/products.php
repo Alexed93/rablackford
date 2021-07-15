@@ -1,6 +1,6 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
 ?>
@@ -8,11 +8,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 <div id="wdp_reporter_tab_products_template">
     <div class="product-row product-header">
-        <div class="product-cell index"><?php echo __( '#', 'advanced-dynamic-pricing-for-woocommerce' ); ?></div>
-        <div class="product-cell large"><?php echo __( 'Name', 'advanced-dynamic-pricing-for-woocommerce' ); ?></div>
-        <div class="product-cell small"><?php echo __( 'Original price', 'advanced-dynamic-pricing-for-woocommerce' ); ?></div>
-        <div class="product-cell small"><?php echo __( 'Discounted price', 'advanced-dynamic-pricing-for-woocommerce' ); ?></div>
-        <div class="product-cell product-history-cell large"><?php echo __( 'History', 'advanced-dynamic-pricing-for-woocommerce' ); ?></div>
+        <div class="product-cell index"><?php echo __('#', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="product-cell large"><?php echo __('Name', 'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="product-cell small"><?php echo __('Original price',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="product-cell small"><?php echo __('Discounted price',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
+        <div class="product-cell product-history-cell large"><?php echo __('History',
+                'advanced-dynamic-pricing-for-woocommerce'); ?></div>
     </div>
 
     {product_rows}

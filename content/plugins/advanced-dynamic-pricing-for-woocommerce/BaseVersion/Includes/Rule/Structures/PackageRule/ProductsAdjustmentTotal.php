@@ -2,121 +2,158 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Structures\PackageRule;
 
+use ADP\BaseVersion\Includes\Rule\Enums\ProductAdjustmentSplitDiscount;
 use ADP\BaseVersion\Includes\Rule\Structures\Discount;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class ProductsAdjustmentTotal {
-	const AVAILABLE_DISCOUNT_TYPES = array(
-		Discount::TYPE_AMOUNT,
-		Discount::TYPE_FIXED_VALUE,
-		Discount::TYPE_PERCENTAGE,
-	);
+class ProductsAdjustmentTotal
+{
+    const AVAILABLE_DISCOUNT_TYPES = array(
+        Discount::TYPE_AMOUNT,
+        Discount::TYPE_FIXED_VALUE,
+        Discount::TYPE_PERCENTAGE,
+    );
 
-	/**
-	 * @var Discount
-	 */
-	protected $discount;
+    /**
+     * @var Discount
+     */
+    protected $discount;
 
-	/**
-	 * @var float
-	 */
-	protected $maxAvailableAmount;
+    /**
+     * @var float
+     */
+    protected $maxAvailableAmount;
 
-	/**
-	 * Coupon or Fee
-	 *
-	 * @var bool
-	 */
-	protected $replaceAsCartAdjustment;
+    /**
+     * Coupon or Fee
+     *
+     * @var bool
+     */
+    protected $replaceAsCartAdjustment;
 
-	/**
-	 * @var string
-	 */
-	protected $replaceCartAdjustmentCode;
+    /**
+     * @var string
+     */
+    protected $replaceCartAdjustmentCode;
 
-	/**
-	 * @param Discount $discount
-	 */
-	public function __construct( $discount ) {
-		if ( $discount instanceof Discount && in_array( $discount->getType(), self::AVAILABLE_DISCOUNT_TYPES ) ) {
-			$this->discount = $discount;
-		}
-		$this->replaceAsCartAdjustment   = false;
-		$this->replaceCartAdjustmentCode = null;
-	}
+    /**
+     * @var ProductAdjustmentSplitDiscount
+     */
+    protected $splitDiscount;
 
-	/**
-	 * @param Discount $discount
-	 */
-	public function setDiscount( $discount ) {
-		$this->discount = $discount;
-	}
+    /**
+     * @param Discount $discount
+     */
+    public function __construct($discount)
+    {
+        if ($discount instanceof Discount && in_array($discount->getType(), self::AVAILABLE_DISCOUNT_TYPES)) {
+            $this->discount = $discount;
+        }
+        $this->replaceAsCartAdjustment   = false;
+        $this->replaceCartAdjustmentCode = null;
+        $this->splitDiscount             = ProductAdjustmentSplitDiscount::ITEM_COST();
+    }
 
-	/**
-	 * @return Discount
-	 */
-	public function getDiscount() {
-		return $this->discount;
-	}
+    /**
+     * @param Discount $discount
+     */
+    public function setDiscount($discount)
+    {
+        $this->discount = $discount;
+    }
 
-	/**
-	 * @param float $value
-	 */
-	public function setMaxAvailableAmount( $value ) {
-		$value = floatval( $value );
+    /**
+     * @return Discount
+     */
+    public function getDiscount()
+    {
+        return $this->discount;
+    }
 
-		$this->maxAvailableAmount = $value;
-	}
+    /**
+     * @param float $value
+     */
+    public function setMaxAvailableAmount($value)
+    {
+        $value = floatval($value);
 
-	/**
-	 * @param bool $replace
-	 */
-	public function setReplaceAsCartAdjustment( $replace ) {
-		$this->replaceAsCartAdjustment = boolval( $replace );
-	}
+        $this->maxAvailableAmount = $value;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isMaxAvailableAmountExists() {
-		return ! is_null( $this->maxAvailableAmount );
-	}
+    /**
+     * @param bool $replace
+     */
+    public function setReplaceAsCartAdjustment($replace)
+    {
+        $this->replaceAsCartAdjustment = boolval($replace);
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getMaxAvailableAmount() {
-		return $this->maxAvailableAmount;
-	}
+    /**
+     * @return bool
+     */
+    public function isMaxAvailableAmountExists()
+    {
+        return ! is_null($this->maxAvailableAmount);
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isReplaceWithCartAdjustment() {
-		return $this->replaceCartAdjustmentCode && $this->replaceAsCartAdjustment;
-	}
+    /**
+     * @return float|null
+     */
+    public function getMaxAvailableAmount()
+    {
+        return $this->maxAvailableAmount;
+    }
 
-	/**
-	 * @param string $code
-	 */
-	public function setReplaceCartAdjustmentCode( $code ) {
-		$this->replaceCartAdjustmentCode = (string) $code;
-	}
+    /**
+     * @return bool
+     */
+    public function isReplaceWithCartAdjustment()
+    {
+        return $this->replaceCartAdjustmentCode && $this->replaceAsCartAdjustment;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getReplaceCartAdjustmentCode() {
-		return $this->replaceCartAdjustmentCode;
-	}
+    /**
+     * @param string $code
+     */
+    public function setReplaceCartAdjustmentCode($code)
+    {
+        $this->replaceCartAdjustmentCode = (string)$code;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isValid() {
-		return ! is_null( $this->discount );
-	}
+    /**
+     * @return string
+     */
+    public function getReplaceCartAdjustmentCode()
+    {
+        return $this->replaceCartAdjustmentCode;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isValid()
+    {
+        return ! is_null($this->discount);
+    }
+
+    /**
+     * @param ProductAdjustmentSplitDiscount $splitDiscount
+     */
+    public function setSplitDiscount($splitDiscount)
+    {
+        if ($splitDiscount instanceof ProductAdjustmentSplitDiscount) {
+            $this->splitDiscount = $splitDiscount;
+        }
+    }
+
+    /**
+     * @return ProductAdjustmentSplitDiscount
+     */
+    public function getSplitDiscount()
+    {
+        return $this->splitDiscount;
+    }
 }

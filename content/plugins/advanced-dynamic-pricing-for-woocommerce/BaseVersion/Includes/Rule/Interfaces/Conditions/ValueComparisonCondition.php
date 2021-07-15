@@ -2,31 +2,32 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Interfaces\Conditions;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface ValueComparisonCondition {
-	const COMPARISON_VALUE_KEY = 'comparison_value';
-	const COMPARISON_VALUE_METHOD_KEY = 'comparison_value_method';
+interface ValueComparisonCondition
+{
+    const COMPARISON_VALUE_KEY = 'comparison_value';
+    const COMPARISON_VALUE_METHOD_KEY = 'comparison_value_method';
 
-	/**
-	 * @param string $comparison_method
-	 */
-	public function setValueComparisonMethod( $comparison_method );
+    /**
+     * @param string|null $comparisonMethod
+     */
+    public function setValueComparisonMethod($comparisonMethod);
 
-	/**
-	 * @return string
-	 */
-	public function getValueComparisonMethod();
+    /**
+     * @return string|null
+     */
+    public function getValueComparisonMethod();
 
-	/**
-	 * @param float $comparison_value
-	 */
-	public function setComparisonValue( $comparison_value );
+    /**
+     * @param string|float|null $comparisonValue
+     */
+    public function setComparisonValue($comparisonValue);
 
-	/**
-	 * @return float
-	 */
-	public function getComparisonValue();
+    /**
+     * @return string|float|null
+     */
+    public function getComparisonValue();
 }

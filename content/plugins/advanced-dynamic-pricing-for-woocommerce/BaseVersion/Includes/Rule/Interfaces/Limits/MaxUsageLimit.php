@@ -2,20 +2,21 @@
 
 namespace ADP\BaseVersion\Includes\Rule\Interfaces\Limits;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-interface MaxUsageLimit {
+interface MaxUsageLimit
+{
     const MAX_USAGE_KEY = 'max_usage';
 
     /**
-     * @param integer $max_usage
+     * @param string|int $maxUsage
      */
-    public function setMaxUsage( $max_usage );
+    public function setMaxUsage($maxUsage);
 
     /**
-     * @return integer
+     * @return int
      */
     public function getMaxUsage();
 }

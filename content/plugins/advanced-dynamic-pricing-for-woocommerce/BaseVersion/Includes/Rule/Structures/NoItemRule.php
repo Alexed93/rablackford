@@ -8,22 +8,25 @@ use ADP\BaseVersion\Includes\Rule\Processors\NoItemRuleProcessor;
 use ADP\BaseVersion\Includes\Rule\Structures\Abstracts\BaseRule;
 use Exception;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class NoItemRule extends BaseRule implements Rule {
-	public function __construct() {
-		parent::__construct();
-	}
+class NoItemRule extends BaseRule implements Rule
+{
+    public function __construct()
+    {
+        parent::__construct();
+    }
 
-	/**
-	 * @param Context $context
-	 *
-	 * @return NoItemRuleProcessor
-	 * @throws Exception
-	 */
-	public function buildProcessor( $context ) {
-		return new NoItemRuleProcessor( $context, $this );
-	}
+    /**
+     * @param Context $context
+     *
+     * @return NoItemRuleProcessor
+     * @throws Exception
+     */
+    public function buildProcessor($context)
+    {
+        return new NoItemRuleProcessor($context, $this);
+    }
 }

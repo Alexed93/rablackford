@@ -1,6 +1,6 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 ?>
 <div class="wdp-column wdp-condition-subfield wdp-condition-field-qty">
@@ -14,20 +14,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 </div>
 
 <div class="wdp-column wdp-condition-subfield wdp-condition-field-method">
-	<select name="rule[conditions][{c}][options][1]">
-		<option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-		<option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-        <option value="not_containing"><?php _e('not containing', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
-	</select>
+    <select name="rule[conditions][{c}][options][1]">
+        <option value="in_list" selected><?php _e('in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+        <option value="not_in_list"><?php _e('not in list', 'advanced-dynamic-pricing-for-woocommerce') ?></option>
+        <option value="not_containing"><?php _e('not containing',
+                'advanced-dynamic-pricing-for-woocommerce') ?></option>
+    </select>
 </div>
 
 <div class="wdp-column wdp-condition-subfield wdp-condition-field-value">
-	<div>
-		<select multiple
-		        data-list="product_sku"
-		        data-field="autocomplete"
-		        data-placeholder="Select values"
-		        name="rule[conditions][{c}][options][2][]">
-		</select>
-	</div>
+    <div>
+        <select multiple
+                data-list="product_sku"
+                data-field="autocomplete"
+                data-placeholder="<?php _e("Select values", "advanced-dynamic-pricing-for-woocommerce") ?>"
+                name="rule[conditions][{c}][options][2][]">
+        </select>
+    </div>
 </div>

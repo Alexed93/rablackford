@@ -10,9 +10,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 if ( ! class_exists( 'Woo_Conditional_Shipping_Filters' ) ) {
 class Woo_Conditional_Shipping_Filters {
   public static function filter_weight( $condition, $package ) {
-		$package_weight = self::calculate_package_weight( $package );
+		$package_weight = self::calculate_package_weight( $package, $condition );
 
-		if ( isset( $condition['value'] ) && ! empty( $condition['value'] ) ) {
+		if ( isset( $condition['value'] ) ) {
 			$weight = self::parse_number( $condition['value'] );
 
 			return ! self::compare_numeric_value( $package_weight, $weight, $condition['operator'] );
@@ -108,13 +108,13 @@ class Woo_Conditional_Shipping_Filters {
 			} 
 		}
 
-		$total = WC()->cart->get_displayed_subtotal();
+		$total = wcs_get_cart_func( 'get_displayed_subtotal' );
 
 		if ( isset( $condition['subtotal_includes_coupons'] ) && $condition['subtotal_includes_coupons'] && method_exists( WC()->cart, 'get_discount_total' ) ) {
-			$total -= floatval( WC()->cart->get_discount_total() );
+			$total -= floatval( wcs_get_cart_func( 'get_discount_total' ) );
 
-			if ( WC()->cart->display_prices_including_tax() ) {
-				$total -= floatval( WC()->cart->get_discount_tax() );
+			if ( wcs_get_cart_func( 'display_prices_including_tax' ) ) {
+				$total -= floatval( wcs_get_cart_func( 'get_discount_tax' ) );
 			}
 		}
 
@@ -133,7 +133,7 @@ class Woo_Conditional_Shipping_Filters {
 
 		$items = self::get_subset_of_items_by_shipping_class( $condition );
 
-		$incl_tax = WC()->cart->display_prices_including_tax();
+		$incl_tax = wcs_get_cart_func( 'display_prices_including_tax' );
 
 		foreach ( $items as $key => $item ) {
 			if ( $subtotal_includes_coupons ) {
@@ -170,17 +170,31 @@ class Woo_Conditional_Shipping_Filters {
 		$shipping_class_id = str_replace( $prefix, '', $condition['subset_filter'] );
 
 		$subset = array();
-		foreach ( WC()->cart->get_cart() as $key => $item ) {
+		foreach ( wcs_get_cart_func( 'get_cart' ) as $key => $item ) {
 			if ( isset( $item['data'] ) && method_exists( $item['data'], 'get_shipping_class_id' ) ) {
-				if ( $inclusive && $item['data']->get_shipping_class_id() == $shipping_class_id ) {
+				$product_shipping_class_id = self::get_product_shipping_class_id( $item['data'] );
+
+				if ( $inclusive && $product_shipping_class_id == $shipping_class_id ) {
 					$subset[$key] = $item;
-				} else if ( ! $inclusive && $item['data']->get_shipping_class_id() != $shipping_class_id ) {
+				} else if ( ! $inclusive && $product_shipping_class_id != $shipping_class_id ) {
 					$subset[$key] = $item;
 				}
 			}
 		}
 
 		return $subset;
+	}
+
+	/**
+	 * Get product shipping class
+	 */
+	public static function get_product_shipping_class_id( $product ) {
+		// Special handling for WPML
+		if ( function_exists( 'icl_object_id' ) ) {
+			return apply_filters( 'wpml_object_id', $product->get_shipping_class_id(), 'product_shipping_class', true, apply_filters( 'wpml_default_language', NULL ) );
+		}
+
+		return $product->get_shipping_class_id();
 	}
 
 	/**
@@ -202,7 +216,7 @@ class Woo_Conditional_Shipping_Filters {
 	private static function get_cart_products() {
 		$products = array();
 
-		foreach ( WC()->cart->get_cart() as $key => $item ) {
+		foreach ( wcs_get_cart_func( 'get_cart' ) as $key => $item ) {
 			if ( isset( $item['data'] ) ) {
 				if ( isset( $item['variation_id'] ) && ! empty( $item['variation_id'] ) ) {
 					$products[$item['variation_id']] = $item['data'];
@@ -233,24 +247,32 @@ class Woo_Conditional_Shipping_Filters {
 	/**
 	 * Calculate cart weight
 	 */
-	private static function calculate_package_weight($package) {
+	private static function calculate_package_weight( $package, $condition ) {
+		$items = $package['contents'];
+
+		if ( is_array( $condition ) && isset( $condition['subset_filter'] ) && ! empty( $condition['subset_filter'] ) ) {
+			if ( strpos( $condition['subset_filter'], 'shipping_class_' ) !== false ) {
+				$items = self::get_subset_of_items_by_shipping_class( $condition );
+			} 
+		}
+
 		$total_weight = 0;
 
-		foreach ( $package['contents'] as $key => $data ) {
+		foreach ( $items as $key => $data ) {
 			$product = $data['data'];
 
 			if ( ! $product->needs_shipping() ) {
 				continue;
 			}
 
-			$item_weight = $product->get_weight();
+			$item_weight = floatval( $product->get_weight() );
 
 			if ( $item_weight ) {
 				$total_weight += $item_weight * $data['quantity'];
 			}
 		}
 
-		return apply_filters( 'woo_conditional_shipping_package_weight', $total_weight, $package );
+		return apply_filters( 'woo_conditional_shipping_package_weight', $total_weight, $package, $condition );
 	}
 
 	/**

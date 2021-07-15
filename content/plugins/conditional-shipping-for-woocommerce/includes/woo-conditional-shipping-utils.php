@@ -110,6 +110,22 @@ function woo_conditional_shipping_filter_groups() {
 }
 
 /**
+ * Get a list of filters
+ */
+function woo_conditional_shipping_filters() {
+  $groups = woo_conditional_shipping_filter_groups();
+
+  $filters = array();
+  foreach ( $groups as $group ) {
+    foreach ( $group['filters'] as $key => $filter ) {
+      $filters[$key] = $filter;
+    }
+  }
+
+  return $filters;
+}
+
+/**
  * Get a list of actions
  */
 function woo_conditional_shipping_actions() {
@@ -130,6 +146,31 @@ function woo_conditional_shipping_country_options() {
   $countries_obj = new WC_Countries();
 
   return $countries_obj->get_countries();
+}
+
+/**
+ * State options
+ */
+function woo_conditional_shipping_state_options() {
+  $countries_obj = new WC_Countries();
+  $countries = $countries_obj->get_countries();
+  $states = array_filter( $countries_obj->get_states() );
+
+  $options = [];
+
+  foreach ( $states as $country_id => $state_list ) {
+    $options[$country_id] = [
+      'states' => $state_list,
+      'country' => $countries[$country_id],
+    ];
+  }
+
+  // Move US as first as it is the most commonly used
+  $us = $options['US'];
+  unset( $options['US'] );
+  $options = ['US' => $us] + $options;
+
+  return $options;
 }
 
 /**
@@ -227,13 +268,52 @@ function woo_conditional_shipping_get_shipping_class_options() {
 function woo_conditional_shipping_get_category_options() {
   $categories = get_terms( 'product_cat', array(
     'hide_empty' => false,
+    'suppress_filter' => true,
   ) );
-  $category_options = array();
-  foreach ( $categories as $category ) {
-    $category_options[$category->term_id] = $category->name;
+
+  $sorted = array();
+  woo_conditional_shipping_sort_terms_hierarchicaly( $categories, $sorted );
+
+  // Flatten hierarchy
+  $options = array();
+  woo_conditional_shipping_flatten_terms( $options, $sorted );
+
+  return $options;
+}
+
+/**
+ * Output term tree into a select field options
+ */
+function woo_conditional_shipping_flatten_terms( &$options, $cats, $depth = 0 ) {
+  foreach ( $cats as $cat ) {
+    if ( $depth > 0 ) {
+      $prefix = str_repeat( ' - ', $depth );
+      $options[$cat->term_id] = "{$prefix} {$cat->name}";
+    } else {
+      $options[$cat->term_id] = "{$cat->name}";
+    }
+
+    if ( isset( $cat->children ) && ! empty( $cat->children ) ) {
+      woo_conditional_shipping_flatten_terms( $options, $cat->children, $depth + 1 );
+    }
+  }
+}
+
+/**
+ * Sort categories hierarchically
+ */
+function woo_conditional_shipping_sort_terms_hierarchicaly( Array &$cats, Array &$into, $parentId = 0 ) {
+  foreach ( $cats as $i => $cat ) {
+    if ( $cat->parent == $parentId ) {
+      $into[$cat->term_id] = $cat;
+      unset( $cats[$i] );
+    }
   }
 
-  return $category_options;
+  foreach ( $into as $topCat ) {
+    $topCat->children = array();
+    woo_conditional_shipping_sort_terms_hierarchicaly( $cats, $topCat->children, $topCat->term_id );
+  }
 }
 
 /**
@@ -268,12 +348,14 @@ function woo_conditional_shipping_get_coupon_options() {
  * Load all roles to be used in a select field
  */
 function woo_conditional_shipping_role_options() {
+  global $wp_roles;
+  
   $options = array();
 
-  if ( function_exists( 'get_editable_roles' ) ) {
-    $editable_roles = array_reverse( get_editable_roles() );
+  if ( is_a( $wp_roles, 'WP_Roles' ) && isset( $wp_roles->roles ) ) {
+    $roles = $wp_roles->roles;
 
-    foreach ( $editable_roles as $role => $details ) {
+    foreach ( $roles as $role => $details ) {
       $name = translate_user_role( $details['name'] );
       $options[$role] = $name;
     }
@@ -331,7 +413,11 @@ function woo_conditional_shipping_time_mins_options() {
  * Get shipping method title by instance ID
  */
 function woo_conditional_shipping_get_method_title( $instance_id ) {
-  $options = woo_conditional_shipping_get_shipping_method_options();
+  // Simple caching mechanism as this can take quite a while
+  static $options = [];
+  if ( empty( $options ) ) {
+    $options = woo_conditional_shipping_get_shipping_method_options();
+  }
 
   foreach ( $options as $zone_id => $data ) {
     foreach ( $data['options'] as $id => $option ) {
@@ -401,4 +487,83 @@ function woo_conditional_shipping_format_ruleset_ids( $ids ) {
   }
 
   return implode( ', ', $items );
+}
+
+/**
+ * Get ruleset admin edit URL
+ */
+function wcs_get_ruleset_admin_url( $ruleset_id ) {
+  $url = add_query_arg( array(
+    'ruleset_id' => $ruleset_id,
+  ), admin_url( 'admin.php?page=wc-settings&tab=shipping&section=woo_conditional_shipping' ) );
+
+  return $url;
+}
+
+/**
+ * Get product categories
+ */
+function woo_conditional_shipping_get_product_cats( $product_id ) {
+  $cat_ids = array();
+
+  if ( $product = wc_get_product( $product_id ) ) {
+    $terms = get_the_terms( $product->get_id(), 'product_cat' );
+    if ( $terms ) {
+      foreach ( $terms as $term ) {
+        $cat_ids[$term->term_id] = true;
+      }
+    }
+
+    // If this is variable product, append parent product categories
+    if ( $product->get_parent_id() ) {
+      $terms = get_the_terms( $product->get_parent_id(), 'product_cat' );
+      if ( $terms ) {
+        foreach ( $terms as $term ) {
+          $cat_ids[$term->term_id] = true;
+        }
+      }
+    }
+
+    // Finally add all parent terms
+    if ( apply_filters( 'woo_conditional_shipping_incl_parent_cats', true ) ) {
+      foreach ( array_keys( $cat_ids ) as $term_id ) {
+        $ancestors = (array) get_ancestors( $term_id, 'product_cat', 'taxonomy' );
+
+        foreach ( $ancestors as $ancestor_id ) {
+          $cat_ids[$ancestor_id] = true;
+        }
+      }
+    }
+  }
+
+  return array_keys( $cat_ids );
+}
+
+/**
+ * Get cart function
+ * 
+ * In some cases cart is not always available so we cannot trust WC()->cart
+ * to exist. If cart doesn't exist, return sensible default value
+ */
+function wcs_get_cart_func( $func = 'get_cart' ) {
+  $cart = WC()->cart;
+  $default = false;
+
+  switch ( $func ) {
+    case 'get_cart':
+    case 'get_applied_coupons':
+      $default = array();
+      break;
+    case 'display_prices_including_tax':
+      $default = false;
+      break;
+    case 'get_displayed_subtotal':
+    case 'get_discount_total':
+    case 'get_discount_tax':
+    case 'get_cart_contents_count':
+      $default = 0;
+      break;
+  }
+
+  return $cart ? call_user_func( [$cart, $func] ) : $default;
 }

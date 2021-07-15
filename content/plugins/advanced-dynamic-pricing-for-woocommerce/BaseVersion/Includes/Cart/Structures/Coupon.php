@@ -3,137 +3,216 @@
 namespace ADP\BaseVersion\Includes\Cart\Structures;
 
 use ADP\BaseVersion\Includes\Context;
+use ADP\BaseVersion\Includes\External\WC\WcCartItemFacade;
 use Exception;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class Coupon {
-	const TYPE_ITEM_DISCOUNT = 'item';
-	const TYPE_FREE_ITEM_PRICE = 'free_item';
-	const TYPE_PERCENTAGE = 'percentage';
-	const TYPE_FIXED_VALUE = 'fixed_value';
+// should be CouponCartItem, but DO NOT RENAME, otherwise it cause "Cannot instantiate interface" error
+class Coupon implements CouponInterface
+{
+    const TYPE_ITEM_DISCOUNT = 'item';
+    const TYPE_FREE_ITEM = 'free_item';
 
-	const AVAILABLE_TYPES = array(
-		self::TYPE_ITEM_DISCOUNT,
-		self::TYPE_FREE_ITEM_PRICE,
-		self::TYPE_PERCENTAGE,
-		self::TYPE_FIXED_VALUE,
-	);
+    const AVAILABLE_TYPES = array(
+        self::TYPE_ITEM_DISCOUNT,
+        self::TYPE_FREE_ITEM,
+    );
 
-	/**
-	 * @var integer
-	 */
-	protected $ruleId;
+    /**
+     * @var integer
+     */
+    protected $ruleId;
 
-	/**
-	 * @var string
-	 */
-	protected $type;
+    /**
+     * @var string
+     */
+    protected $type;
 
-	/**
-	 * @var float
-	 */
-	protected $value;
+    /**
+     * @var float
+     */
+    protected $value;
 
-	/**
-	 * @var string
-	 */
-	protected $code;
+    /**
+     * @var string
+     */
+    protected $code;
 
-	/**
-	 * @var float
-	 */
-	protected $maxDiscount;
+    /**
+     * @var string Original coupon name
+     */
+    protected $label;
 
-	/**
-	 * @param Context $context
-	 * @param string  $type
-	 * @param string  $code
-	 * @param float   $value
-	 * @param integer $ruleId
-	 */
-	public function __construct( $context, $type, $code, $value, $ruleId ) {
-		if ( ! in_array( $type, self::AVAILABLE_TYPES ) ) {
-			$context->handle_error( new Exception( sprintf( "Coupon type '%s' not supported", $type ) ) );
-		}
+    /**
+     * @var float
+     */
+    protected $maxDiscount;
 
-		$this->type   = $type;
-		$this->code   = wc_format_coupon_code( $code );   // TODO apply wc_format_coupon_code?
-		$this->value  = floatval( $value );
-		$this->ruleId = $ruleId;
-	}
+    /**
+     * @var string
+     */
+    protected $affectedCartItemKey;
 
-	/**
-	 * @return string
-	 */
-	public function getType() {
-		return $this->type;
-	}
+    /**
+     * @var float
+     */
+    protected $affectedCartItemQty;
 
-	/**
-	 * @param string $type
-	 *
-	 * @return bool
-	 */
-	public function isType( $type ) {
-		return $this->type === $type;
-	}
+    /**
+     * @param Context $context
+     * @param string $type
+     * @param string $code
+     * @param float $value
+     * @param int $ruleId
+     * @param WcCartItemFacade|null $affectedCartItem
+     */
+    public function __construct(
+        Context $context,
+        string $type,
+        string $code,
+        float $value,
+        int $ruleId,
+        $affectedCartItem
+    ) {
+        if ( ! in_array($type, self::AVAILABLE_TYPES)) {
+            $context->handleError(new Exception(sprintf("Coupon type '%s' not supported", $type)));
+        }
 
-	/**
-	 * @param string $code
-	 */
-	public function setCode( $code ) {
-		$this->code = (string) $code;
-	}
+        $this->type                = $type;
+        $this->label               = $code;
+        $this->code                = wc_format_coupon_code($code);
+        $this->value               = floatval($value);
+        $this->ruleId              = $ruleId;
+        $this->affectedCartItemKey = "";
+        $this->affectedCartItemQty = floatval(0);
+        $this->setAffectedCartItem($affectedCartItem);
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getCode() {
-		return $this->code;
-	}
+    /**
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
 
-	/**
-	 * @param float $value
-	 */
-	public function setValue( $value ) {
-		$this->value = floatval( $value );
-	}
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function isType($type)
+    {
+        return $this->type === $type;
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getValue() {
-		return $this->value;
-	}
+    /**
+     * @param string $code
+     */
+    public function setCode($code)
+    {
+        $this->code = (string)$code;
+    }
 
-	/**
-	 * @return integer
-	 */
-	public function getRuleId() {
-		return $this->ruleId;
-	}
+    /**
+     * @return string
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
 
-	/**
-	 * @param float $amount
-	 */
-	public function setMaxDiscount( $amount ) {
-		$this->maxDiscount = $amount;
-	}
+    /**
+     * @param float $value
+     */
+    public function setValue($value)
+    {
+        $this->value = floatval($value);
+    }
 
-	/**
-	 * @return float
-	 */
-	public function getMaxDiscount() {
-		return $this->maxDiscount;
-	}
+    /**
+     * @return float
+     */
+    public function getValue()
+    {
+        return $this->value;
+    }
 
-	/**
-	 * @return bool
-	 */
-	public function isMaxDiscountDefined() {
-		return isset( $this->maxDiscount ) && $this->maxDiscount > 0;
-	}
+    /**
+     * @return int
+     */
+    public function getRuleId()
+    {
+        return $this->ruleId;
+    }
+
+    /**
+     * @param float $amount
+     */
+    public function setMaxDiscount($amount)
+    {
+        $this->maxDiscount = $amount;
+    }
+
+    /**
+     * @return float
+     */
+    public function getMaxDiscount()
+    {
+        return $this->maxDiscount;
+    }
+
+    /**
+     * @param string $label
+     */
+    public function setLabel($label)
+    {
+        $this->label = $label;
+    }
+
+    /**
+     * @return string
+     */
+    public function getLabel()
+    {
+        return $this->label;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isMaxDiscountDefined()
+    {
+        return isset($this->maxDiscount) && $this->maxDiscount > 0;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAffectedCartItemKey()
+    {
+        return $this->affectedCartItemKey;
+    }
+
+    /**
+     * @param WcCartItemFacade|null $affectedCartItem
+     */
+    public function setAffectedCartItem($affectedCartItem)
+    {
+        if ($affectedCartItem instanceof WcCartItemFacade) {
+            $this->affectedCartItemKey = $affectedCartItem->getKey();
+            $this->affectedCartItemQty = $affectedCartItem->getQty();
+        }
+    }
+
+    /**
+     * @return float
+     */
+    public function getAffectedCartItemQty()
+    {
+        return $this->affectedCartItemQty;
+    }
 }

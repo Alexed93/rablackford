@@ -10,87 +10,94 @@ use ADP\Settings\Varieties\Option\Exceptions\ValidateCallbackIsNotCallable;
 use ADP\Settings\Varieties\Option\Interfaces\OptionInterface;
 
 
-abstract class Option extends OriginOption implements OptionInterface {
-	/**
-	 * @var callable
-	 */
-	protected $validateCallback;
+abstract class Option extends OriginOption implements OptionInterface
+{
+    /**
+     * @var callable
+     */
+    protected $validateCallback;
 
-	/**
-	 * @var callable
-	 */
-	protected $sanitizeCallback;
+    /**
+     * @var callable
+     */
+    protected $sanitizeCallback;
 
-	/**
-	 * Option constructor.
-	 *
-	 * @param string $id
-	 */
-	public function __construct( $id ) {
-		parent::__construct( $id );
+    /**
+     * Option constructor.
+     *
+     * @param string $id
+     */
+    public function __construct(string $id)
+    {
+        parent::__construct($id);
 
-		$this->validateCallback = array( $this, 'validate' );
-		$this->sanitizeCallback = array( $this, 'sanitize' );
-	}
+        $this->validateCallback = array($this, 'validate');
+        $this->sanitizeCallback = array($this, 'sanitize');
+    }
 
-	/**
-	 * Must be override
-	 *
-	 * @param mixed $value
-	 *
-	 * @return mixed
-	 * @throws OptionValueFilterFailed
-	 */
-	protected function sanitize( $value ) {
-		return $value;
-	}
+    /**
+     * Must be override
+     *
+     * @param mixed $value
+     *
+     * @return mixed
+     * @throws OptionValueFilterFailed
+     */
+    protected function sanitize($value)
+    {
+        return $value;
+    }
 
-	/**
-	 * Must be override
-	 *
-	 * @param mixed $value
-	 *
-	 * @return bool
-	 */
-	protected function validate( $value ) {
-		return true;
-	}
+    /**
+     * Must be override
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    protected function validate($value)
+    {
+        return true;
+    }
 
-	/**
-	 * @param mixed $value
-	 *
-	 * @return mixed
-	 * @throws OptionValueFilterFailed
-	 * @throws SanitizeCallbackIsNotCallable
-	 * @throws ValidateCallbackIsNotCallable
-	 */
-	protected function filter( $value ) {
-		if ( ! is_callable( $this->sanitizeCallback ) ) {
-			throw new SanitizeCallbackIsNotCallable(); // TODO if in production LOG IT!
-		}
+    /**
+     * @param mixed $value
+     *
+     * @return mixed
+     * @throws OptionValueFilterFailed
+     * @throws SanitizeCallbackIsNotCallable
+     * @throws ValidateCallbackIsNotCallable
+     */
+    protected function filter($value)
+    {
+        if ( ! is_callable($this->sanitizeCallback)) {
+            throw new SanitizeCallbackIsNotCallable(); // TODO if in production LOG IT!
+        }
 
-		$value = call_user_func( $this->sanitizeCallback, $value );
+        $value = call_user_func($this->sanitizeCallback, $value);
 
-		if ( ! is_callable( $this->validateCallback ) ) {
-			throw new ValidateCallbackIsNotCallable(); // TODO if in production LOG IT!
-		}
+        if ( ! is_callable($this->validateCallback)) {
+            throw new ValidateCallbackIsNotCallable(); // TODO if in production LOG IT!
+        }
 
-		if ( ! call_user_func( $this->validateCallback, $value ) ) {
-			throw new OptionValueFilterFailed(); // TODO if in production LOG IT!
-		}
+        if ( ! call_user_func($this->validateCallback, $value)) {
+            throw new OptionValueFilterFailed(); // TODO if in production LOG IT!
+        }
 
-		return $value;
-	}
+        return $value;
+    }
 
-	public function setSanitizeCallback( $callback ) {
-		$this->sanitizeCallback = $callback;
+    public function setSanitizeCallback($callback): Option
+    {
+        $this->sanitizeCallback = $callback;
 
-		return $this;
-	}
+        return $this;
+    }
 
-	public function setValidateCallback( $callback ) {
-		$this->validateCallback = $callback;
+    public function setValidateCallback($callback): Option
+    {
+        $this->validateCallback = $callback;
 
-		return $this;
-	}
+        return $this;
+    }
 }

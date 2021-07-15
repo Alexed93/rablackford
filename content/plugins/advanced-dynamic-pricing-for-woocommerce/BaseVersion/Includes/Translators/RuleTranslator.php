@@ -2,6 +2,8 @@
 
 namespace ADP\BaseVersion\Includes\Translators;
 
+use ADP\BaseVersion\Includes\Enums\GiftChoiceTypeEnum;
+use ADP\BaseVersion\Includes\Rule\Interfaces\Rule;
 use ADP\BaseVersion\Includes\Rule\Structures\Discount;
 use ADP\BaseVersion\Includes\Rule\Structures\NoItemRule;
 use ADP\BaseVersion\Includes\Rule\Structures\PackageRule;
@@ -10,140 +12,165 @@ use ADP\BaseVersion\Includes\Rule\Structures\PackageRule\ProductsAdjustmentTotal
 use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule;
 use ADP\BaseVersion\Includes\Rule\Structures\SingleItemRule\ProductsAdjustment;
 
-if ( ! defined( 'ABSPATH' ) ) {
-	exit; // Exit if accessed directly
+if ( ! defined('ABSPATH')) {
+    exit; // Exit if accessed directly
 }
 
-class RuleTranslator {
-	/**
-	 * @param SingleItemRule|PackageRule|NoItemRule $rule
-	 *
-	 * @return NoItemRule|PackageRule|SingleItemRule
-	 * @return NoItemRule|PackageRule|SingleItemRule
-	 */
-    public static function setCurrency( $rule, $rate ) {
+class RuleTranslator
+{
+    /**
+     * @param SingleItemRule|PackageRule|NoItemRule $rule
+     * @param float $rate
+     *
+     * @return NoItemRule|PackageRule|SingleItemRule
+     */
+    public static function setCurrency($rule, $rate)
+    {
         //$this->currency = $currency;
 
-		if ( $rule->hasProductAdjustment() ) {
-            $product_adj = $rule->getProductAdjustmentHandler();
-            if( $product_adj instanceof ProductsAdjustment OR
-            $product_adj instanceof ProductsAdjustmentTotal ) {
-                if( $product_adj->isMaxAvailableAmountExists() ) {
-                    $product_adj->setMaxAvailableAmount( $product_adj->getMaxAvailableAmount() * $rate );
+        if ($rule->hasProductAdjustment()) {
+            $productAdj = $rule->getProductAdjustmentHandler();
+            if ($productAdj instanceof ProductsAdjustment or
+                $productAdj instanceof ProductsAdjustmentTotal) {
+                if ($productAdj->isMaxAvailableAmountExists()) {
+                    $productAdj->setMaxAvailableAmount($productAdj->getMaxAvailableAmount() * $rate);
                 }
-                $discount = $product_adj->getDiscount();
-                if( $discount->getType() !== Discount::TYPE_PERCENTAGE ) {
-                    $discount->setValue( $discount->getValue() * $rate );
+                $discount = $productAdj->getDiscount();
+                if ($discount->getType() !== Discount::TYPE_PERCENTAGE) {
+                    $discount->setValue($discount->getValue() * $rate);
                 }
-                $product_adj->setDiscount( $discount );
-            }
-            elseif( $product_adj instanceof ProductsAdjustmentSplit ) {
-                $discounts = $product_adj->getDiscounts();
-                foreach( $discounts as &$discount ) {
-                    if( $discount->getType() !== Discount::TYPE_PERCENTAGE ) {
-                        $discount->setValue( $discount->getValue() * $rate );
+                $productAdj->setDiscount($discount);
+            } elseif ($productAdj instanceof ProductsAdjustmentSplit) {
+                $discounts = $productAdj->getDiscounts();
+                foreach ($discounts as &$discount) {
+                    if ($discount->getType() !== Discount::TYPE_PERCENTAGE) {
+                        $discount->setValue($discount->getValue() * $rate);
                     }
                 }
-                $product_adj->setDiscounts( $discounts );
+                $productAdj->setDiscounts($discounts);
             }
 
-            $rule->installProductAdjustmentHandler( $product_adj );
+            $rule->installProductAdjustmentHandler($productAdj);
         }
 
-        if( $rule->hasProductRangeAdjustment() ) {
-            $product_adj = $rule->getProductRangeAdjustmentHandler();
-            $ranges = $product_adj->getRanges();
-            foreach( $ranges as &$range ) {
+        if ($rule->hasProductRangeAdjustment()) {
+            $productAdj = $rule->getProductRangeAdjustmentHandler();
+            $ranges     = $productAdj->getRanges();
+            foreach ($ranges as &$range) {
                 $discount = $range->getData();
-                if( $discount->getType() !== Discount::TYPE_PERCENTAGE ) {
-                    $discount->setValue( $discount->getValue() * $rate );
-                    $range->setData( $discount );
+                if ($discount->getType() !== Discount::TYPE_PERCENTAGE) {
+                    $discount->setValue($discount->getValue() * $rate);
+                    $range->setData($discount);
                 }
             }
-            $product_adj->setRanges( $ranges );
+            $productAdj->setRanges($ranges);
 
-            $rule->installProductRangeAdjustmentHandler( $product_adj );
+            $rule->installProductRangeAdjustmentHandler($productAdj);
         }
-        
-        $role_discounts = array();
-        if( $rule->getRoleDiscounts() !== null ) {
-            foreach( $rule->getRoleDiscounts() as $role_discount ) {
-                $discount = $role_discount->getDiscount();
-                if( $discount->getType() !== Discount::TYPE_PERCENTAGE ) {
-                    $discount->setValue( $discount->getValue() * $rate );
+
+        $roleDiscounts = array();
+        if ($rule->getRoleDiscounts() !== null) {
+            foreach ($rule->getRoleDiscounts() as $roleDiscount) {
+                $discount = $roleDiscount->getDiscount();
+                if ($discount->getType() !== Discount::TYPE_PERCENTAGE) {
+                    $discount->setValue($discount->getValue() * $rate);
                 }
-                $role_discount->setDiscount( $discount );
-                $role_discounts[] = $role_discount;
+                $roleDiscount->setDiscount($discount);
+                $roleDiscounts[] = $roleDiscount;
             }
-            $rule->setRoleDiscounts( $role_discounts );
+            $rule->setRoleDiscounts($roleDiscounts);
         }
 
-        if( $rule->getCartAdjustments() ) {
-            $cart_adjs = $rule->getCartAdjustments();
-            foreach ( $cart_adjs as $cart_adjustment ) {
-                $cart_adjustment->multiply_amounts( $rate );
+        if ($rule->getCartAdjustments()) {
+            $cartAdjs = $rule->getCartAdjustments();
+            foreach ($cartAdjs as $cartAdjustment) {
+                $cartAdjustment->multiplyAmounts($rate);
             }
-            $rule->setCartAdjustments( $cart_adjs );
+            $rule->setCartAdjustments($cartAdjs);
         }
 
-        if( $rule->getConditions() ) {
+        if ($rule->getConditions()) {
             $cart_conditions = $rule->getConditions();
-            foreach ( $cart_conditions as $cart_condition ) {
-                $cart_condition->multiplyAmounts( $rate );
+            foreach ($cart_conditions as $cart_condition) {
+                $cart_condition->multiplyAmounts($rate);
             }
-            $rule->setConditions( $cart_conditions );
+            $rule->setConditions($cart_conditions);
+        }
+
+        if ($rule instanceof SingleItemRule || $rule instanceof PackageRule) {
+            $rule->setItemGiftSubtotalDivider($rule->getItemGiftSubtotalDivider() * $rate);
         }
 
         return $rule;
     }
 
-	/**
-	 * @param SingleItemRule|PackageRule|NoItemRule $rule
-	 *
-	 * @return NoItemRule|PackageRule|SingleItemRule
-	 * @return NoItemRule|PackageRule|SingleItemRule
-	 */
-    public static function translate( $rule, $language_code ) {
-		$filter_translator = new FilterTranslator();
+    /**
+     * @param Rule $rule
+     * @param string $languageCode
+     *
+     * @return Rule
+     */
+    public static function translate($rule, $languageCode)
+    {
+        $filterTranslator = new FilterTranslator();
 
-		if ( $rule instanceof SingleItemRule ) {
+        if ($rule instanceof SingleItemRule) {
             $filters = array();
-			foreach( $rule->getFilters() as $filter ) {
-				$filter->setValue( $filter_translator->translateByType( $filter->getType(), $filter->getValue(), $language_code ) );
-                $filter->setExcludeProductIds( $filter_translator->translateProduct( $filter->getExcludeProductIds(), $language_code ) );
+            foreach ($rule->getFilters() as $filter) {
+                $filter->setValue($filterTranslator->translateByType($filter->getType(), $filter->getValue(),
+                    $languageCode));
+                $filter->setExcludeProductIds($filterTranslator->translateProduct($filter->getExcludeProductIds(),
+                    $languageCode));
                 $filters[] = $filter;
             }
-            $rule->setFilters( $filters );
-        }
-        elseif( $rule instanceof PackageRule ) {
+            $rule->setFilters($filters);
+        } elseif ($rule instanceof PackageRule) {
             $packages = array();
-            foreach( $rule->getPackages() as $package ) {
+            foreach ($rule->getPackages() as $package) {
                 $filters = array();
-                foreach( $package->getFilters() as $filter ) {
-                    $filter->setValue( $filter_translator->translateByType( $filter->getType(), $filter->getValue(), $language_code ) );
-                    $filter->setExcludeProductIds( $filter_translator->translateProduct( $filter->getExcludeProductIds(), $language_code ) );
+                foreach ($package->getFilters() as $filter) {
+                    $filter->setValue($filterTranslator->translateByType($filter->getType(), $filter->getValue(),
+                        $languageCode));
+                    $filter->setExcludeProductIds($filterTranslator->translateProduct($filter->getExcludeProductIds(),
+                        $languageCode));
                     $filters[] = $filter;
                 }
-                $package->setFilters( $filters );
+                $package->setFilters($filters);
                 $packages[] = $package;
             }
-            $rule->setPackages( $packages );
+            $rule->setPackages($packages);
         }
 
-        if( $rule->hasProductRangeAdjustment() ) {
-            $product_adj = $rule->getProductRangeAdjustmentHandler();
-            $product_adj->setSelectedProductIds( $filter_translator->translateProduct( $product_adj->getSelectedCategoryIds(), $language_code ) );
-            $product_adj->setSelectedCategoryIds( $filter_translator->translateCategory( $product_adj->getSelectedCategoryIds(), $language_code ) );
-            $rule->installProductRangeAdjustmentHandler( $product_adj );
+        if ($rule instanceof SingleItemRule || $rule instanceof PackageRule) {
+            if ($rule->hasProductRangeAdjustment()) {
+                $productAdj = $rule->getProductRangeAdjustmentHandler();
+                $productAdj->setSelectedProductIds($filterTranslator->translateProduct($productAdj->getSelectedCategoryIds(),
+                    $languageCode));
+                $productAdj->setSelectedCategoryIds($filterTranslator->translateCategory($productAdj->getSelectedCategoryIds(),
+                    $languageCode));
+                $rule->installProductRangeAdjustmentHandler($productAdj);
+            }
+
+            foreach ( $rule->getItemGiftsCollection()->asArray() as $gift ) {
+                foreach ($gift->getChoices() as $choice) {
+                    if ( $choice->getType()->equals(GiftChoiceTypeEnum::PRODUCT())) {
+                        $choice->setValues($filterTranslator->translateProduct($choice->getValues(), $languageCode));
+                    }
+
+                    if ( $choice->getType()->equals(GiftChoiceTypeEnum::CATEGORY())) {
+                        $choice->setValues($filterTranslator->translateCategory($choice->getValues(), $languageCode));
+                    }
+                }
+            }
         }
 
         $cart_conditions = array();
-		foreach ( $rule->getConditions() as $cart_condition ) {
-            $cart_condition->translate( $language_code );
-            $cart_conditions[] = $cart_condition;
+        foreach ($rule->getConditions() as $cartCondition) {
+            $cartCondition->translate($languageCode);
+            $cart_conditions[] = $cartCondition;
         }
-        $rule->setConditions( $cart_conditions );
+        $rule->setConditions($cart_conditions);
 
         return $rule;
-	}
+    }
 }

@@ -11,7 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 	/**
-	 * Extension of the WP_Image_Editor_Imagick class to auto-compress edited images.
+	 * Extension of the WP_Thumb_Image_Editor_Imagick class to auto-compress edited images.
+	 * Note that WPThumb is no longer maintained and you should update your code.
 	 *
 	 * @see WP_Image_Editor_Imagick
 	 */
@@ -28,7 +29,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			ewwwio_debug_message( '<b>wp_image_editor_imagick(wpthumb)::' . __FUNCTION__ . '()</b>' );
 			global $ewww_defer;
 			global $ewww_preempt_editor;
-			if ( ! empty( $ewww_preempt_editor ) ) {
+			if ( ! empty( $ewww_preempt_editor ) || ! defined( 'EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR' ) || ! EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR ) {
 				return parent::_save( $image, $filename, $mime_type );
 			}
 			list( $filename, $extension, $mime_type ) = $this->get_output_format( $filename, $mime_type );
@@ -37,7 +38,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			}
 			if ( ( ! defined( 'EWWWIO_EDITOR_OVERWRITE' ) || ! EWWWIO_EDITOR_OVERWRITE ) && ewwwio_is_file( $filename ) ) {
 				ewwwio_debug_message( "detected existing file: $filename" );
-				$current_size = getimagesize( $filename );
+				$current_size = wp_getimagesize( $filename );
 				if ( $current_size && (int) $this->size['width'] === (int) $current_size[0] && (int) $this->size['height'] === (int) $current_size[1] ) {
 					ewwwio_debug_message( "existing file has same dimensions, not saving $filename" );
 					return array(
@@ -58,29 +59,11 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 					$filename = $saved['path'];
 				}
 				if ( file_exists( $filename ) ) {
-					/* if ( ! ewww_image_optimizer_test_background_opt() ) { */
-						ewww_image_optimizer( $filename );
-						ewwwio_debug_message( "image editor (wpthumb imagick) saved: $filename" );
-						$image_size = ewww_image_optimizer_filesize( $filename );
-						ewwwio_debug_message( "image editor size: $image_size" );
-
-					/*
-					} else {
-						add_filter( 'http_headers_useragent', 'ewww_image_optimizer_cloud_useragent', PHP_INT_MAX );
-						global $ewwwio_image_background;
-						if ( ! class_exists( 'WP_Background_Process' ) ) {
-							require_once( EWWW_IMAGE_OPTIMIZER_PLUGIN_PATH . 'background.php' );
-						}
-						if ( ! is_object( $ewwwio_image_background ) ) {
-							$ewwwio_image_background = new EWWWIO_Image_Background_Process();
-						}
-						$ewwwio_image_background->push_to_queue( $filename );
-						$ewwwio_image_background->save()->dispatch();
-						ewwwio_debug_message( "image editor (wpthumb imagick) queued: $filename" );
-					}
-					*/
+					ewww_image_optimizer( $filename );
+					ewwwio_debug_message( "image editor (wpthumb imagick) saved: $filename" );
+					$image_size = ewww_image_optimizer_filesize( $filename );
+					ewwwio_debug_message( "image editor size: $image_size" );
 				}
-				ewww_image_optimizer_debug_log();
 			}
 			ewwwio_memory( __FUNCTION__ );
 			return $saved;
@@ -88,9 +71,8 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 	}
 } elseif ( class_exists( 'BFI_Image_Editor_Imagick' ) ) {
 	/**
-	 * Extension of the WP_Image_Editor_Imagick class to auto-compress edited images.
-	 *
-	 * @see WP_Image_Editor_Imagick
+	 * Extension of the BFI_Image_Editor_Imagick class to auto-compress edited images.
+	 * The BFI project is no longer maintained, stop using it and update your code!
 	 */
 	class EWWWIO_Imagick_Editor extends BFI_Image_Editor_Imagick {
 		/**
@@ -105,7 +87,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			ewwwio_debug_message( '<b>wp_image_editor_imagick(bfi)::' . __FUNCTION__ . '()</b>' );
 			global $ewww_defer;
 			global $ewww_preempt_editor;
-			if ( ! empty( $ewww_preempt_editor ) ) {
+			if ( ! empty( $ewww_preempt_editor ) || ! defined( 'EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR' ) || ! EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR ) {
 				return parent::_save( $image, $filename, $mime_type );
 			}
 			list( $filename, $extension, $mime_type ) = $this->get_output_format( $filename, $mime_type );
@@ -114,7 +96,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			}
 			if ( ( ! defined( 'EWWWIO_EDITOR_OVERWRITE' ) || ! EWWWIO_EDITOR_OVERWRITE ) && ewwwio_is_file( $filename ) ) {
 				ewwwio_debug_message( "detected existing file: $filename" );
-				$current_size = getimagesize( $filename );
+				$current_size = wp_getimagesize( $filename );
 				if ( $current_size && (int) $this->size['width'] === (int) $current_size[0] && (int) $this->size['height'] === (int) $current_size[1] ) {
 					ewwwio_debug_message( "existing file has same dimensions, not saving $filename" );
 					return array(
@@ -135,29 +117,11 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 					$filename = $saved['path'];
 				}
 				if ( file_exists( $filename ) ) {
-					/* if ( ! ewww_image_optimizer_test_background_opt() ) { */
-						ewww_image_optimizer( $filename );
-						ewwwio_debug_message( "image editor (BFI imagick) saved: $filename" );
-						$image_size = ewww_image_optimizer_filesize( $filename );
-						ewwwio_debug_message( "image editor size: $image_size" );
-
-					/*
-					} else {
-						add_filter( 'http_headers_useragent', 'ewww_image_optimizer_cloud_useragent', PHP_INT_MAX );
-						global $ewwwio_image_background;
-						if ( ! class_exists( 'WP_Background_Process' ) ) {
-							require_once( EWWW_IMAGE_OPTIMIZER_PLUGIN_PATH . 'background.php' );
-						}
-						if ( ! is_object( $ewwwio_image_background ) ) {
-							$ewwwio_image_background = new EWWWIO_Image_Background_Process();
-						}
-						$ewwwio_image_background->push_to_queue( $filename );
-						$ewwwio_image_background->save()->dispatch();
-						ewwwio_debug_message( "image editor (BFI imagick) queued: $filename" );
-					}
-					*/
+					ewww_image_optimizer( $filename );
+					ewwwio_debug_message( "image editor (BFI imagick) saved: $filename" );
+					$image_size = ewww_image_optimizer_filesize( $filename );
+					ewwwio_debug_message( "image editor size: $image_size" );
 				}
-				ewww_image_optimizer_debug_log();
 			}
 			ewwwio_memory( __FUNCTION__ );
 			return $saved;
@@ -182,7 +146,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			ewwwio_debug_message( '<b>wp_image_editor_imagick(respimg)::' . __FUNCTION__ . '()</b>' );
 			global $ewww_defer;
 			global $ewww_preempt_editor;
-			if ( ! empty( $ewww_preempt_editor ) ) {
+			if ( ! empty( $ewww_preempt_editor ) || ! defined( 'EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR' ) || ! EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR ) {
 				return parent::_save( $image, $filename, $mime_type );
 			}
 			list( $filename, $extension, $mime_type ) = $this->get_output_format( $filename, $mime_type );
@@ -191,7 +155,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			}
 			if ( ( ! defined( 'EWWWIO_EDITOR_OVERWRITE' ) || ! EWWWIO_EDITOR_OVERWRITE ) && ewwwio_is_file( $filename ) ) {
 				ewwwio_debug_message( "detected existing file: $filename" );
-				$current_size = getimagesize( $filename );
+				$current_size = wp_getimagesize( $filename );
 				if ( $current_size && (int) $this->size['width'] === (int) $current_size[0] && (int) $this->size['height'] === (int) $current_size[1] ) {
 					ewwwio_debug_message( "existing file has same dimensions, not saving $filename" );
 					return array(
@@ -247,7 +211,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 		 * @return true|WP_Error
 		 */
 		public function resize( $max_w, $max_h, $crop = false ) {
-			ewwwio_debug_message( '<b>wp_image_editor_gd::' . __FUNCTION__ . '()</b>' );
+			ewwwio_debug_message( '<b>wp_image_editor_imagick::' . __FUNCTION__ . '()</b>' );
 			if ( (int) $this->size['width'] === (int) $max_w && (int) $this->size['height'] === (int) $max_h ) {
 				return true;
 			}
@@ -292,7 +256,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 		 * @return bool|WP_Error
 		 */
 		protected function _resize( $dims, $crop ) {
-			ewwwio_debug_message( '<b>wp_image_editor_gd::' . __FUNCTION__ . '()</b>' );
+			ewwwio_debug_message( '<b>wp_image_editor_imagick::' . __FUNCTION__ . '()</b>' );
 			list( $dst_x, $dst_y, $src_x, $src_y, $dst_w, $dst_h, $src_w, $src_h ) = $dims;
 			if ( defined( 'EWWWIO_EDITOR_AGR' ) && ! EWWWIO_EDITOR_AGR ) {
 				ewwwio_debug_message( 'AGR disabled' );
@@ -314,18 +278,18 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			}
 			$ewww_status = get_transient( 'ewww_image_optimizer_cloud_status' );
 			if ( 'image/gif' === $this->mime_type && function_exists( 'ewww_image_optimizer_path_check' ) && ! ewww_image_optimizer_get_option( 'ewww_image_optimizer_cloud_key' ) ) {
-				ewww_image_optimizer_path_check( false, false, true, false, false, false );
+				ewww_image_optimizer_path_check( false, false, true, false, false, false, false );
 			}
 			if ( 'image/gif' === $this->mime_type && ( ! defined( 'EWWW_IMAGE_OPTIMIZER_GIFSICLE' ) || ! EWWW_IMAGE_OPTIMIZER_GIFSICLE ) ) {
 				if ( false === strpos( $ewww_status, 'great' ) ) {
-					if ( ! ewww_image_optimizer_cloud_verify() ) {
+					if ( ! ewww_image_optimizer_cloud_verify( ewww_image_optimizer_get_option( 'ewww_image_optimizer_cloud_key' ) ) ) {
 						ewwwio_debug_message( 'no gifsicle or API to resize an animated GIF' );
 						$return_parent = true;
 					}
 				}
 			}
 			if ( 'image/gif' !== $this->mime_type && false === strpos( $ewww_status, 'great' ) ) {
-				if ( ! ewww_image_optimizer_cloud_verify() ) {
+				if ( ! ewww_image_optimizer_cloud_verify( ewww_image_optimizer_get_option( 'ewww_image_optimizer_cloud_key' ) ) ) {
 					ewwwio_debug_message( 'no API to resize the image' );
 					$return_parent = true;
 				}
@@ -336,7 +300,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			}
 			// TODO: Possibly handle crop, rotate, and flip down the road.
 			if ( ! empty( $this->modified ) ) {
-				ewwwio_debug_message( 'GIF already altered, leave it alone' );
+				ewwwio_debug_message( 'image already altered, leave it alone' );
 				$return_parent = true;
 			}
 			if ( ! $this->file || ewww_image_optimizer_stream_wrapped( $this->file ) || 0 === strpos( $this->file, 'http' ) || 0 === strpos( $this->file, 'ftp' ) || ! ewwwio_is_file( $this->file ) ) {
@@ -539,7 +503,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			global $ewww_preempt_editor;
 			if ( ( ! defined( 'EWWWIO_EDITOR_OVERWRITE' ) || ! EWWWIO_EDITOR_OVERWRITE ) && ewwwio_is_file( $filename ) && empty( $ewww_preempt_editor ) ) {
 				ewwwio_debug_message( "detected existing file: $filename" );
-				$current_size = getimagesize( $filename );
+				$current_size = wp_getimagesize( $filename );
 				if ( $current_size && (int) $this->size['width'] === (int) $current_size[0] && (int) $this->size['height'] === (int) $current_size[1] ) {
 					ewwwio_debug_message( "existing file has same dimensions, not saving $filename" );
 					return array(
@@ -591,7 +555,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			if ( ! empty( $this->ewww_image ) && empty( $this->modified ) ) {
 				return $this->_save_ewwwio_file( $this->ewww_image, $filename, $mime_type );
 			}
-			if ( ! empty( $ewww_preempt_editor ) ) {
+			if ( ! empty( $ewww_preempt_editor ) || ! defined( 'EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR' ) || ! EWWW_IMAGE_OPTIMIZER_ENABLE_EDITOR ) {
 				return parent::_save( $image, $filename, $mime_type );
 			}
 			list( $filename, $extension, $mime_type ) = $this->get_output_format( $filename, $mime_type );
@@ -600,7 +564,7 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 			}
 			if ( ( ! defined( 'EWWWIO_EDITOR_OVERWRITE' ) || ! EWWWIO_EDITOR_OVERWRITE ) && ewwwio_is_file( $filename ) ) {
 				ewwwio_debug_message( "detected existing file: $filename" );
-				$current_size = getimagesize( $filename );
+				$current_size = wp_getimagesize( $filename );
 				if ( $current_size && (int) $this->size['width'] === (int) $current_size[0] && (int) $this->size['height'] === (int) $current_size[1] ) {
 					ewwwio_debug_message( "existing file has same dimensions, not saving $filename" );
 					return array(
@@ -621,29 +585,11 @@ if ( class_exists( 'WP_Thumb_Image_Editor_Imagick' ) ) {
 					$filename = $saved['path'];
 				}
 				if ( file_exists( $filename ) ) {
-					/* if ( ! ewww_image_optimizer_test_background_opt() ) { */
-						ewww_image_optimizer( $filename );
-						ewwwio_debug_message( "image editor (imagick) saved: $filename" );
-						$image_size = ewww_image_optimizer_filesize( $filename );
-						ewwwio_debug_message( "image editor size: $image_size" );
-
-					/*
-					} else {
-						add_filter( 'http_headers_useragent', 'ewww_image_optimizer_cloud_useragent', PHP_INT_MAX );
-						global $ewwwio_image_background;
-						if ( ! class_exists( 'WP_Background_Process' ) ) {
-							require_once( EWWW_IMAGE_OPTIMIZER_PLUGIN_PATH . 'background.php' );
-						}
-						if ( ! is_object( $ewwwio_image_background ) ) {
-							$ewwwio_image_background = new EWWWIO_Image_Background_Process();
-						}
-						$ewwwio_image_background->push_to_queue( $filename );
-						$ewwwio_image_background->save()->dispatch();
-						ewwwio_debug_message( "image editor (imagick) queued: $filename" );
-					}
-					*/
+					ewww_image_optimizer( $filename );
+					ewwwio_debug_message( "image editor (imagick) saved: $filename" );
+					$image_size = ewww_image_optimizer_filesize( $filename );
+					ewwwio_debug_message( "image editor size: $image_size" );
 				}
-				ewww_image_optimizer_debug_log();
 			}
 			ewwwio_memory( __FUNCTION__ );
 			return $saved;

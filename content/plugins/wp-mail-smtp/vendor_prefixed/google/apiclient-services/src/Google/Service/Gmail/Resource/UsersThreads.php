@@ -50,9 +50,9 @@ class Google_Service_Gmail_Resource_UsersThreads extends \WPMailSMTP\Vendor\Goog
      * @param string $id The ID of the thread to retrieve.
      * @param array $optParams Optional parameters.
      *
+     * @opt_param string format The format to return the messages in.
      * @opt_param string metadataHeaders When given and format is METADATA, only
      * include headers specified.
-     * @opt_param string format The format to return the messages in.
      * @return Google_Service_Gmail_Thread
      */
     public function get($userId, $id, $optParams = array())
@@ -68,6 +68,10 @@ class Google_Service_Gmail_Resource_UsersThreads extends \WPMailSMTP\Vendor\Goog
      * used to indicate the authenticated user.
      * @param array $optParams Optional parameters.
      *
+     * @opt_param bool includeSpamTrash Include threads from `SPAM` and `TRASH` in
+     * the results.
+     * @opt_param string labelIds Only return threads with labels that match all of
+     * the specified label IDs.
      * @opt_param string maxResults Maximum number of threads to return.
      * @opt_param string pageToken Page token to retrieve a specific page of results
      * in the list.
@@ -75,10 +79,6 @@ class Google_Service_Gmail_Resource_UsersThreads extends \WPMailSMTP\Vendor\Goog
      * Supports the same query format as the Gmail search box. For example,
      * `"from:someuser@example.com rfc822msgid: is:unread"`. Parameter cannot be
      * used when accessing the api using the gmail.metadata scope.
-     * @opt_param string labelIds Only return threads with labels that match all of
-     * the specified label IDs.
-     * @opt_param bool includeSpamTrash Include threads from `SPAM` and `TRASH` in
-     * the results.
      * @return Google_Service_Gmail_ListThreadsResponse
      */
     public function listUsersThreads($userId, $optParams = array())

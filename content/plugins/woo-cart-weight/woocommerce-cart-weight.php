@@ -3,16 +3,16 @@
  * Plugin Name: WooCommerce Cart Weight
  * Plugin URI: https://wordpress.org/plugins/woo-cart-weight/
  * Description: Displays total order weight in cart.
- * Version: 1.3.0
+ * Version: 1.3.5
  * Author: WP Desk
  * Author URI: https://www.wpdesk.net/
  * Text Domain: woo-cart-weight
  * Domain Path: /lang/
- * Requires at least: 4.5
- * Tested up to: 5.5
- * WC requires at least: 4.0
- * WC tested up to: 4.5
- * Requires PHP: 5.6
+ * Requires at least: 5.2
+ * Tested up to: 5.7
+ * WC requires at least: 4.8
+ * WC tested up to: 5.3
+ * Requires PHP: 7.0
  *
  * Copyright 2019 WP Desk Ltd.
  *
@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 
 /* THIS VARIABLE CAN BE CHANGED AUTOMATICALLY */
-$plugin_version = '1.3.0';
+$plugin_version = '1.3.5';
 
 $plugin_name        = 'WooCommerce Cart Weight';
 $plugin_class_name  = '\WPDesk\WooCommerceCartWeight\Plugin';

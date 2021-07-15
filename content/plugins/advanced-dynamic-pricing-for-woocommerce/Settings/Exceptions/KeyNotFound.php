@@ -2,7 +2,8 @@
 
 namespace ADP\Settings\Exceptions;
 
-class KeyNotFound extends \Exception {
+class KeyNotFound extends \Exception
+{
     private $key;
 
     public function __construct($key, $code = 0, \Throwable $previous = null)
@@ -11,7 +12,8 @@ class KeyNotFound extends \Exception {
         parent::__construct('', $code, $previous);
     }
 
-    public function errorMessage() {
+    public function errorMessage()
+    {
         return "Key '{$this->key}' not found"; // TODO localize
     }
 }

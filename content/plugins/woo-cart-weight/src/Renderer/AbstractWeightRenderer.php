@@ -48,6 +48,7 @@ abstract class AbstractWeightRenderer implements Hookable {
 	}
 
 	/**
+	 * @return void
 	 * @internal
 	 */
 	public function render_weight() {
