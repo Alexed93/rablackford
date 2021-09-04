@@ -182,29 +182,7 @@ function rab_order_delivery_options(){
 
     //if (  WC()->session->get( 'chosen_shipping_methods' )[0] == targeted_shipping_method() ) :
 
-        echo '<tr class="delivery"><th>' . __('Fuel delivery method', $domain) . '</th><td>';
-        echo '<ul id="delivery__methods" class="">';
-
-        $chosen = WC()->session->get('chosen_delivery');
-        $chosen = empty($chosen) ? WC()->checkout->get_value('delivery') : $chosen;
-        $chosen = empty($chosen) ? 'radio_delivery_open' : $chosen;
-
-        //echo $chosen;
-
-        ?>
-        <li>
-          <input type="radio" class="input-radio " value="radio_delivery_open" name="radio_delivery"  id="radio_delivery_open" <?php checked( $chosen, 'radio_delivery_open', true ); ?>/>
-          <label for="radio_delivery_open" class="radio ">Open Sacks</label>
-        </li>
-        <li>
-          <input type="radio" class="input-radio " value="radio_delivery_closed" name="radio_delivery"  id="radio_delivery_bagged" <?php checked( $chosen, 'radio_delivery_closed', true ); ?>/>
-          <label for="radio_delivery_bagged" class="radio ">Sealed Plastic Bags</label>
-        </li>
-
-
-        <?php
-
-        echo '</ul>';
+        echo '<tr class="delivery"><th>' . __('Fuel delivery', $domain) . '</th><td>';
 
         $method_text = get_field('delivery_method_supporting_text', 'options');
 
@@ -359,5 +337,7 @@ function rab_custom_delivery_method_review( $item_id, $item, $order ){
         $delivery_text = 'Open Bags';
     }
     // Display the custom field:
-    echo '<p class="u-pad-top"><strong>' . __('Delivery Method', 'woocommerce') . ': </strong>' . $delivery_text . '</p>';
+    if ($delivery_text) {
+        echo '<p class="u-pad-top"><strong>' . __('Delivery Method', 'woocommerce') . ': </strong>' . $delivery_text . '</p>';
+    }
 }
