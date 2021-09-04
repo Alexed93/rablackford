@@ -10,7 +10,10 @@ use Yoast\WP\SEO\Generators\Schema_Generator;
 use Yoast\WP\SEO\Generators\Twitter_Image_Generator;
 use Yoast\WP\SEO\Helpers\Current_Page_Helper;
 use Yoast\WP\SEO\Helpers\Image_Helper;
+use Yoast\WP\SEO\Helpers\Indexable_Helper;
+use Yoast\WP\SEO\Helpers\Open_Graph\Values_Helper;
 use Yoast\WP\SEO\Helpers\Options_Helper;
+use Yoast\WP\SEO\Helpers\Permalink_Helper;
 use Yoast\WP\SEO\Helpers\Url_Helper;
 use Yoast\WP\SEO\Helpers\User_Helper;
 use Yoast\WP\SEO\Models\Indexable;
@@ -47,6 +50,7 @@ use Yoast\WP\SEO\Models\Indexable;
  * @property string $twitter_site
  * @property array  $source
  * @property array  $breadcrumbs
+ * @property int    $estimated_reading_time_minutes
  */
 class Indexable_Presentation extends Abstract_Presentation {
 
@@ -135,6 +139,27 @@ class Indexable_Presentation extends Abstract_Presentation {
 	protected $user;
 
 	/**
+	 * The indexable helper.
+	 *
+	 * @var Indexable_Helper
+	 */
+	protected $indexable_helper;
+
+	/**
+	 * The permalink helper.
+	 *
+	 * @var Permalink_Helper
+	 */
+	protected $permalink_helper;
+
+	/**
+	 * The values helper.
+	 *
+	 * @var Values_Helper
+	 */
+	protected $values_helper;
+
+	/**
 	 * Sets the generator dependencies.
 	 *
 	 * @required
@@ -169,19 +194,41 @@ class Indexable_Presentation extends Abstract_Presentation {
 	 * @param Current_Page_Helper $current_page The current page helper.
 	 * @param Url_Helper          $url          The URL helper.
 	 * @param User_Helper         $user         The user helper.
+	 * @param Indexable_Helper    $indexable    The indexable helper.
+	 * @param Permalink_Helper    $permalink    The permalink helper.
+	 * @param Values_Helper       $values       The values helper.
 	 */
 	public function set_helpers(
 		Image_Helper $image,
 		Options_Helper $options,
 		Current_Page_Helper $current_page,
 		Url_Helper $url,
-		User_Helper $user
+		User_Helper $user,
+		Indexable_Helper $indexable,
+		Permalink_Helper $permalink,
+		Values_Helper $values
 	) {
-		$this->image        = $image;
-		$this->options      = $options;
-		$this->current_page = $current_page;
-		$this->url          = $url;
-		$this->user         = $user;
+		$this->image            = $image;
+		$this->options          = $options;
+		$this->current_page     = $current_page;
+		$this->url              = $url;
+		$this->user             = $user;
+		$this->indexable_helper = $indexable;
+		$this->permalink_helper = $permalink;
+		$this->values_helper    = $values;
+	}
+
+	/**
+	 * Gets the permalink from the indexable or generates it if dynamic permalinks are enabled.
+	 *
+	 * @return string The permalink.
+	 */
+	public function get_permalink() {
+		if ( $this->indexable_helper->dynamic_permalinks_enabled() ) {
+			return $this->permalink_helper->get_permalink_for_indexable( $this->model );
+		}
+
+		return $this->model->permalink;
 	}
 
 	/**
@@ -312,7 +359,7 @@ class Indexable_Presentation extends Abstract_Presentation {
 	 * @return array The robots value with opt-in snippets.
 	 */
 	public function generate_googlebot() {
-		_deprecated_function( __METHOD__, 'WPSEO 14.9' );
+		\_deprecated_function( __METHOD__, 'WPSEO 14.9' );
 
 		return [];
 	}
@@ -326,7 +373,7 @@ class Indexable_Presentation extends Abstract_Presentation {
 	 * @return array The robots value with opt-in snippets.
 	 */
 	public function generate_bingbot() {
-		_deprecated_function( __METHOD__, 'WPSEO 14.9' );
+		\_deprecated_function( __METHOD__, 'WPSEO 14.9' );
 
 		return [];
 	}
@@ -341,8 +388,9 @@ class Indexable_Presentation extends Abstract_Presentation {
 			return $this->model->canonical;
 		}
 
-		if ( $this->model->permalink ) {
-			return $this->model->permalink;
+		$permalink = $this->get_permalink();
+		if ( $permalink ) {
+			return $permalink;
 		}
 
 		return '';
@@ -382,10 +430,19 @@ class Indexable_Presentation extends Abstract_Presentation {
 	 */
 	public function generate_open_graph_title() {
 		if ( $this->model->open_graph_title ) {
-			return $this->model->open_graph_title;
+			$open_graph_title = $this->model->open_graph_title;
 		}
 
-		return $this->title;
+		if ( empty( $open_graph_title ) ) {
+			// The helper applies a filter, but we don't have a default value at this stage so we pass an empty string.
+			$open_graph_title = $this->values_helper->get_open_graph_title( '', $this->model->object_type, $this->model->object_sub_type );
+		}
+
+		if ( empty( $open_graph_title ) ) {
+			$open_graph_title = $this->title;
+		}
+
+		return $open_graph_title;
 	}
 
 	/**
@@ -395,10 +452,19 @@ class Indexable_Presentation extends Abstract_Presentation {
 	 */
 	public function generate_open_graph_description() {
 		if ( $this->model->open_graph_description ) {
-			return $this->model->open_graph_description;
+			$open_graph_description = $this->model->open_graph_description;
 		}
 
-		return $this->meta_description;
+		if ( empty( $open_graph_description ) ) {
+			// The helper applies a filter, but we don't have a default value at this stage so we pass an empty string.
+			$open_graph_description = $this->values_helper->get_open_graph_description( '', $this->model->object_type, $this->model->object_sub_type );
+		}
+
+		if ( empty( $open_graph_description ) ) {
+			$open_graph_description = $this->meta_description;
+		}
+
+		return $open_graph_description;
 	}
 
 	/**
@@ -415,6 +481,32 @@ class Indexable_Presentation extends Abstract_Presentation {
 	}
 
 	/**
+	 * Generates the open graph image ID.
+	 *
+	 * @return string The open graph image ID.
+	 */
+	public function generate_open_graph_image_id() {
+		if ( $this->model->open_graph_image_id ) {
+			return $this->model->open_graph_image_id;
+		}
+
+		return $this->values_helper->get_open_graph_image_id( 0, $this->model->object_type, $this->model->object_sub_type );
+	}
+
+	/**
+	 * Generates the open graph image URL.
+	 *
+	 * @return string The open graph image URL.
+	 */
+	public function generate_open_graph_image() {
+		if ( $this->model->open_graph_image ) {
+			return $this->model->open_graph_image;
+		}
+
+		return $this->values_helper->get_open_graph_image( '', $this->model->object_type, $this->model->object_sub_type );
+	}
+
+	/**
 	 * Generates the open graph url.
 	 *
 	 * @return string The open graph url.
@@ -424,7 +516,7 @@ class Indexable_Presentation extends Abstract_Presentation {
 			return $this->model->canonical;
 		}
 
-		return $this->model->permalink;
+		return $this->get_permalink();
 	}
 
 	/**
@@ -475,6 +567,9 @@ class Indexable_Presentation extends Abstract_Presentation {
 	/**
 	 * Generates the open graph Facebook app ID.
 	 *
+	 * @deprecated 15.5
+	 * @codeCoverageIgnore
+	 *
 	 * @return string The open graph Facebook app ID.
 	 */
 	public function generate_open_graph_fb_app_id() {
@@ -509,8 +604,20 @@ class Indexable_Presentation extends Abstract_Presentation {
 			return $this->model->twitter_title;
 		}
 
-		if ( $this->open_graph_title && $this->context->open_graph_enabled === true ) {
-			return '';
+		if ( $this->context->open_graph_enabled === true ) {
+			$social_template_title = $this->values_helper->get_open_graph_title( '', $this->model->object_type, $this->model->object_sub_type );
+			$open_graph_title      = $this->open_graph_title;
+
+			// If the helper returns a value and it's different from the OG value in the indexable,
+			// output it in a twitter: tag.
+			if ( ! empty( $social_template_title ) && $social_template_title !== $open_graph_title ) {
+				return $social_template_title;
+			}
+
+			// If the OG title is set, let og: tag take care of this.
+			if ( ! empty( $open_graph_title ) ) {
+				return '';
+			}
 		}
 
 		if ( $this->title ) {
@@ -530,8 +637,20 @@ class Indexable_Presentation extends Abstract_Presentation {
 			return $this->model->twitter_description;
 		}
 
-		if ( $this->open_graph_description && $this->context->open_graph_enabled === true ) {
-			return '';
+		if ( $this->context->open_graph_enabled === true ) {
+			$social_template_description = $this->values_helper->get_open_graph_description( '', $this->model->object_type, $this->model->object_sub_type );
+			$open_graph_description      = $this->open_graph_description;
+
+			// If the helper returns a value and it's different from the OG value in the indexable,
+			// output it in a twitter: tag.
+			if ( ! empty( $social_template_description ) && $social_template_description !== $open_graph_description ) {
+				return $social_template_description;
+			}
+
+			// If the OG description is set, let og: tag take care of this.
+			if ( ! empty( $open_graph_description ) ) {
+				return '';
+			}
 		}
 
 		if ( $this->meta_description ) {
@@ -550,17 +669,22 @@ class Indexable_Presentation extends Abstract_Presentation {
 		$images = $this->twitter_image_generator->generate( $this->context );
 		$image  = \reset( $images );
 
-		// When there is an image set by the user.
+		// Use a user-defined Twitter image, if present.
 		if ( $image && $this->context->indexable->twitter_image_source === 'set-by-user' ) {
 			return $image['url'];
 		}
 
-		// When there isn't a set image or there is a Open Graph image set.
-		if ( empty( $image ) || ( $this->context->open_graph_enabled === true && $this->open_graph_images ) ) {
+		// Let the Open Graph tags, if enabled, handle the rest of the fallback hierarchy.
+		if ( $this->context->open_graph_enabled === true && $this->open_graph_images ) {
 			return '';
 		}
 
-		return $image['url'];
+		// Set a Twitter tag with the featured image, or a prominent image from the content, if present.
+		if ( $image ) {
+			return $image['url'];
+		}
+
+		return '';
 	}
 
 	/**
@@ -623,6 +747,28 @@ class Indexable_Presentation extends Abstract_Presentation {
 	 */
 	public function generate_breadcrumbs() {
 		return $this->breadcrumbs_generator->generate( $this->context );
+	}
+
+	/**
+	 * Generates the estimated reading time.
+	 *
+	 * @return int|null The estimated reading time.
+	 *
+	 * @codeCoverageIgnore Wrapper method.
+	 */
+	public function generate_estimated_reading_time_minutes() {
+		if ( $this->model->estimated_reading_time_minutes !== null ) {
+			return $this->model->estimated_reading_time_minutes;
+		}
+
+		if ( $this->context->post === null ) {
+			return null;
+		}
+
+		// 200 is the approximate estimated words per minute across languages.
+		$words_per_minute = 200;
+		$words            = \str_word_count( \wp_strip_all_tags( $this->context->post->post_content ) );
+		return (int) \round( $words / $words_per_minute );
 	}
 
 	/**

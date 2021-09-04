@@ -14,32 +14,48 @@ class WC_Min_Max_Quantities_Admin {
 		$this->settings = array(
 			array( 'name' => __( 'Min/Max Quantities', 'woocommerce-min-max-quantities' ), 'type' => 'title', 'desc' => '', 'id' => 'minmax_quantity_options' ),
 			array(
-				'name' 		=> __( 'Minimum Order Qty', 'woocommerce-min-max-quantities' ),
-				'desc' 		=> __( 'The minimum allowed quantity of items in an order.', 'woocommerce-min-max-quantities' ),
-				'id' 		=> 'woocommerce_minimum_order_quantity',
-				'type' 		=> 'number',
-				'desc_tip'  => true
+				'name'              => __( 'Minimum Order Qty', 'woocommerce-min-max-quantities' ),
+				'desc'              => __( 'The minimum allowed quantity of items in an order.', 'woocommerce-min-max-quantities' ),
+				'id'                => 'woocommerce_minimum_order_quantity',
+				'type'              => 'number',
+				'desc_tip'          => true,
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 1,
+				),
 			),
 			array(
-				'name' 		=> __( 'Maximum Order Qty', 'woocommerce-min-max-quantities' ),
-				'desc' 		=> __( 'The maximum allowed quantity of items in an order.', 'woocommerce-min-max-quantities' ),
-				'id' 		=> 'woocommerce_maximum_order_quantity',
-				'type' 		=> 'number',
-				'desc_tip'  => true
+				'name'              => __( 'Maximum Order Qty', 'woocommerce-min-max-quantities' ),
+				'desc'              => __( 'The maximum allowed quantity of items in an order.', 'woocommerce-min-max-quantities' ),
+				'id'                => 'woocommerce_maximum_order_quantity',
+				'type'              => 'number',
+				'desc_tip'          => true,
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 1,
+				),
 			),
 			array(
-				'name' 		=> __( 'Minimum Order Value', 'woocommerce-min-max-quantities' ),
-				'desc' 		=> __( 'The minimum allowed value of items in an order.', 'woocommerce-min-max-quantities' ),
-				'id' 		=> 'woocommerce_minimum_order_value',
-				'type' 		=> 'number',
-				'desc_tip'  => true
+				'name'              => __( 'Minimum Order Value', 'woocommerce-min-max-quantities' ),
+				'desc'              => __( 'The minimum allowed value of items in an order.', 'woocommerce-min-max-quantities' ),
+				'id'                => 'woocommerce_minimum_order_value',
+				'type'              => 'number',
+				'desc_tip'          => true,
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 1,
+				),
 			),
 			array(
-				'name' 		=> __( 'Maximum Order Value', 'woocommerce-min-max-quantities' ),
-				'desc' 		=> __( 'The maximum allowed value of items in an order.', 'woocommerce-min-max-quantities' ),
-				'id' 		=> 'woocommerce_maximum_order_value',
-				'type' 		=> 'number',
-				'desc_tip'  => true
+				'name'              => __( 'Maximum Order Value', 'woocommerce-min-max-quantities' ),
+				'desc'              => __( 'The maximum allowed value of items in an order.', 'woocommerce-min-max-quantities' ),
+				'id'                => 'woocommerce_maximum_order_value',
+				'type'              => 'number',
+				'desc_tip'          => true,
+				'custom_attributes' => array(
+					'min'  => 0,
+					'step' => 1,
+				),
 			),
 			array( 'type' => 'sectionend', 'id' => 'minmax_quantity_options' ),
 		);
@@ -55,7 +71,6 @@ class WC_Min_Max_Quantities_Admin {
 		add_action( 'woocommerce_product_options_general_product_data', array( &$this, 'write_panel' ) );
 
 		add_action( 'woocommerce_process_product_meta', array( &$this, 'write_panel_save' ) );
-
 
 		// Category level
 		add_action( 'created_term', array( $this, 'category_fields_save' ), 10, 3 );
@@ -114,11 +129,11 @@ class WC_Min_Max_Quantities_Admin {
 
 		woocommerce_wp_text_input( array( 'id' => 'group_of_quantity', 'label' => __( 'Group of...', 'woocommerce-min-max-quantities' ), 'description' => __( 'Enter a quantity to only allow this product to be purchased in groups of X', 'woocommerce-min-max-quantities' ), 'desc_tip' => true, 'type' => 'number', 'custom_attributes' => array( 'min' => 0, 'step' => 1 ) ) );
 
-		woocommerce_wp_checkbox( array( 'id' => 'allow_combination', 'label' => __( 'Allow Combination', 'woocommerce-min-max-quantities' ), 'description' => __( 'Allow combination of variations to satisfy the min/max rules above.', 'woocommerce-min-max-quantities' ) ) );
+		woocommerce_wp_checkbox( array( 'id' => 'allow_combination', 'label' => __( 'Combine variations', 'woocommerce-min-max-quantities' ), 'description' => __( 'Combine all variations together when checking the min/max rules above.', 'woocommerce-min-max-quantities' ) ) );
 
-		woocommerce_wp_checkbox( array( 'id' => 'minmax_do_not_count', 'label' => __( 'Order rules: Do not count', 'woocommerce-min-max-quantities' ), 'description' => __( 'Don\'t count this product against your minimum order quantity/value rules.', 'woocommerce-min-max-quantities' ) ) );
+		woocommerce_wp_checkbox( array( 'id' => 'minmax_do_not_count', 'label' => __( 'Order rules: Do not count', 'woocommerce-min-max-quantities' ), 'description' => __( 'Don\'t count this product against your minimum order quantity/value rules. See the <a href="https://docs.woocommerce.com/document/minmax-quantities/#section-3" target="_blank">documentation</a> for full details.', 'woocommerce-min-max-quantities' ) ) );
 
-		woocommerce_wp_checkbox( array( 'id' => 'minmax_cart_exclude', 'label' => __( 'Order rules: Exclude', 'woocommerce-min-max-quantities' ), 'description' => __( 'Exclude this product from minimum order quantity/value rules. If this is the only item in the cart, rules will not apply.', 'woocommerce-min-max-quantities' ) ) );
+		woocommerce_wp_checkbox( array( 'id' => 'minmax_cart_exclude', 'label' => __( 'Order rules: Exclude', 'woocommerce-min-max-quantities' ), 'description' => __( 'Exclude this product from minimum order quantity/value rules. If this is the only item in the cart, rules will not apply. See the <a href="https://docs.woocommerce.com/document/minmax-quantities/#section-3" target="_blank">documentation</a> for full details.', 'woocommerce-min-max-quantities' ) ) );
 
 		woocommerce_wp_checkbox( array( 'id' => 'minmax_category_group_of_exclude', 'label' => __( 'Category rules: Exclude', 'woocommerce-min-max-quantities' ), 'description' => __( 'Exclude this product from category group-of-quantity rules. This product will not be counted towards category groups.', 'woocommerce-min-max-quantities' ) ) );
 
@@ -228,6 +243,9 @@ class WC_Min_Max_Quantities_Admin {
 			update_post_meta( $variation_id, 'variation_minmax_category_group_of_exclude', 'no' );
 
 		}
+
+		// Increments the transient version to invalidate cache.
+		WC_Cache_Helper::get_transient_version( 'wc_min_max_group_quantity', true );
     }
 
     /**
@@ -262,6 +280,9 @@ class WC_Min_Max_Quantities_Admin {
 		update_post_meta( $post_id, 'minmax_cart_exclude', empty( $_POST['minmax_cart_exclude'] ) ? 'no' : 'yes' );
 
 		update_post_meta( $post_id, 'minmax_category_group_of_exclude', empty( $_POST['minmax_category_group_of_exclude'] ) ? 'no' : 'yes' );
+
+		// Increments the transient version to invalidate cache.
+		WC_Cache_Helper::get_transient_version( 'wc_min_max_group_quantity', true );
     }
 
     /**
@@ -306,17 +327,17 @@ class WC_Min_Max_Quantities_Admin {
 	<div class="min_max_rules_options" <?php echo $visible; ?>>
 		<p class="form-row form-row-first">
 			<label><?php _e( 'Minimum quantity', 'woocommerce-min-max-quantities' ); ?>
-			<input type="number" size="5" name="variation_minimum_allowed_quantity[<?php echo $loop; ?>]" value="<?php if ( $min_qty ) echo esc_attr( $min_qty ); ?>" /></label>
+			<input type="number" min="0" step="1" size="5" name="variation_minimum_allowed_quantity[<?php echo $loop; ?>]" value="<?php if ( $min_qty ) echo esc_attr( $min_qty ); ?>" /></label>
 		</p>
 
 		<p class="form-row form-row-last">
 			<label><?php _e( 'Maximum quantity', 'woocommerce-min-max-quantities' ); ?>
-			<input type="number" size="5" name="variation_maximum_allowed_quantity[<?php echo $loop; ?>]" value="<?php if ( $max_qty ) echo esc_attr( $max_qty ); ?>" /></label>
+			<input type="number" min="0" step="1" size="5" name="variation_maximum_allowed_quantity[<?php echo $loop; ?>]" value="<?php if ( $max_qty ) echo esc_attr( $max_qty ); ?>" /></label>
 		</p>
 
 		<p class="form-row form-row-first">
 			<label><?php _e( 'Group of...', 'woocommerce-min-max-quantities' ); ?>
-			<input type="number" size="5" name="variation_group_of_quantity[<?php echo $loop; ?>]" value="<?php if ( $group_of ) echo esc_attr( $group_of ); ?>" /></label>
+			<input type="number" min="0" step="1" size="5" name="variation_group_of_quantity[<?php echo $loop; ?>]" value="<?php if ( $group_of ) echo esc_attr( $group_of ); ?>" /></label>
 		</p>
 
 		<p class="form-row form-row-last">
@@ -341,7 +362,7 @@ class WC_Min_Max_Quantities_Admin {
 		?>
 		<div class="form-field">
 			<label><?php _e( 'Group of...', 'woocommerce-min-max-quantities' ); ?></label>
-			<input type="number" size="5" name="group_of_quantity" />
+			<input type="number" min="0" step="1" size="5" name="group_of_quantity" />
 			<p class="description"><?php _e( 'Enter a quantity to only allow products in this category to be purchased in groups of X', 'woocommerce-min-max-quantities' ); ?></p>
 		</div>
 		<?php
@@ -363,7 +384,7 @@ class WC_Min_Max_Quantities_Admin {
 		<tr class="form-field">
 			<th scope="row" valign="top"><label><?php _e( 'Group of...', 'woocommerce-min-max-quantities' ); ?></label></th>
 			<td>
-				<input type="number" size="5" name="group_of_quantity" value="<?php echo $display_type; ?>" />
+				<input type="number" min="0" step="1" size="5" name="group_of_quantity" value="<?php echo $display_type; ?>" />
 				<p class="description"><?php _e( 'Enter a quantity to only allow products in this category to be purchased in groups of X', 'woocommerce-min-max-quantities' ); ?></p>
 			</td>
 		</tr>
@@ -386,6 +407,9 @@ class WC_Min_Max_Quantities_Admin {
 			} else {
 				update_woocommerce_term_meta( $term_id, 'group_of_quantity', esc_attr( $_POST['group_of_quantity'] ) );
 			}
+
+			// Increments the transient version to invalidate cache.
+			WC_Cache_Helper::get_transient_version( 'wc_min_max_group_quantity', true );
 		}
 	}
 

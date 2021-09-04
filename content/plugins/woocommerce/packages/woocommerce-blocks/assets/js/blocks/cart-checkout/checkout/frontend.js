@@ -3,17 +3,17 @@
  */
 import { __ } from '@wordpress/i18n';
 import {
-	withRestApiHydration,
 	withStoreCartApiHydration,
+	withRestApiHydration,
 } from '@woocommerce/block-hocs';
-import { useStoreCart } from '@woocommerce/base-hooks';
+import { useStoreCart } from '@woocommerce/base-context/hooks';
 import {
 	StoreNoticesProvider,
 	ValidationContextProvider,
 } from '@woocommerce/base-context';
 import BlockErrorBoundary from '@woocommerce/base-components/block-error-boundary';
-import { CURRENT_USER_IS_ADMIN } from '@woocommerce/block-settings';
-import { __experimentalCreateInterpolateElement } from 'wordpress-element';
+import { CURRENT_USER_IS_ADMIN } from '@woocommerce/settings';
+import { createInterpolateElement } from 'wordpress-element';
 import {
 	renderFrontend,
 	getValidBlockAttributes,
@@ -46,7 +46,7 @@ const CheckoutFrontend = ( props ) => {
 						'Something went wrong…',
 						'woocommerce'
 					) }
-					text={ __experimentalCreateInterpolateElement(
+					text={ createInterpolateElement(
 						__(
 							'The checkout has encountered an unexpected error. <button>Try reloading the page</button>. If the error persists, please get in touch with us so we can assist.',
 							'woocommerce'
@@ -82,7 +82,7 @@ const getProps = ( el ) => {
 const getErrorBoundaryProps = () => {
 	return {
 		header: __( 'Something went wrong…', 'woocommerce' ),
-		text: __experimentalCreateInterpolateElement(
+		text: createInterpolateElement(
 			__(
 				'The checkout has encountered an unexpected error. <button>Try reloading the page</button>. If the error persists, please get in touch with us so we can assist.',
 				'woocommerce'

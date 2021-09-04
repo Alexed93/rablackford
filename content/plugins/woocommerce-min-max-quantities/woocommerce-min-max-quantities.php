@@ -3,18 +3,18 @@
  * Plugin Name: WooCommerce Min/Max Quantities
  * Plugin URI: https://woocommerce.com/products/minmax-quantities/
  * Description: Define minimum/maximum allowed quantities for products, variations and orders.
- * Version: 2.4.20
+ * Version: 2.4.24
  * Author: WooCommerce
  * Author URI: https://woocommerce.com
  * Requires at least: 4.0
- * Tested up to: 5.5
- * WC tested up to: 4.5
+ * Tested up to: 5.7
+ * WC tested up to: 5.4
  * WC requires at least: 2.6
  *
  * Text Domain: woocommerce-min-max-quantities
  * Domain Path: /languages
  *
- * Copyright: © 2020 WooCommerce
+ * Copyright: © 2021 WooCommerce
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * Woo: 18616:2b5188d90baecfb781a5aa2d6abb900a
@@ -24,7 +24,7 @@
 
 if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 
-	define( 'WC_MIN_MAX_QUANTITIES', '2.4.20' ); // WRCS: DEFINED_VERSION.
+	define( 'WC_MIN_MAX_QUANTITIES', '2.4.24' ); // WRCS: DEFINED_VERSION.
 
 	/**
 	 * Min Max Quantities class.
@@ -95,6 +95,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 		 */
 		public function __construct() {
 			if ( ! class_exists( 'WooCommerce' ) ) {
+				add_action( 'admin_notices', array( $this, 'admin_notice' ) );
 				return;
 			}
 
@@ -119,9 +120,13 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 			// Check items.
 			add_action( 'woocommerce_check_cart_items', array( $this, 'check_cart_items' ) );
 
+			// If we have errors, make sure those are shown on the checkout page
+			add_action( 'woocommerce_cart_has_errors', array( $this, 'output_errors' ) );
+
 			// Quantity selelectors (2.0+).
 			add_filter( 'woocommerce_quantity_input_args', array( $this, 'update_quantity_args' ), 10, 2 );
 			add_filter( 'woocommerce_available_variation', array( $this, 'available_variation' ), 10, 3 );
+			add_filter( 'wc_min_max_use_group_as_min_quantity', array( $this, 'use_group_as_min_quantity' ), 10, 3 );
 
 			// Prevent add to cart.
 			add_filter( 'woocommerce_add_to_cart_validation', array( $this, 'add_to_cart' ), 10, 4 );
@@ -133,6 +138,34 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 			add_filter( 'woocommerce_get_availability', array( $this, 'maybe_show_backorder_message' ), 10, 2 );
 
 			add_action( 'wp_enqueue_scripts', array( $this, 'load_scripts' ) );
+
+			add_filter( 'woocommerce_add_to_cart_product_id', array( $this, 'modify_add_to_cart_quantity' ) );
+		}
+
+		/**
+		 * Output a notice if Woocommerce isn't active.
+		 */
+		public function admin_notice() {
+			// Make sure the get_current_screen function exists.
+			if ( ! function_exists( 'get_current_screen' ) ) {
+				require_once ABSPATH . 'wp-admin/includes/screen.php';
+			}
+
+			// Only show notice if on the plugins page and user has proper permissions.
+			$current_screen = get_current_screen();
+			if ( 'plugins' !== $current_screen->id || ( ! current_user_can( 'install_plugins' ) || ! current_user_can( 'activate_plugins' ) ) ) {
+				return;
+			}
+			?>
+
+			<div class="notice notice-error is-dismissible">
+				<p>
+					<?php /* translators: %s is the WooCommerce link. */ ?>
+					<?php printf( esc_html__( 'Min/Max Quantities requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-min-max-quantities' ), '<a href="https://woocommerce.com/" target="_blank">WooCommerce</a>' ); ?>
+				</p>
+			</div>
+
+			<?php
 		}
 
 		/**
@@ -178,7 +211,40 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 		 */
 		public function add_error( $error = '' ) {
 			if ( $error && ! wc_has_notice( $error, 'error' ) ) {
-				wc_add_notice( $error, 'error' );
+				wc_add_notice( $error, 'error', array( 'source' => 'woocommerce-min-max-quantities' ) );
+			}
+		}
+
+		/**
+		 * Output any plugin specific error messages
+		 *
+		 * We use this instead of wc_print_notices so we
+		 * can remove any error notices that aren't from us.
+		 */
+		public function output_errors() {
+			$notices  = wc_get_notices( 'error' );
+			$messages = array();
+
+			foreach ( $notices as $i => $notice ) {
+				if ( isset( $notice['notice'] ) && isset( $notice['data']['source'] ) && 'woocommerce-min-max-quantities' === $notice['data']['source'] ) {
+					$messages[] = $notice['notice'];
+				} else {
+					unset( $notice[ $i ] );
+				}
+			}
+
+			if ( ! empty( $messages ) ) {
+				ob_start();
+
+				wc_get_template(
+					'notices/error.php',
+					array(
+						'messages' => array_filter( $messages ), // @deprecated 3.9.0
+						'notices'  => array_filter( $notices ),
+					)
+				);
+
+				echo wc_kses_notice( ob_get_clean() ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 			}
 		}
 
@@ -194,7 +260,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 			if ( 'variable' !== $product->get_type() ) {
 				$quantity_attribute = 1;
 				$minimum_quantity   = absint( get_post_meta( $product->get_id(), 'minimum_allowed_quantity', true ) );
-				$group_of_quantity  = absint( get_post_meta( $product->get_id(), 'group_of_quantity', true ) );
+				$group_of_quantity  = $this->get_group_of_quantity_for_product( $product );
 
 				if ( $minimum_quantity || $group_of_quantity ) {
 
@@ -219,9 +285,10 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 		 */
 		public function get_id_to_check( $values ) {
 			if ( $values['variation_id'] ) {
-				$min_max_rules = get_post_meta( $values['variation_id'], 'min_max_rules', true );
+				$min_max_rules     = get_post_meta( $values['variation_id'], 'min_max_rules', true );
+				$allow_combination = ( 'yes' === get_post_meta( $values['product_id'], 'allow_combination', true ) );
 
-				if ( 'yes' === $min_max_rules ) {
+				if ( 'yes' === $min_max_rules || ! $allow_combination ) {
 					$checking_id = $values['variation_id'];
 				} else {
 					$checking_id = $values['product_id'];
@@ -279,11 +346,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 
 					foreach ( $terms as $term ) {
 
-						if ( 'yes' === get_post_meta( $checking_id, 'minmax_category_group_of_exclude', true ) ) {
-							continue;
-						}
-
-						if ( 'yes' === get_post_meta( $checking_id, 'variation_minmax_category_group_of_exclude', true ) ) {
+						if ( 'yes' === get_post_meta( $checking_id, 'variation_minmax_category_group_of_exclude', true ) || 'yes' === get_post_meta( $values['product_id'], 'minmax_category_group_of_exclude', true ) ) {
 							continue;
 						}
 
@@ -373,7 +436,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 
 				if ( $this->minimum_order_quantity > 0 && $total_quantity < $this->minimum_order_quantity ) {
 					/* translators: %d: Minimum amount of items in the cart */
-					$this->add_error( sprintf( __( 'The minimum required items in cart is %d. Please add more items to your cart', 'woocommerce-min-max-quantities' ), $this->minimum_order_quantity ) . $excludes );
+					$this->add_error( sprintf( __( 'The minimum required items in cart is %d. Please increase the quantity in your cart.', 'woocommerce-min-max-quantities' ), $this->minimum_order_quantity ) . $excludes );
 
 					return;
 
@@ -381,23 +444,23 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 
 				if ( $this->maximum_order_quantity > 0 && $total_quantity > $this->maximum_order_quantity ) {
 					/* translators: %d: Maximum amount of items in the cart */
-					$this->add_error( sprintf( __( 'The maximum allowed order quantity is %d. Please remove some items from your cart.', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity ) );
+					$this->add_error( sprintf( __( 'The maximum allowed order quantity is %d. Please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity ) );
 
 					return;
 
 				}
 
 				// Check cart value.
-				if ( $this->minimum_order_value && $total_cost && $total_cost < $this->minimum_order_value ) {
+				if ( $this->minimum_order_value && $total_cost < $this->minimum_order_value ) {
 					/* translators: %s: Minimum order value */
-					$this->add_error( sprintf( __( 'The minimum required order value is %s. Please add more items to your cart', 'woocommerce-min-max-quantities' ), wc_price( $this->minimum_order_value ) ) . $excludes );
+					$this->add_error( sprintf( __( 'The minimum required order value is %s. Please increase the quantity in your cart.', 'woocommerce-min-max-quantities' ), wc_price( $this->minimum_order_value ) ) . $excludes );
 
 					return;
 				}
 
-				if ( $this->maximum_order_value && $total_cost && $total_cost > $this->maximum_order_value ) {
+				if ( $this->maximum_order_value && $total_cost > $this->maximum_order_value ) {
 					/* translators: %s: Maximum order value */
-					$this->add_error( sprintf( __( 'The maximum allowed order value is %s. Please remove some items from your cart.', 'woocommerce-min-max-quantities' ), wc_price( $this->maximum_order_value ) ) );
+					$this->add_error( sprintf( __( 'The maximum allowed order value is %s. Please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), wc_price( $this->maximum_order_value ) ) );
 
 					return;
 				}
@@ -498,24 +561,24 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 
 				if ( $allow_combination && ( $product->is_type( 'variation' ) || $product->is_type( 'variable' ) ) ) {
 					/* translators: %1$s: Product name, %2$s: Minimum order quantity */
-					$this->add_error( sprintf( __( 'The minimum order quantity for %1$s is %2$s - please increase the quantity in your cart or add additional variation of this product.', 'woocommerce-min-max-quantities' ), $product->get_title(), $minimum_quantity ) );
+					$this->add_error( sprintf( __( 'The minimum required order quantity for %1$s is %2$s. Please increase the quantity in your cart or add additional variation of this product.', 'woocommerce-min-max-quantities' ), $product->get_title(), $minimum_quantity ) );
 				} else {
 					/* translators: %1$s: Product name, %2$s: Minimum order quantity */
-					$this->add_error( sprintf( __( 'The minimum order quantity for %1$s is %2$s - please increase the quantity in your cart.', 'woocommerce-min-max-quantities' ), $product->get_title(), $minimum_quantity ) );
+					$this->add_error( sprintf( __( 'The minimum required order quantity for %1$s is %2$s. Please increase the quantity in your cart.', 'woocommerce-min-max-quantities' ), $product->get_title(), $minimum_quantity ) );
 				}
 			} elseif ( $maximum_quantity > 0 && $quantity > $maximum_quantity ) {
 				if ( $allow_combination && ( $product->is_type( 'variation' ) || $product->is_type( 'variable' ) ) ) {
 					/* translators: %1$s: Product name, %2$s: Maximum order quantity */
-					$this->add_error( sprintf( __( 'The maximum allowed quantity for %1$s is %2$s - please decrease the quantity in your cart or remove additional variation of this product.', 'woocommerce-min-max-quantities' ), $product->get_title(), $maximum_quantity ) );
+					$this->add_error( sprintf( __( 'The maximum allowed quantity for %1$s is %2$s. Please decrease the quantity in your cart or remove additional variation of this product.', 'woocommerce-min-max-quantities' ), $product->get_title(), $maximum_quantity ) );
 				} else {
 					/* translators: %1$s: Product name, %2$s: Maximum order quantity */
-					$this->add_error( sprintf( __( 'The maximum allowed quantity for %1$s is %2$s - please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), $product->get_title(), $maximum_quantity ) );
+					$this->add_error( sprintf( __( 'The maximum allowed quantity for %1$s is %2$s. Please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), $product->get_title(), $maximum_quantity ) );
 				}
 			}
 
 			if ( $group_of_quantity > 0 && ( intval( $quantity ) % intval( $group_of_quantity ) > 0 ) ) {
 				/* translators: %1$s: Product name, %2$d: Group amount */
-				$this->add_error( sprintf( __( '%1$s must be bought in groups of %2$d. Please add or decrease items to continue.', 'woocommerce-min-max-quantities' ), $product->get_title(), $group_of_quantity, $group_of_quantity - ( $quantity % $group_of_quantity ) ) );
+				$this->add_error( sprintf( __( '%1$s must be bought in groups of %2$d. Please increase or decrease the quantity to continue.', 'woocommerce-min-max-quantities' ), $product->get_title(), $group_of_quantity, $group_of_quantity - ( $quantity % $group_of_quantity ) ) );
 			}
 		}
 
@@ -529,36 +592,43 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 		 * @return mixed
 		 */
 		public function add_to_cart( $pass, $product_id, $quantity, $variation_id = 0 ) {
-			$rule_for_variaton = false;
-
-			$allow_combination = 'yes' === get_post_meta( $product_id, 'allow_combination', true );
-
-			if ( 0 < $variation_id && $allow_combination ) {
-				return $pass;
-			}
+			$rule_for_variation = false;
+			$allow_combination  = 'yes' === get_post_meta( $product_id, 'allow_combination', true );
+			$exclude_from_count = false;
 
 			// Product level.
 			if ( $variation_id ) {
 
-				$min_max_rules = get_post_meta( $variation_id, 'min_max_rules', true );
+				$min_max_rules       = get_post_meta( $variation_id, 'min_max_rules', true );
+				$minmax_do_not_count = get_post_meta( $variation_id, 'variation_minmax_do_not_count', true );
+				$minmax_cart_exclude = get_post_meta( $variation_id, 'variation_minmax_cart_exclude', true );
 
 				if ( 'yes' === $min_max_rules ) {
 
-					$maximum_quantity  = absint( get_post_meta( $variation_id, 'variation_maximum_allowed_quantity', true ) );
-					$minimum_quantity  = absint( get_post_meta( $variation_id, 'variation_minimum_allowed_quantity', true ) );
-					$rule_for_variaton = true;
+					$maximum_quantity   = absint( get_post_meta( $variation_id, 'variation_maximum_allowed_quantity', true ) );
+					$minimum_quantity   = absint( get_post_meta( $variation_id, 'variation_minimum_allowed_quantity', true ) );
+					$rule_for_variation = true;
 
 				} else {
 
 					$maximum_quantity = absint( get_post_meta( $product_id, 'maximum_allowed_quantity', true ) );
 					$minimum_quantity = absint( get_post_meta( $product_id, 'minimum_allowed_quantity', true ) );
 
+					if ( ! $allow_combination ) {
+						$rule_for_variation = true;
+					}
 				}
 			} else {
 
-				$maximum_quantity = absint( get_post_meta( $product_id, 'maximum_allowed_quantity', true ) );
-				$minimum_quantity = absint( get_post_meta( $product_id, 'minimum_allowed_quantity', true ) );
+				$minmax_do_not_count = get_post_meta( $product_id, 'minmax_do_not_count', true );
+				$minmax_cart_exclude = get_post_meta( $product_id, 'minmax_cart_exclude', true );
+				$maximum_quantity    = absint( get_post_meta( $product_id, 'maximum_allowed_quantity', true ) );
+				$minimum_quantity    = absint( get_post_meta( $product_id, 'minimum_allowed_quantity', true ) );
 
+			}
+
+			if ( 'yes' === $minmax_do_not_count || 'yes' === $minmax_cart_exclude ) {
+				$exclude_from_count = true;
 			}
 
 			$total_quantity = $quantity;
@@ -572,7 +642,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 					continue;
 				}
 
-				if ( $rule_for_variaton ) {
+				if ( $rule_for_variation ) {
 
 					if ( $values['variation_id'] === $variation_id ) {
 
@@ -593,12 +663,12 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 					$_product = wc_get_product( $product_id );
 
 					/* translators: %1$s: Product name, %2$d: Maximum quantity, %3$s: Currenty quantity */
-					$message = sprintf( __( 'The maximum allowed quantity for %1$s is %2$d (you currently have %3$s in your cart).', 'woocommerce-min-max-quantities' ), $_product->get_title(), $maximum_quantity, $total_quantity - $quantity );
+					$message = sprintf( __( 'The maximum allowed quantity for %1$s is %2$d (you currently have %3$s in your cart). Please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), $_product->get_title(), $maximum_quantity, $total_quantity - $quantity );
 
 					// If quantity requirement is met, show cart link.
 					if ( intval( $maximum_quantity ) <= intval( $total_quantity - $quantity ) ) {
 						/* translators: %1$s: Product name, %2$d: Maximum quantity, %3$s: Currenty quantity, %4$s: Cart link */
-						$message = sprintf( __( 'The maximum allowed quantity for %1$s is %2$d (you currently have %3$s in your cart). <a href="%4$s" class="woocommerce-min-max-quantities-error-cart-link button wc-forward">View cart</a>', 'woocommerce-min-max-quantities' ), $_product->get_title(), $maximum_quantity, $total_quantity - $quantity, esc_url( wc_get_cart_url() ) );
+						$message = sprintf( __( 'The maximum allowed quantity for %1$s is %2$d (you currently have %3$s in your cart). Please decrease the quantity in your cart. <a href="%4$s" class="woocommerce-min-max-quantities-error-cart-link button wc-forward">View cart</a>', 'woocommerce-min-max-quantities' ), $_product->get_title(), $maximum_quantity, $total_quantity - $quantity, esc_url( wc_get_cart_url() ) );
 					}
 
 					$this->add_error( $message );
@@ -608,12 +678,12 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 			}
 
 			if ( isset( $minimum_quantity ) && $minimum_quantity > 0 ) {
-				if ( $total_quantity < $minimum_quantity ) {
+				if ( $pass && $total_quantity < $minimum_quantity ) {
 
 					$_product = wc_get_product( $product_id );
 
 					/* translators: %1$s: Product name, %2$d: Minimum quantity, %3$s: Currenty quantity */
-					$this->add_error( sprintf( __( 'The minimum allowed quantity for %1$s is %2$d (you currently have %3$s in your cart).', 'woocommerce-min-max-quantities' ), $_product->get_title(), $minimum_quantity, $total_quantity - $quantity ) );
+					$this->add_error( sprintf( __( 'The minimum required quantity for %1$s is %2$d (you currently have %3$s in your cart). Please increase the quantity in your cart.', 'woocommerce-min-max-quantities' ), $_product->get_title(), $minimum_quantity, $total_quantity ) );
 
 					$pass = true;
 				}
@@ -621,25 +691,59 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 
 			// If product level quantity are not set then check global order quantity.
 			if ( empty( $maximum_quantity ) && empty( $minimum_quantity ) ) {
-				$total_quantity = intval( WC()->cart->get_cart_contents_count() + $quantity );
+				$total_quantity = 0;
+
+				// Check each product in the cart to determine if it should count towards total.
+				foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
+					$product     = $values['data'];
+					$checking_id = $this->get_id_to_check( $values );
+
+					if ( apply_filters( 'wc_min_max_cart_quantity_do_not_count', false, $checking_id, $cart_item_key, $values ) ) {
+						$values['quantity'] = 0;
+					}
+
+					// Do_not_count and cart_exclude from variation or product.
+					$minmax_do_not_count = apply_filters( 'wc_min_max_quantity_minmax_do_not_count', ( 'yes' === get_post_meta( $checking_id, 'variation_minmax_do_not_count', true ) ? 'yes' : get_post_meta( $values['product_id'], 'minmax_do_not_count', true ) ), $checking_id, $cart_item_key, $values );
+
+					$minmax_cart_exclude = apply_filters( 'wc_min_max_quantity_minmax_cart_exclude', ( 'yes' === get_post_meta( $checking_id, 'variation_minmax_cart_exclude', true ) ? 'yes' : get_post_meta( $values['product_id'], 'minmax_cart_exclude', true ) ), $checking_id, $cart_item_key, $values );
+
+					// If either the do not count or exclude options are set, don't count this product.
+					if ( 'yes' === $minmax_do_not_count || 'yes' === $minmax_cart_exclude ) {
+						$this->excludes[] = $product->get_title();
+					} else {
+						$total_quantity += $values['quantity'];
+					}
+				}
+
+				// Check if we should count the product being added to our total.
+				if ( ! $exclude_from_count ) {
+					$total_quantity += $quantity;
+				}
 
 				if ( $this->maximum_order_quantity && $this->maximum_order_quantity > 0 ) {
 					if ( $total_quantity > $this->maximum_order_quantity ) {
+						$error_message    = '';
+						$excludes_message = '';
+
+						// If we have excluded products, add that as a label to our error.
+						if ( count( $this->excludes ) > 0 ) {
+							$excludes_message = ' (' . __( 'excludes ', 'woocommerce-min-max-quantities' ) . implode( ', ', $this->excludes ) . ')';
+						}
+
 						if ( 0 === $total_quantity - $quantity ) {
 							/* translators: %d: Maximum quantity in cart */
-							$this->add_error( sprintf( __( 'The maximum allowed items in cart is %d.', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity ) );
+							$error_message = sprintf( __( 'The maximum allowed items in cart is %d. Please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity );
 						} else {
 							/* translators: %1$d: Maximum quanity, %2$d: Current quantity */
-							$message = sprintf( __( 'The maximum allowed items in cart is %1$d (you currently have %2$d in your cart).', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity, $total_quantity - $quantity );
+							$error_message = sprintf( __( 'The maximum allowed items in cart is %1$d (you currently have %2$d in your cart). Please decrease the quantity in your cart.', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity, $total_quantity - $quantity );
 
 							if ( intval( $this->maximum_order_quantity ) <= intval( $total_quantity - $quantity ) ) {
 								/* translators: %1$d: Maximum quanity, %2$d: Current quantity, %3$s: Cart link */
-								$message = sprintf( __( 'The maximum allowed items in cart is %1$d (you currently have %2$d in your cart). <a href="%3$s" class="woocommerce-min-max-quantities-error-cart-link button wc-forward">View cart</a>', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity, $total_quantity - $quantity, esc_url( wc_get_cart_url() ) );
+								$error_message = sprintf( __( 'The maximum allowed items in cart is %1$d (you currently have %2$d in your cart). Please decrease the quantity in your cart. <a href="%3$s" class="woocommerce-min-max-quantities-error-cart-link button wc-forward">View cart</a>', 'woocommerce-min-max-quantities' ), $this->maximum_order_quantity, $total_quantity - $quantity, esc_url( wc_get_cart_url() ) );
 							}
-
-							$this->add_error( $message );
 						}
 
+						$this->add_error( $error_message . $excludes_message );
 						$pass = false;
 					}
 				}
@@ -662,7 +766,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 				return $data;
 			}
 
-			$group_of_quantity = get_post_meta( $product->get_id(), 'group_of_quantity', true );
+			$group_of_quantity = $this->get_group_of_quantity_for_product( $product );
 			$minimum_quantity  = get_post_meta( $product->get_id(), 'minimum_allowed_quantity', true );
 			$maximum_quantity  = get_post_meta( $product->get_id(), 'maximum_allowed_quantity', true );
 			$allow_combination = 'yes' === get_post_meta( version_compare( WC_VERSION, '3.0', '<' ) ? $product->get_id() : $product->get_parent_id(), 'allow_combination', true );
@@ -718,7 +822,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 				}
 			}
 
-			if ( $minimum_quantity ) {
+			if ( isset( $minimum_quantity ) && strlen( $minimum_quantity ) ) {
 
 				if ( $product->managing_stock() && ! $product->backorders_allowed() && absint( $minimum_quantity ) > $product->get_stock_quantity() ) {
 					$data['min_value'] = $product->get_stock_quantity();
@@ -745,7 +849,7 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 				$data['step'] = 1;
 
 				// If both minimum and maximum quantity are set, make sure both are equally divisble by qroup of quantity.
-				if ( $maximum_quantity && $minimum_quantity ) {
+				if ( $maximum_quantity && ( isset( $minimum_quantity ) && strlen( $minimum_quantity ) ) ) {
 
 					if ( absint( $maximum_quantity ) % absint( $group_of_quantity ) === 0 && absint( $minimum_quantity ) % absint( $group_of_quantity ) === 0 ) {
 						$data['step'] = $group_of_quantity;
@@ -756,8 +860,15 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 					$data['step'] = $group_of_quantity;
 				}
 
-				// Set a new minimum if group of is set but not minimum.
-				if ( ! $minimum_quantity ) {
+				/**
+				 * Check if we should use the group of setting as our minimum.
+				 *
+				 * @since 2.4.22
+				 * @param boolean    $use_group Whether we should use the group of setting.
+				 * @param WC_Product $product   Product object.
+				 * @param array      $data      Available product data.
+				 */
+				if ( ( ! isset( $minimum_quantity ) || ! strlen( $minimum_quantity ) ) && apply_filters( 'wc_min_max_use_group_as_min_quantity', true, $product, $data ) ) {
 					$data['min_value'] = $group_of_quantity;
 				}
 			}
@@ -767,12 +878,34 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 				// If we have a group of quantity and no minimum then set the quantity to the group of quantity.
 				if ( ! empty( $minimum_quantity ) ) {
 					$data['input_value'] = $minimum_quantity;
-				} elseif ( ! empty( $group_of_quantity ) ) {
+				} elseif ( ! empty( $group_of_quantity ) && $this->use_group_as_min_quantity( true, $product, $data ) ) {
 					$data['input_value'] = $group_of_quantity;
 				}
 			}
 
 			return $data;
+		}
+
+		/**
+		 * If on a grouped product page, don't use Group as for our minimum.
+		 *
+		 * @param boolean $use_group Whether to use group quantity as minimum. Default true.
+		 * @param object  $product   Product object.
+		 * @param array   $data      Available product data.
+		 * @return boolean
+		 */
+		public function use_group_as_min_quantity( $use_group, $product, $data ) {
+			$parent_product = wc_get_product( get_queried_object_id() );
+
+			if (
+				$parent_product
+				&& $parent_product->get_id() !== $product->get_id()
+				&& 'grouped' === $parent_product->get_type()
+			) {
+				return false;
+			}
+
+			return $use_group;
 		}
 
 		/**
@@ -889,6 +1022,111 @@ if ( ! class_exists( 'WC_Min_Max_Quantities' ) ) :
 			}
 
 			return $data;
+		}
+
+		/**
+		 * Get group_of_quantity setting for a product.
+		 *
+		 * @param WC_Product $product Product object.
+		 *
+		 * @return int
+		 */
+		public function get_group_of_quantity_for_product( $product ) {
+			$transient_name    = 'wc_min_max_group_quantity_' . $product->get_id();
+			$transient_version = WC_Cache_Helper::get_transient_version( 'wc_min_max_group_quantity' );
+			$transient_value   = get_transient( $transient_name );
+
+			if ( isset( $transient_value['value'], $transient_value['version'] ) && $transient_value['version'] === $transient_version ) {
+				return absint( $transient_value['value'] );
+			}
+
+			$group_of_quantity = get_post_meta( $product->get_id(), 'group_of_quantity', true );
+
+			// If the product level group_of_quantity is not set, check for category settings.
+			// If the product has multiple categories, use the smallest value.
+			if ( ! $group_of_quantity && 'yes' !== get_post_meta( $product->get_id(), 'minmax_category_group_of_exclude', true ) ) {
+				$terms          = get_the_terms( $product->get_id(), 'product_cat' );
+				$found_settings = [];
+
+				if ( $terms && ! is_wp_error( $terms ) ) {
+					foreach ( $terms as $term ) {
+						$found_settings[] = intval( get_term_meta( $term->term_id, 'group_of_quantity', true ) );
+					}
+
+					$found_settings = array_filter( $found_settings );
+
+					if ( ! empty( $found_settings ) ) {
+						$group_of_quantity = min( $found_settings );
+					}
+				}
+			}
+
+			$transient_value = array(
+				'version' => $transient_version,
+				'value'   => absint( $group_of_quantity ),
+			);
+
+			set_transient( $transient_name, $transient_value, DAY_IN_SECONDS * 30 );
+
+			return absint( $group_of_quantity );
+		}
+
+		/**
+		 * Modify quantity for add to cart action inside loop to respect minimum rules.
+		 *
+		 * @param int $product_id Product ID.
+		 *
+		 * @return int
+		 */
+		public function modify_add_to_cart_quantity( $product_id ) {
+			if ( ! isset( $_GET['add-to-cart'] ) || ! is_numeric( wp_unslash( $_GET['add-to-cart'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+				return $product_id;
+			}
+
+			if ( ! empty( $_REQUEST['quantity'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				return $product_id;
+			}
+
+			$product = wc_get_product( $product_id );
+
+			if ( ! is_a( $product, 'WC_Product' ) || 'variable' === $product->get_type() ) {
+				return $product_id;
+			}
+
+			$quantity = 0;
+
+			foreach ( WC()->cart->get_cart() as $cart_item ) {
+				if ( intval( $product->get_id() ) === intval( $cart_item['product_id'] ) ) {
+					$quantity = $cart_item['quantity'];
+					break; // stop the loop if product is found.
+				}
+			}
+
+			$minimum_quantity  = absint( get_post_meta( $product->get_id(), 'minimum_allowed_quantity', true ) );
+			$group_of_quantity = $this->get_group_of_quantity_for_product( $product );
+
+			if ( $quantity < $minimum_quantity ) {
+				$_REQUEST['quantity'] = $minimum_quantity - $quantity;
+				return $product_id;
+			}
+
+			if ( $group_of_quantity ) {
+				if ( $group_of_quantity > $quantity ) {
+					$_REQUEST['quantity'] = $group_of_quantity - $quantity;
+					return $product_id;
+				}
+
+				$remainder = $quantity % $group_of_quantity;
+
+				if ( 0 === $remainder ) {
+					$_REQUEST['quantity'] = $group_of_quantity;
+				} else {
+					$_REQUEST['quantity'] = $group_of_quantity - $remainder;
+				}
+				return $product_id;
+			}
+
+			return $product_id;
 		}
 	}
 

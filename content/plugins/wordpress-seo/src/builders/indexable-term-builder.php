@@ -2,6 +2,8 @@
 
 namespace Yoast\WP\SEO\Builders;
 
+use Yoast\WP\SEO\Exceptions\Indexable\Invalid_Term_Exception;
+use Yoast\WP\SEO\Exceptions\Indexable\Term_Not_Found_Exception;
 use Yoast\WP\SEO\Helpers\Taxonomy_Helper;
 use Yoast\WP\SEO\Models\Indexable;
 
@@ -11,6 +13,7 @@ use Yoast\WP\SEO\Models\Indexable;
  * Formats the term meta to indexable format.
  */
 class Indexable_Term_Builder {
+
 	use Indexable_Social_Image_Trait;
 
 	/**
@@ -21,24 +24,14 @@ class Indexable_Term_Builder {
 	private $taxonomy;
 
 	/**
-	 * The link builder.
-	 *
-	 * @var Indexable_Link_Builder
-	 */
-	protected $link_builder;
-
-	/**
 	 * Indexable_Term_Builder constructor.
 	 *
-	 * @param Taxonomy_Helper        $taxonomy     The taxonomy helper.
-	 * @param Indexable_Link_Builder $link_builder The link builder.
+	 * @param Taxonomy_Helper $taxonomy The taxonomy helper.
 	 */
 	public function __construct(
-		Taxonomy_Helper $taxonomy,
-		Indexable_Link_Builder $link_builder
+		Taxonomy_Helper $taxonomy
 	) {
-		$this->taxonomy     = $taxonomy;
-		$this->link_builder = $link_builder;
+		$this->taxonomy = $taxonomy;
 	}
 
 	/**
@@ -48,18 +41,25 @@ class Indexable_Term_Builder {
 	 * @param Indexable $indexable The indexable to format.
 	 *
 	 * @return bool|Indexable The extended indexable. False when unable to build.
+	 *
+	 * @throws Invalid_Term_Exception When the term is invalid.
+	 * @throws Term_Not_Found_Exception When the term is not found.
 	 */
 	public function build( $term_id, $indexable ) {
 		$term = \get_term( $term_id );
 
-		if ( $term === null || \is_wp_error( $term ) ) {
-			return false;
+		if ( $term === null ) {
+			throw new Term_Not_Found_Exception();
+		}
+
+		if ( \is_wp_error( $term ) ) {
+			throw new Invalid_Term_Exception( $term->get_error_message() );
 		}
 
 		$term_link = \get_term_link( $term, $term->taxonomy );
 
 		if ( \is_wp_error( $term_link ) ) {
-			return false;
+			throw new Invalid_Term_Exception( $term_link->get_error_message() );
 		}
 
 		$term_meta = $this->taxonomy->get_term_meta( $term );
@@ -89,7 +89,6 @@ class Indexable_Term_Builder {
 		}
 
 		$this->handle_social_images( $indexable );
-		$this->link_builder->build( $indexable, $term->description );
 
 		$indexable->is_cornerstone = $this->get_meta_value( 'wpseo_is_cornerstone', $term_meta );
 
@@ -127,7 +126,7 @@ class Indexable_Term_Builder {
 	 * @param string $keyword The focus keyword that is set.
 	 * @param int    $score   The score saved on the meta data.
 	 *
-	 * @return null|int Score to use.
+	 * @return int|null Score to use.
 	 */
 	protected function get_keyword_score( $keyword, $score ) {
 		if ( empty( $keyword ) ) {
@@ -167,7 +166,7 @@ class Indexable_Term_Builder {
 	 * @param string $meta_key  The key to extract.
 	 * @param array  $term_meta The meta data.
 	 *
-	 * @return null|string The meta value.
+	 * @return string|null The meta value.
 	 */
 	protected function get_meta_value( $meta_key, $term_meta ) {
 		if ( ! $term_meta || ! \array_key_exists( $meta_key, $term_meta ) ) {

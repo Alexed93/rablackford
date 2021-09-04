@@ -2,6 +2,7 @@
 
 namespace Yoast\WP\SEO\Helpers;
 
+use WP_Post;
 use Yoast\WP\SEO\Wrappers\WP_Query_Wrapper;
 
 /**
@@ -19,9 +20,9 @@ class Current_Page_Helper {
 	/**
 	 * Current_Page_Helper constructor.
 	 *
-	 * @param WP_Query_Wrapper $wp_query_wrapper The wrapper for WP_Query.
-	 *
 	 * @codeCoverageIgnore It only sets dependencies.
+	 *
+	 * @param WP_Query_Wrapper $wp_query_wrapper The wrapper for WP_Query.
 	 */
 	public function __construct(
 		WP_Query_Wrapper $wp_query_wrapper
@@ -226,11 +227,14 @@ class Current_Page_Helper {
 	 * @return bool Whether or not the current page is a static posts page.
 	 */
 	public function is_static_posts_page() {
-		$wp_query = $this->wp_query_wrapper->get_main_query();
+		$wp_query       = $this->wp_query_wrapper->get_main_query();
+		$queried_object = $wp_query->get_queried_object();
 
-		$page_for_posts = (int) \get_option( 'page_for_posts' );
-
-		return ( $page_for_posts > 0 && $page_for_posts === $wp_query->get_queried_object_id() );
+		return (
+			$wp_query->is_posts_page &&
+			\is_a( $queried_object, WP_Post::class ) &&
+			$queried_object->post_type === 'page'
+		);
 	}
 
 	/**
@@ -411,11 +415,27 @@ class Current_Page_Helper {
 		static $is_yoast_seo;
 
 		if ( $is_yoast_seo === null ) {
-			$current_page = filter_input( INPUT_GET, 'page' );
-			$is_yoast_seo = ( strpos( $current_page, 'wpseo_' ) === 0 );
+			$current_page = \filter_input( \INPUT_GET, 'page' );
+			$is_yoast_seo = ( \strpos( $current_page, 'wpseo_' ) === 0 );
 		}
 
 		return $is_yoast_seo;
+	}
+
+	/**
+	 * Returns the current Yoast SEO page.
+	 * (E.g. the `page` query variable in the URL).
+	 *
+	 * @return string The current Yoast SEO page.
+	 */
+	public function get_current_yoast_seo_page() {
+		static $current_yoast_seo_page;
+
+		if ( $current_yoast_seo_page === null ) {
+			$current_yoast_seo_page = \filter_input( \INPUT_GET, 'page' );
+		}
+
+		return $current_yoast_seo_page;
 	}
 
 	/**

@@ -59,7 +59,7 @@ if ( wc_tax_enabled() ) {
 			foreach ( $line_items as $item_id => $item ) {
 				do_action( 'woocommerce_before_order_item_' . $item->get_type() . '_html', $item_id, $item, $order );
 
-				include 'html-order-item.php';
+				include __DIR__ . '/html-order-item.php';
 
 				do_action( 'woocommerce_order_item_' . $item->get_type() . '_html', $item_id, $item, $order );
 			}
@@ -69,7 +69,7 @@ if ( wc_tax_enabled() ) {
 		<tbody id="order_fee_line_items">
 			<?php
 			foreach ( $line_items_fee as $item_id => $item ) {
-				include 'html-order-fee.php';
+				include __DIR__ . '/html-order-fee.php';
 			}
 			do_action( 'woocommerce_admin_order_items_after_fees', $order->get_id() );
 			?>
@@ -78,7 +78,7 @@ if ( wc_tax_enabled() ) {
 			<?php
 			$shipping_methods = WC()->shipping() ? WC()->shipping()->load_shipping_methods() : array();
 			foreach ( $line_items_shipping as $item_id => $item ) {
-				include 'html-order-shipping.php';
+				include __DIR__ . '/html-order-shipping.php';
 			}
 			do_action( 'woocommerce_admin_order_items_after_shipping', $order->get_id() );
 			?>
@@ -89,7 +89,7 @@ if ( wc_tax_enabled() ) {
 
 			if ( $refunds ) {
 				foreach ( $refunds as $refund ) {
-					include 'html-order-refund.php';
+					include __DIR__ . '/html-order-refund.php';
 				}
 				do_action( 'woocommerce_admin_order_items_after_refunds', $order->get_id() );
 			}
@@ -189,7 +189,10 @@ if ( wc_tax_enabled() ) {
 					<td class="label"><?php echo esc_html( $tax_total->label ); ?>:</td>
 					<td width="1%"></td>
 					<td class="total">
-						<?php echo wc_price( $tax_total->amount, array( 'currency' => $order->get_currency() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped ?>
+						<?php
+							// We use wc_round_tax_total here because tax may need to be round up or round down depending upon settings, whereas wc_price alone will always round it down.
+							echo wc_price( wc_round_tax_total( $tax_total->amount ), array( 'currency' => $order->get_currency() ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						?>
 					</td>
 				</tr>
 			<?php endforeach; ?>
